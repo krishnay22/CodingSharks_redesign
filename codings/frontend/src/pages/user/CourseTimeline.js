@@ -1,14 +1,20 @@
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import ProgressBar from "react-bootstrap/ProgressBar";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 
 export default function CourseTimeline() {
+  const [selectedTopic, setSelectedTopic] = useState(null);
+  const topics = {
+    "Front End": ["JS", "Operators", "Strings", "If-Else"],
+    "Back End": ["if Statements", "Loops", "Database Connection"]
+  };
+
   useEffect(() => {
     document.body.style.backgroundColor = "#F8F8F8";
-    document.body.style.overflow = "hidden"; // Disable scrolling
+    document.body.style.overflow = "hidden";
     return () => {
       document.body.style.backgroundColor = "";
-      document.body.style.overflow = ""; // Reset overflow on unmount
+      document.body.style.overflow = "";
     };
   }, []);
 
@@ -42,9 +48,7 @@ export default function CourseTimeline() {
           margin: "auto",
         }}
       >
-        <h3
-          style={{ fontSize: "15px", fontWeight: "bold", marginBottom: "10px" }}
-        >
+        <h3 style={{ fontSize: "15px", fontWeight: "bold", marginBottom: "10px" }}>
           Web Development
         </h3>
 
@@ -73,136 +77,70 @@ export default function CourseTimeline() {
           </p>
         </div>
 
-        {/* 📌 Rectangle Box 1 */}
-        <div
-          style={{
-            width: "1069px",
-            height: "220px",
-            border: "2px solid black",
-            borderRadius: "23px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 20px",
-            marginBottom: "20px",
-            marginTop: "-20px",
-          }}
-        >
-          <div style={{ width: "60px", height: "60px" }}>
-            <CircularProgressbar
-              value={51}
-              text={`94s`}
-              styles={buildStyles({
-                textSize: "16px",
-                pathColor: "#ff6600",
-                textColor: "#ff6600",
-                trailColor: "#d6d6d6",
-              })}
-            />
-          </div>
+        {/* Topic Sections */}
+        {["Front End", "Back End"].map((topic) => (
           <div
+            key={topic}
             style={{
+              width: "1069px",
+              border: "2px solid black",
+              borderRadius: "23px",
               display: "flex",
               flexDirection: "column",
-              alignItems: "flex-start",
+              alignItems: "center",
+              padding: "20px",
+              marginBottom: "20px",
+              cursor: "pointer",
             }}
+            onClick={() => setSelectedTopic(selectedTopic === topic ? null : topic)}
           >
-            <p
-              style={{
-                fontSize: "16px",
-                fontWeight: "bold",
-                marginRight: "854px",
-              }}
-            >
-              Front End
-            </p>
-            <ul
-              style={{
-                listStyleType: "none",
-                padding: "0",
-                margin: "5px 0 0 0",
-              }}
-            >
-              <li style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                <span
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    backgroundColor: "#ff6600",
-                    borderRadius: "50%",
-                  }}
-                ></span>
-                Tags and Attributes
-              </li>
-            </ul>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", width: "100%" }}>
+              <div style={{ width: "60px", height: "60px" }}>
+                <CircularProgressbar
+                  value={51}
+                  text={`94s`}
+                  styles={buildStyles({
+                    textSize: "16px",
+                    pathColor: "#ff6600",
+                    textColor: "#ff6600",
+                    trailColor: "#d6d6d6",
+                  })}
+                />
+              </div>
+              <p style={{ fontSize: "16px", fontWeight: "bold" }}>{topic}</p>
+            </div>
+            
+            {/* Topic List Inside Box */}
+            {selectedTopic === topic && (
+              <div
+                style={{
+                  width: "100%",
+                  marginTop: "10px",
+                  paddingTop: "10px",
+                  borderTop: "1px solid black",
+                  textAlign: "left",
+                }}
+              >
+                <h3 style={{ fontSize: "16px", fontWeight: "bold" }}>{topic}</h3>
+                <ul style={{ listStyleType: "none", padding: "0", margin: "5px 0 0 0" }}>
+                  {topics[topic].map((item, index) => (
+                    <li key={index} style={{ display: "flex", alignItems: "center", gap: "5px" }}>
+                      <span
+                        style={{
+                          width: "8px",
+                          height: "8px",
+                          backgroundColor: "#ff6600",
+                          borderRadius: "50%",
+                        }}
+                      ></span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
           </div>
-        </div>
-
-        {/* 📌 Rectangle Box 2 (Increased Height) */}
-        <div
-          style={{
-            width: "1069px",
-            height: "676px",
-            border: "2px solid black",
-            borderRadius: "23px",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "0 20px",
-            marginTop: "-11px",
-          }}
-        >
-          <div
-            style={{
-              width: "60px",
-              height: "60px",
-              alignSelf: "flex-start",
-              marginTop: "20px",
-            }}
-          >
-            <CircularProgressbar
-              value={51}
-              text={`94s`}
-              styles={buildStyles({
-                textSize: "16px",
-                pathColor: "#ff6600",
-                textColor: "#ff6600",
-                trailColor: "#d6d6d6",
-              })}
-            />
-          </div>
-          <div style={{ flex: 1, marginLeft: "42px",marginTop:"-267px" }}>
-            <p
-              style={{
-                fontSize: "16px",
-                fontWeight: "bold",
-                margin: "10px",
-                whiteSpace: "nowrap",
-              }}
-            >
-              Front End
-            </p>
-            <ul
-              style={{
-                listStyleType: "none",
-                padding: "0",
-                margin: "5px 0 0 0",
-              }}
-            >
-              <li style={{ display: "flex", alignItems: "center", gap: "5px" }}>
-                <span
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    backgroundColor: "#ff6600",
-                    borderRadius: "50%",
-                  }}
-                ></span>
-                Tags and Attributes
-              </li>
-            </ul>
-          </div>
-        </div>
+        ))}
       </div>
     </div>
   );
