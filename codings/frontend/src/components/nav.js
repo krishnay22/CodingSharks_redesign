@@ -1,5 +1,6 @@
-import { Container, Nav, Navbar, Button } from "react-bootstrap";
+import { Container, Nav, Navbar } from "react-bootstrap";
 import { NavLink } from "react-router-dom";
+import CustomButton from "./homecomponents/Landingbutoon";
 
 function Homenav() {
   return (
@@ -14,61 +15,91 @@ function Homenav() {
         <Navbar.Collapse id="basic-navbar-nav">
           {/* Align navigation links to center-left */}
           <Nav className="nav-links">
-            <Nav.Link as={NavLink} to="/" exact>
+            <Nav.Link as={NavLink} to="/" exact activeClassName="active">
               Home
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/dashboard">
+            <Nav.Link as={NavLink} to="/dashboard" activeClassName="active">
               Dashboard
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/courses">
+            <Nav.Link as={NavLink} to="/courses" activeClassName="active">
               Courses
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/students-work">
+            <Nav.Link as={NavLink} to="/students-work" activeClassName="active">
               Students Work
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/about">
+            <Nav.Link as={NavLink} to="/about" activeClassName="active">
               About us
             </Nav.Link>
           </Nav>
 
           {/* Keep login button on the far right */}
           <Nav className="ms-auto">
-            <Button as={NavLink} to="/login" className="login-btn">
-              Login
-            </Button>
+            <CustomButton
+              text="Login"
+              accentColor="#FF9A70"
+              primaryColor="#ffffff"
+            />
           </Nav>
         </Navbar.Collapse>
       </Navbar>
       <div className="nav-underline"></div>
 
-      {/* Inline CSS at the bottom */}
+      {/* CSS Styles */}
       <style>
         {`
-         .homenav {
-            padding: 2px 15px !important; /* 3px top & bottom, 5px left & right */
+          .homenav {
+            background-color: #ffffff !important; /* White background */
+            padding: 5px 20px !important;
+            font-size: 18px;
+          }
+
+          .brand-logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: rgb(0, 0, 0) !important;
+          }
+
+          .nav-underline {
+            height: 0.1px;
+            background-color: #ff9a70;
+            width: 100%;
           }
 
           .nav-links {
-            padding: 3px !important;
+            display: flex;
+            gap: 20px;
           }
 
-          .navbar-nav {
-            padding: 3px !important;
+          .nav-links a {
+            text-decoration: none;
+            font-size: 18px;
+            color: lightgray !important; /* Default inactive color */
+            transition: color 0.3s ease-in-out;
           }
 
-          .navbar-brand {
-            padding: 3px !important;
+          .nav-links a.active {
+            color:rgb(0, 0, 0) !important; /* Active link color */
           }
 
-          .navbar-collapse {
-            padding: 3px !important;
+          .nav-links a:hover {
+            color: #ff9a70 !important; /* Hover effect */
           }
 
           .login-btn {
-            padding: 5px 15px !important; /* Keep minimal padding for button */
+            background-color: white !important;
+            color: black !important;
+            border-radius: 50px !important;
+            padding: 5px 15px;
+            font-weight: bold;
+            border: 0.1px solid black !important;
+            transition: background-color 0.3s ease-in-out, border-color 0.3s ease-in-out;
           }
 
-s
+          .login-btn:hover {
+            background-color: #ff9a70 !important;
+            color: white !important;
+            border-color: #ff9a70 !important;
+          }
         `}
       </style>
     </>

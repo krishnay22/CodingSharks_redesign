@@ -7,10 +7,14 @@ import EnquirySection from "../../components/homecomponents/Enquire";
 
 const Home = () => {
   return (
-    <div style={{ width: "100%", overflow: "hidden" }}>
-      <EnquirySection />
-      <LogoSlider />
-    </div>
+    <>
+      <div style={{ width: "100%", overflow: "hidden" }}>
+        <EnquirySection />
+        <div style={{ margin: "180px 0px 100px 0px" }}>
+          <LogoSlider />
+        </div>
+      </div>
+    </>
   );
 };
 
