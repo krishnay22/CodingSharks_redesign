@@ -1,5 +1,6 @@
-import React from "react";
-import { Container } from "react-bootstrap";
+import React, { useEffect } from "react";
+import { motion, useAnimation } from "framer-motion";
+import { useInView } from "react-intersection-observer";
 
 // Array of logo images (replace with actual paths)
 const logos = [
@@ -11,92 +12,86 @@ const logos = [
   "https://upload.wikimedia.org/wikipedia/commons/b/bd/Tesla_Motors.svg",
 ];
 
-function LogoSlider() {
+function LogoDisplay() {
+  const controls = useAnimation();
+  const { ref, inView } = useInView({ triggerOnce: false, threshold: 0.1 });
+
+  useEffect(() => {
+    if (inView) {
+      controls.start("visible");
+    } else {
+      controls.start("hidden");
+    }
+  }, [controls, inView]);
+
   return (
-    <div className="logo-slider-container">
-      <h4 className="logo-slider-title">Our Students Work At</h4>
-      <div className="logo-slider">
-        <div className="logo-track">
-          {/* Duplicate logos to create a seamless effect */}
-          {[...logos, ...logos].map((logo, index) => (
-            <img
-              key={index}
-              src={logo}
-              alt="Company Logo"
-              className="logo-img"
-            />
-          ))}
-        </div>
+    <div className="logo-display-container" ref={ref}>
+      <h4 className="logo-display-title">Our students got placed at :</h4>
+      <div className="logo-grid">
+        {logos.map((logo, index) => (
+          <motion.img
+            key={index}
+            src={logo}
+            alt="Company Logo"
+            className="logo-img"
+            initial="hidden"
+            animate={controls}
+            transition={{ duration: 0.5, delay: index * 0.2 }}
+            variants={{
+              hidden: { opacity: 0, x: -50 },
+              visible: { opacity: 1, x: 0 },
+            }}
+          />
+        ))}
       </div>
 
-      {/* ✅ Moved CSS Inside `style jsx` */}
       <style jsx>{`
-        /* Logo Slider Container */
-        .logo-slider-container {
+        .logo-display-container {
           text-align: center;
-          margin: 100px 0; /* Adds 100px margin above and below */
-        }
-
-        /* Title Styling */
-        .logo-slider-title {
-          text-align: left;
-          margin-left: 90px;
-          font-size: 24px;
-          font-weight: bold;
-          margin-bottom: 15px;
-        }
-
-        /* Outer Wrapper */
-        .logo-slider {
-          width: 100%;
-          overflow: hidden;
-          white-space: nowrap;
-          position: relative;
-          margin-bottom: 15px;
-          margin-top: 50px;
-          padding: 10px;
-        }
-
-        /* Track for Sliding Logos */
-        .logo-track {
+          margin: 100px 0;
           display: flex;
-          gap: 40px;
-          animation: slide 15s linear infinite; /* Smooth infinite scroll */
+          flex-direction: column;
+          align-items: center;
         }
 
-        /* Individual Logo Styling */
+        .logo-display-title {
+          text-align: center;
+          font-size: 45px;
+          font-weight: 280;
+          margin-bottom: 40px;
+        }
+
+        .logo-grid {
+          display: grid;
+          grid-template-columns: repeat(3, 1fr);
+          justify-content: center;
+          align-items: center;
+          gap: 40px;
+          padding: 10px;
+          max-width: 80%;
+        }
+
         .logo-img {
           height: 60px;
-          filter: grayscale(100%);
-          transition: filter 0.3s ease-in-out;
+          width: auto;
+          max-width: 100%;
         }
 
-        .logo-img:hover {
-          filter: grayscale(0%);
-        }
-
-        /* Sliding Animation */
-        @keyframes slide {
-          from {
-            transform: translateX(0);
-          }
-          to {
-            transform: translateX(-50%);
-          }
-        }
-
-        /* Responsive adjustments */
         @media (max-width: 992px) {
-          .logo-slider-title {
+          .logo-display-title {
             font-size: 22px;
-            margin-left: 50px;
+          }
+          .logo-grid {
+            grid-template-columns: repeat(2, 1fr);
           }
         }
 
         @media (max-width: 576px) {
-          .logo-slider-title {
+          .logo-display-title {
             font-size: 18px;
-            margin-left: 30px;
+          }
+          .logo-grid {
+            grid-template-columns: repeat(1, 1fr);
           }
         }
       `}</style>
@@ -104,4 +99,4 @@ function LogoSlider() {
   );
 }
 
-export default LogoSlider;
+export default LogoDisplay;
