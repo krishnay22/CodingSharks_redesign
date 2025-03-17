@@ -26,7 +26,11 @@ function LogoDisplay() {
 
   return (
     <div className="logo-display-container" ref={ref}>
-      <h4 className="logo-display-title">Our students got placed at :</h4>
+      {/* Wrapped the title inside a div to apply full width and proper alignment */}
+      <div className="title-container">
+        <h4 className="logo-display-title">Our students got placed at :</h4>
+      </div>
+
       <div className="logo-grid">
         {logos.map((logo, index) => (
           <motion.img
@@ -54,11 +58,18 @@ function LogoDisplay() {
           align-items: center;
         }
 
+        /* New container to make sure the title aligns properly */
+        .title-container {
+          width: 100%; /* Ensures it spans the full width */
+          text-align: left; /* Forces left alignment */
+          padding-left: 3%; /* Adjusts positioning from the left */
+        }
+
         .logo-display-title {
-          text-align: center;
-          font-size: 45px;
-          font-weight: 280;
-          margin-bottom: 40px;
+          font-size: 65px;
+          font-weight: 100;
+          margin-bottom: 80px;
+          /* Removed text-align: left since it's now handled in .title-container */
         }
 
         .logo-grid {
@@ -72,7 +83,7 @@ function LogoDisplay() {
         }
 
         .logo-img {
-          height: 60px;
+          height: 73px;
           width: auto;
           max-width: 100%;
         }

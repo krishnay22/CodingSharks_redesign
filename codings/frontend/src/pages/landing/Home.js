@@ -4,7 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "./Landing.css";
 import LogoSlider from "../../components/homecomponents/logoslider";
 import EnquirySection from "../../components/homecomponents/Enquire";
-
+import CommunitySection from "../../components/homecomponents/Aboutus";
 const Home = () => {
   return (
     <>
@@ -12,6 +12,9 @@ const Home = () => {
         <EnquirySection />
         <div style={{ margin: "180px 0px 100px 0px" }}>
           <LogoSlider />
+        </div>
+        <div style={{ margin: "180px 0px 100px 0px" }}>
+          <CommunitySection />
         </div>
       </div>
     </>
