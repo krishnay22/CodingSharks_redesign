@@ -5,6 +5,8 @@ import "./Landing.css";
 import LogoSlider from "../../components/homecomponents/logoslider";
 import EnquirySection from "../../components/homecomponents/Enquire";
 import CommunitySection from "../../components/homecomponents/Aboutus";
+import CustomVerticalScrollbar from "../../components/homecomponents/teachingMethods";
+
 const Home = () => {
   return (
     <>
@@ -15,6 +17,9 @@ const Home = () => {
         </div>
         <div style={{ margin: "180px 0px 100px 0px" }}>
           <CommunitySection />
+        </div>
+        <div style={{ margin: "180px 0px 100px 0px" }}>
+          <CustomVerticalScrollbar />
         </div>
       </div>
     </>
