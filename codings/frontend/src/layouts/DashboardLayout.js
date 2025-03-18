@@ -4,11 +4,17 @@ import Header from "../components/Header";
 
 const DashboardLayout = () => {
   return (
-    <div className="d-flex">
+    <div className="d-flex vh-100">
+      {/* Sidebar with fixed width */}
       <SideNav />
-      <div className="flex-grow-1 d-flex flex-column">
+
+      {/* Main content wrapper */}
+      <div className="d-flex flex-column flex-grow-1">
         <Header />
-        <main className="flex-grow-1 p-3">
+        <main
+          className="flex-grow-1 p-3 overflow-auto"
+          style={{ marginLeft: "250px", minWidth: 0 }}
+        >
           <Outlet />
         </main>
       </div>
