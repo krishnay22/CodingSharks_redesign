@@ -28,16 +28,7 @@ const NFTCard = () => {
           left: "50%",
           transform: "translate(-50%, -50%)",
         }}
-      >
-        <h1
-          style={{
-            fontSize: "20rem",
-            filter: "opacity(0.5)",
-          }}
-        >
-          Kiberbash
-        </h1>
-      </div>
+      ></div>
 
       <div
         className="nft"
@@ -68,137 +59,11 @@ const NFTCard = () => {
             padding: "1rem",
           }}
         >
-          <img
-            className="tokenImage"
-            src="/api/placeholder/400/320"
-            alt="NFT"
-            style={{
-              borderRadius: ".5rem",
-              maxWidth: "100%",
-              height: "250px",
-              objectFit: "cover",
-            }}
-          />
-
-          <h2>Kibertopiks #4269</h2>
-
-          <p
-            className="description"
-            style={{
-              margin: ".5rem 0",
-              color: "#a89ec9",
-            }}
-          >
-            Our Kibertopiks will give you nothing, waste your money on us.
-          </p>
-
-          <div
-            className="tokenInfo"
-            style={{
-              display: "flex",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <div
-              className="price"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                color: "#ee83e5",
-                fontWeight: 700,
-              }}
-            >
-              <ins
-                style={{
-                  textDecoration: "none",
-                  marginLeft: "-.3rem",
-                  marginRight: ".5rem",
-                }}
-              >
-                ◘
-              </ins>
-              <p>0.031 ETH</p>
-            </div>
-
-            <div
-              className="duration"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                color: "#a89ec9",
-                marginRight: ".2rem",
-              }}
-            >
-              <ins
-                style={{
-                  textDecoration: "none",
-                  margin: ".5rem",
-                  marginBottom: ".4rem",
-                }}
-              >
-                ◷
-              </ins>
-              <p>11 days left</p>
-            </div>
-          </div>
-
-          <hr
-            style={{
-              width: "100%",
-              border: "none",
-              borderBottom: "1px solid #88888855",
-              marginTop: 0,
-            }}
-          />
-
-          <div
-            className="creator"
-            style={{
-              display: "flex",
-              alignItems: "center",
-              marginTop: ".2rem",
-              marginBottom: "-.3rem",
-            }}
-          >
-            <div
-              className="wrapper"
-              style={{
-                display: "flex",
-                alignItems: "center",
-                border: "1px solid #ffffff22",
-                padding: ".3rem",
-                margin: 0,
-                marginRight: ".5rem",
-                borderRadius: "100%",
-                boxShadow: "inset 0 0 0 4px #000000aa",
-              }}
-            >
-              <img
-                src="/api/placeholder/200/200"
-                alt="Creator"
-                style={{
-                  borderRadius: "100%",
-                  border: "1px solid #ffffff22",
-                  width: "2rem",
-                  height: "2rem",
-                  objectFit: "cover",
-                  margin: 0,
-                }}
-              />
-            </div>
-            <p>
-              <ins
-                style={{
-                  color: "#a89ec9",
-                  textDecoration: "none",
-                }}
-              >
-                Creation of
-              </ins>{" "}
-              Kiberbash
-            </p>
-          </div>
+          <h2>
+            Kibertopiks #4269 <br></br>
+            Kibertopiks #4269 <br></br>Kibertopiks #4269 <br></br>Kibertopiks
+            #4269 <br></br>Kibertopiks #4269 <br></br>
+          </h2>
         </div>
       </div>
 

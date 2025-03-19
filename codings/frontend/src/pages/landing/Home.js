@@ -1,12 +1,11 @@
 import React from "react";
 import { Container, Row, Col, Form, Button } from "react-bootstrap";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "./Landing.css";
 import LogoSlider from "../../components/homecomponents/logoslider";
 import EnquirySection from "../../components/homecomponents/Enquire";
 import CommunitySection from "../../components/homecomponents/Aboutus";
 import CustomVerticalScrollbar from "../../components/homecomponents/teachingMethods";
-
+import NFTCard from "../../components/homecomponents/cards";
 const Home = () => {
   return (
     <>
@@ -20,6 +19,9 @@ const Home = () => {
         </div>
         <div style={{ margin: "180px 0px 100px 0px" }}>
           <CustomVerticalScrollbar />
+        </div>
+        <div style={{ margin: "180px 0px 100px 0px" }}>
+          <NFTCard />
         </div>
       </div>
     </>
