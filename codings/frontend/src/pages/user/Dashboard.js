@@ -8,53 +8,103 @@ const NewComponent = () => {
   return (
     <div
       style={{
-        border: "2px solid black",  padding: "20px",borderRadius: "10px",position: "relative",minHeight: "650px",overflow: "hidden",background:"#F8F8F8",
-      }} >
+        border: "2px solid black",
+        padding: "20px",
+        borderRadius: "10px",
+        position: "relative",
+        minHeight: "650px",
+        overflow: "hidden",
+        background: "#F8F8F8",
+      }}
+    >
       <div className="container">
-        <div className="box">
-          <h4>Questions of the day</h4>
-        </div>
-
-        <div className="box1">
-          <h4 className="box2">Events</h4>
-          <div className="divider"></div>
-          <div className="nested-box">
-            <p>This will include future events</p>
+        <div className="row">
+          <div className="col-12">
+            <div className="box">
+              <h4>Questions of the day</h4>
+            </div>
           </div>
         </div>
 
-        <div className="box1">
-          <h4 className="box3">News</h4>
-          <div className="divider"></div>
-          <div className="nested-box"></div>
-        </div>
-
-        <div className="right-box">
-          <div className="progress-header">Web Development Progress</div>
-          <div className="divider"></div>
-          <p className="role">Front-end Developer</p>
-          <ul className="progress-list">
-            <li>Basic Document Structure</li>
-            <li>Tags and Attributes</li>
-            <li>List</li>
-          </ul>
-          <div className="progress-circle">
-            <CircularProgressbar
-              value={percentage}
-              text={`${percentage}%`}
-              styles={buildStyles({
-              textColor: "#333",pathColor: "#ff6600", trailColor: "#d6d6d6",})}/>
+        <div className="row mt-4">
+          <div className="col-md-6 col-sm-12">
+            <div className="box1">
+              <h4 className="box2">Events</h4>
+              <div className="divider"></div>
+              <div className="nested-box">
+                <p>This will include future events</p>
+              </div>
+            </div>
+            
+            <div className="box1 mt-4">
+              <h4 className="box3">News</h4>
+              <div className="divider"></div>
+              <div className="nested-box"></div>
+            </div>
+          </div>
+          
+          <div className="col-md-5 col-sm-12 offset-md-1">
+            <div className="right-box">
+              <div className="progress-header">Web Development Progress</div>
+              <div className="divider"></div>
+              <p className="role">Front-end Developer</p>
+              <ul className="progress-list">
+                <li>Basic Document Structure</li>
+                <li>Tags and Attributes</li>
+                <li>List</li>
+              </ul>
+              <div className="progress-circle">
+                <CircularProgressbar
+                  value={percentage}
+                  text={`${percentage}%`}
+                  styles={buildStyles({
+                    textColor: "#333",
+                    pathColor: "#ff6600",
+                    trailColor: "#d6d6d6",
+                  })}
+                />
+              </div>
+            </div>
           </div>
         </div>
+
         <style jsx>{`
           .container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             padding: 20px;
+            width: 100%;
+          }
+          .row {
+            display: flex;
+            flex-wrap: wrap;
+            margin-right: -15px;
+            margin-left: -15px;
+          }
+          .col-12 {
+            flex: 0 0 100%;
+            max-width: 100%;
+            padding: 0 15px;
+          }
+          .col-md-6 {
+            flex: 0 0 50%;
+            max-width: 50%;
+            padding: 0 15px;
+          }
+          .col-md-5 {
+            flex: 0 0 41.666667%;
+            max-width: 41.666667%;
+            padding: 0 15px;
+          }
+          .offset-md-1 {
+            margin-left: 8.333333%;
+          }
+          .col-sm-12 {
+            padding: 0 15px;
+          }
+          .mt-4 {
+            margin-top: 1.5rem;
           }
           .box {
-            width: 90%;
+            width: 100%;
             padding: 50px;
             background: white;
             border: 2px solid black;
@@ -62,51 +112,51 @@ const NewComponent = () => {
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
             margin-top: -16px;
             text-align: center;
+            position: relative;
           }
-            .box:hover {
-            border-color: #ff6600; 
+          .box:hover {
+            border-color: #ff6600;
           }
           .box h4 {
             position: absolute;
-            top: 10px;
-            left: 76px; 
+            top: -15px;
+            left: 50px;
             color: #333;
-            background-color: white; 
-            border: 2px solid #ff996e; 
-            border-radius: 8px; 
+            background-color: white;
+            border: 2px solid #ff996e;
+            border-radius: 8px;
             padding: 5px 10px;
           }
           .box1 {
-            width: 55%;
+            width: 100%;
             height: 180px;
-            margin-left: -389px;
             background: white;
             border: 2px solid black;
             border-radius: 19px;
-            margin-top: 20px;
-            top:89px;
+            position: relative;
           }
-            .box1:hover {
-            border-color: #ff6600; /* Change border color to orange */
-           }          
+          .box1:hover {
+            border-color: #ff6600;
+          }
           .box2 {
             position: absolute;
-            top: 134px;
+            top: -15px;
+            left: 20px;
             color: #333;
-            background-color: white; 
+            background-color: white;
             border: 2px solid #ff996e;
             border-radius: 8px;
-            padding: 4px 10px;  
+            padding: 4px 10px;
           }
-          
-            .box3 {
+          .box3 {
             position: absolute;
-            top: 334px;
+            top: -15px;
+            left: 20px;
             color: #333;
-            background-color: white; 
-            border: 2px solid #ff996e; 
+            background-color: white;
+            border: 2px solid #ff996e;
             border-radius: 8px;
-            padding: 4px 10px; 
+            padding: 4px 10px;
           }
           .divider {
             width: 100%;
@@ -116,7 +166,7 @@ const NewComponent = () => {
           }
           .nested-box {
             width: 90%;
-            margin-left: 30px;
+            margin-left: 5%;
             height: 96px;
             padding: 10px;
             background: white;
@@ -124,18 +174,15 @@ const NewComponent = () => {
             border-radius: 19px;
           }
           .right-box {
-            width: 275px;
+            width: 100%;
             padding: 15px;
             background: white;
             border: 2px solid black;
             border-radius: 19px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-            position: absolute;
-            right: 177px;
-            top: 145px;
           }
-           .right-box:hover {
-           border-color: #ff6600; /* Change border color to orange */
+          .right-box:hover {
+            border-color: #ff6600;
           }
           .progress-header {
             font-weight: bold;
@@ -160,9 +207,23 @@ const NewComponent = () => {
             height: 100px;
             margin: 15px auto;
           }
+          
+          @media (max-width: 768px) {
+            .col-md-6, .col-md-5 {
+              flex: 0 0 100%;
+              max-width: 100%;
+            }
+            .offset-md-1 {
+              margin-left: 0;
+            }
+            .right-box {
+              margin-top: 1.5rem;
+            }
+          }
         `}</style>
       </div>
     </div>
   );
 };
+
 export default NewComponent;
