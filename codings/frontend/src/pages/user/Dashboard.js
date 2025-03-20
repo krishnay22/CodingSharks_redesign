@@ -105,10 +105,10 @@ const NewComponent = () => {
           }
           .box {
             width: 100%;
-            padding: 50px;
+            padding: 65px;
             background: white;
             border: 2px solid black;
-            border-radius: 19px;
+            border-radius: 34px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
             margin-top: -16px;
             text-align: center;
@@ -120,7 +120,7 @@ const NewComponent = () => {
           .box h4 {
             position: absolute;
             top: -15px;
-            left: 50px;
+            left: -19px;
             color: #333;
             background-color: white;
             border: 2px solid #ff996e;
@@ -128,11 +128,11 @@ const NewComponent = () => {
             padding: 5px 10px;
           }
           .box1 {
-            width: 100%;
+            width: 119%;
             height: 180px;
             background: white;
             border: 2px solid black;
-            border-radius: 19px;
+            border-radius: 34px;
             position: relative;
           }
           .box1:hover {
@@ -141,7 +141,7 @@ const NewComponent = () => {
           .box2 {
             position: absolute;
             top: -15px;
-            left: 20px;
+            left: -19px;
             color: #333;
             background-color: white;
             border: 2px solid #ff996e;
@@ -151,7 +151,7 @@ const NewComponent = () => {
           .box3 {
             position: absolute;
             top: -15px;
-            left: 20px;
+            left: -19px;
             color: #333;
             background-color: white;
             border: 2px solid #ff996e;
@@ -159,23 +159,24 @@ const NewComponent = () => {
             padding: 4px 10px;
           }
           .divider {
-            width: 100%;
+            width: 96%;
             height: 1px;
             background: #ff996e;
-            margin: 24px 0;
+            margin: 22px 0;
           }
           .nested-box {
             width: 90%;
             margin-left: 5%;
-            height: 96px;
+            height: 87px;
             padding: 10px;
             background: white;
             border: 2px solid black;
             border-radius: 19px;
+             margin-top: 45px;
           }
           .right-box {
-            width: 100%;
-            padding: 15px;
+            width: 98%;
+            padding: 16px;
             background: white;
             border: 2px solid black;
             border-radius: 19px;
