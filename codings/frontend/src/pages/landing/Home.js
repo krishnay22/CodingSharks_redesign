@@ -6,7 +6,9 @@ import EnquirySection from "../../components/homecomponents/Enquire";
 import CommunitySection from "../../components/homecomponents/Aboutus";
 import CustomVerticalScrollbar from "../../components/homecomponents/teachingMethods";
 import NFTCard from "../../components/homecomponents/cards";
-import ReviewSlider from "../../components/homecomponents/reviews";
+import ReviewSlider from "../../components/homecomponents/ReviewSlider";
+import RecruitmentStories from "../../components/homecomponents/Slider";
+import Footer from "../../components/homecomponents/FooterForLandingpage";
 const Home = () => {
   return (
     <>
@@ -25,7 +27,13 @@ const Home = () => {
         <div style={{ margin: "180px 0px 100px 0px" }}>
           <NFTCard />
         </div>
+        <div style={{ margin: "80px 0px 80px 0px" }}>
+          <RecruitmentStories />
+        </div>
         <ReviewSlider />
+        <div style={{ margin: "80px 0px 0px 0px" }}>
+          <Footer />
+        </div>
       </div>
     </>
   );

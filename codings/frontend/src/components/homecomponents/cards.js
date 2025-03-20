@@ -36,7 +36,7 @@ const NFTCard = () => {
           userSelect: "none",
           maxWidth: "300px",
           margin: "5rem auto",
-          border: "1px solid #ffffff22",
+          border: "1px solidrgba(255, 255, 255, 0.05)",
           backgroundColor: "#282c34",
           background:
             "linear-gradient(0deg, rgba(40,44,52,1) 0%, rgba(17,0,32,.5) 100%)",
@@ -55,15 +55,22 @@ const NFTCard = () => {
           style={{
             display: "flex",
             flexDirection: "column",
-            width: "90%",
+            width: "100%",
             padding: "1rem",
           }}
         >
-          <h2>
-            Kibertopiks #4269 <br></br>
-            Kibertopiks #4269 <br></br>Kibertopiks #4269 <br></br>Kibertopiks
-            #4269 <br></br>Kibertopiks #4269 <br></br>
+          <img src="https://markovate.com/wp-content/uploads/2022/08/top-MERN-Stack.webp"></img>
+          <h2 style={{ margin: "10px 0px 10px 0px" }}>
+            MERN Stack Development
           </h2>
+
+          <p>
+            Our MERN Stack Development course teaches you to build dynamic
+            full-stack web applications using MongoDB, Express.js, React.js, and
+            Node.js. You’ll master JavaScript for both front-end and back-end
+            development, creating scalable, modern web applications from
+            scratch.
+          </p>
         </div>
       </div>
 
