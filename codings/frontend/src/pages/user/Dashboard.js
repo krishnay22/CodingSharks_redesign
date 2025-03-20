@@ -6,6 +6,7 @@ const NewComponent = () => {
   const [percentage, setPercentage] = useState(65);
 
   return (
+    
     <div
       style={{
         border: "2px solid black",
