@@ -30,7 +30,10 @@ const Home = () => {
         <div style={{ margin: "80px 0px 80px 0px" }}>
           <RecruitmentStories />
         </div>
-        <ReviewSlider />
+        <div style={{ margin: "180px 0px 80px 0px" }}>
+          <ReviewSlider />
+        </div>
+
         <div style={{ margin: "80px 0px 0px 0px" }}>
           <Footer />
         </div>

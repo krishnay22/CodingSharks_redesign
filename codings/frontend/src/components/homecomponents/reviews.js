@@ -6,7 +6,7 @@ export default function Review() {
     <div className="review-card">
       <img
         className="profile-pic"
-        src="https://static.vecteezy.com/system/resources/previews/039/334/802/large_2x/ai-generated-indian-female-student-free-photo.jpg"
+        src="https://media.istockphoto.com/id/1279504799/photo/businesswomans-portrait.jpg?s=612x612&w=0&k=20&c=I-54ajKgmxkY8s5-myHZDv_pcSCveaoopf1DH3arv0k="
         alt="Profile"
       />
       <div className="review-content">

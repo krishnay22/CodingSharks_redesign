@@ -1,11 +1,19 @@
 import React from "react";
 import Review from "./reviews";
+import { useScrollAnimation } from "./fadeuptext";
 
 export default function ReviewSlider() {
+  const headingRef = useScrollAnimation({
+    startTrigger: 1.2, // Start animation before element enters viewport
+  });
   return (
     <>
       <div
+        ref={headingRef}
         style={{
+          opacity: 0,
+          transform: "translateY(200px)",
+          transition: "transform 0.2s ease-out, opacity 0.8s ease-out",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",

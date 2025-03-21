@@ -1,10 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
+import { useScrollAnimation } from "./fadeuptext";
 
 const RecruitmentStoriesCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(0);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [isPaused, setIsPaused] = useState(false);
-
+  const [direction, setDirection] = useState("left"); // For tracking slide direction
+  const headingRef = useScrollAnimation({
+    startTrigger: 1.2, // Start animation before element enters viewport
+  });
   const stories = [
     {
       id: 1,
@@ -36,6 +40,7 @@ const RecruitmentStoriesCarousel = () => {
   const nextSlide = useCallback(() => {
     if (!isTransitioning) {
       setIsTransitioning(true);
+      setDirection("left");
       setActiveIndex((prev) => (prev === stories.length - 1 ? 0 : prev + 1));
     }
   }, [isTransitioning, stories.length]);
@@ -44,6 +49,7 @@ const RecruitmentStoriesCarousel = () => {
   const prevSlide = useCallback(() => {
     if (!isTransitioning) {
       setIsTransitioning(true);
+      setDirection("right");
       setActiveIndex((prev) => (prev === 0 ? stories.length - 1 : prev - 1));
     }
   }, [isTransitioning, stories.length]);
@@ -51,7 +57,7 @@ const RecruitmentStoriesCarousel = () => {
   // Handle automatic slide transitions
   useEffect(() => {
     const transitionTime = 500; // Time for slide transition animation
-    const slideInterval = 3000; // Time between slides (3 seconds)
+    const slideInterval = 1500; // Time between slides (3 seconds)
 
     let slideTimer;
 
@@ -74,6 +80,56 @@ const RecruitmentStoriesCarousel = () => {
     };
   }, [activeIndex, isPaused, nextSlide]);
 
+  const getSlideStyle = (index) => {
+    // Current slide is visible and centered
+    if (index === activeIndex) {
+      return {
+        transform: "translateX(0)",
+        opacity: 1,
+        zIndex: 1,
+      };
+    }
+
+    // Handle different directions for smooth animation
+    if (direction === "left") {
+      // Next slide is off to the right, waiting to come in
+      if (
+        index === activeIndex + 1 ||
+        (activeIndex === stories.length - 1 && index === 0)
+      ) {
+        return {
+          transform: "translateX(100%)",
+          opacity: 1,
+          zIndex: 0,
+        };
+      }
+      // Previous slide moves off to the left
+      return {
+        transform: "translateX(-100%)",
+        opacity: 1,
+        zIndex: 0,
+      };
+    } else {
+      // Previous slide is off to the left, waiting to come in
+      if (
+        index === activeIndex - 1 ||
+        (activeIndex === 0 && index === stories.length - 1)
+      ) {
+        return {
+          transform: "translateX(-100%)",
+          opacity: 1,
+          zIndex: 0,
+        };
+      }
+      // Next slide moves off to the right
+      return {
+        transform: "translateX(100%)",
+        opacity: 1,
+        zIndex: 0,
+      };
+    }
+  };
+
   const styles = {
     outerContainer: {
       position: "relative",
@@ -94,13 +150,7 @@ const RecruitmentStoriesCarousel = () => {
       left: 0,
       width: "100%",
       height: "100%",
-      opacity: 0,
-      visibility: "hidden",
-      transition: "opacity 0.5s ease, visibility 0.5s",
-    },
-    activeSlide: {
-      opacity: 1,
-      visibility: "visible",
+      transition: "transform 0.5s ease",
     },
     slide: {
       display: "flex",
@@ -186,8 +236,12 @@ const RecruitmentStoriesCarousel = () => {
   return (
     <>
       <h2
+        ref={headingRef}
         style={{
-          padding: "80px 20px 80px 50px",
+          opacity: 0,
+          transform: "translateY(200px)",
+          transition: "transform 0.2s ease-out, opacity 0.8s ease-out",
+          padding: "80px 20px 60px 50px",
           fontSize: "55px",
           fontWeight: "lighter",
         }}
@@ -205,7 +259,7 @@ const RecruitmentStoriesCarousel = () => {
               key={story.id}
               style={{
                 ...styles.slideContainer,
-                ...(index === activeIndex ? styles.activeSlide : {}),
+                ...getSlideStyle(index),
               }}
             >
               <div style={styles.slide}>
