@@ -213,9 +213,6 @@ const TeachingMethodsPage = () => {
 
   return (
     <div className="position-relative">
-      {/* Space before the content to allow scrolling to the trigger position */}
-      <div style={{ height: "100vh" }}></div>
-
       {/* Main content wrapper */}
       <div
         ref={wrapperRef}
@@ -353,9 +350,6 @@ const TeachingMethodsPage = () => {
 
       {/* Reference div to detect when user scrolls past the teaching methods section */}
       <div ref={continueScrollRef} style={{ height: "1px" }}></div>
-
-      {/* Space after the content to allow the page to continue scrolling */}
-      <div style={{ height: "100vh" }}></div>
     </div>
   );
 };
