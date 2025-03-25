@@ -1,38 +1,21 @@
 import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 
-/**
- * Custom hook for heading text splitting animations that repeat when scrolling down
- * @param {Object} options - Configuration options
- * @param {number} options.threshold - Intersection threshold (0 to 1)
- * @param {number} options.headingStagger - Stagger time between heading characters
- * @param {number} options.headingDuration - Duration of heading animation
- * @param {string} options.headingEase - GSAP easing for heading animation
- * @returns {Object} - Ref objects to attach to your elements
- */
-const useHeadingTextSplitting = ({
+const useRepeatScrollTextSplitting = ({
   threshold = 0.1,
   headingStagger = 0.03,
   headingDuration = 1,
   headingEase = "power4.out",
 } = {}) => {
   const headingContainerRef = useRef(null);
+  const textRef = useRef(null);
+  const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [headingVisible, setHeadingVisible] = useState(false);
-  const lastHeadingY = useRef(0); // Track the Y position of the heading
+  const lastHeadingY = useRef(0);
   const headingTimeline = useRef(null);
   const headingPrepared = useRef(false);
 
-  // Prepare heading elements (split text) when component mounts
-  useEffect(() => {
-    prepareHeadingElements();
-
-    return () => {
-      // Clean up any animations
-      if (headingTimeline.current) headingTimeline.current.kill();
-    };
-  }, []);
-
-  // Function to prepare heading elements by splitting text
+  // Prepare heading elements
   const prepareHeadingElements = () => {
     if (!headingContainerRef.current || headingPrepared.current) return;
 
@@ -89,10 +72,18 @@ const useHeadingTextSplitting = ({
       headingTimeline.current.kill();
     }
 
+    // Reset animation complete state
+    setIsAnimationComplete(false);
+
     const headings = headingContainerRef.current.querySelectorAll(
       "h1, h2, h3, h4, h5, h6"
     );
-    headingTimeline.current = gsap.timeline();
+    headingTimeline.current = gsap.timeline({
+      onComplete: () => {
+        // Set animation complete when timeline finishes
+        setIsAnimationComplete(true);
+      },
+    });
 
     headings.forEach((heading, index) => {
       const chars = heading.querySelectorAll(".heading-char");
@@ -114,27 +105,33 @@ const useHeadingTextSplitting = ({
     });
   };
 
-  // Set up intersection observer
+  // Prepare elements on mount
+  useEffect(() => {
+    prepareHeadingElements();
+
+    return () => {
+      // Clean up any animations
+      if (headingTimeline.current) headingTimeline.current.kill();
+    };
+  }, []);
+
+  // Intersection observer for headings
   useEffect(() => {
     const headingObserver = new IntersectionObserver(
       (entries) => {
         const [entry] = entries;
 
         if (entry.isIntersecting) {
-          // Check if we're scrolling down by comparing current Y with last Y
           const currentY = entry.boundingClientRect.y;
           const isScrollingDown = currentY < lastHeadingY.current;
 
-          // Update the last Y position
           lastHeadingY.current = currentY;
 
-          // Only animate if scrolling down
           if (isScrollingDown || lastHeadingY.current === 0) {
             setHeadingVisible(true);
           }
         } else {
           setHeadingVisible(false);
-          // Update the last Y position when leaving view too
           lastHeadingY.current = entry.boundingClientRect.y;
         }
       },
@@ -152,14 +149,18 @@ const useHeadingTextSplitting = ({
     };
   }, [threshold]);
 
-  // Run animation when visibility changes
+  // Trigger animation when visible
   useEffect(() => {
     if (headingVisible) {
       animateHeading();
     }
-  }, [headingVisible, headingDuration, headingStagger, headingEase]);
+  }, [headingVisible]);
 
-  return { headingContainerRef };
+  return {
+    headingContainerRef,
+    textRef,
+    isAnimationComplete,
+  };
 };
 
-export default useHeadingTextSplitting;
+export default useRepeatScrollTextSplitting;
