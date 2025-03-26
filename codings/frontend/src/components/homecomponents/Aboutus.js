@@ -52,7 +52,7 @@ const CommunitySection = () => {
               }`}
             >
               <img
-                src="https://imgs.search.brave.com/EoeTizQs1xhS4UZ-oAaq0ClZpU4LEmiIzB54Dr0irBo/rs:fit:860:0:0:0/g:ce/aHR0cHM6Ly9tZWRp/YS5pc3RvY2twaG90/by5jb20vaWQvNTI1/NDA5ODA5L3Bob3Rv/L3RlYWNoZXItYW5k/LXN0dWRlbnRzLWlu/LWNsYXNzcm9vbS1k/dXJpbmctbGVzc29u/LmpwZz9zPTYxMng2/MTImdz0wJms9MjAm/Yz1TTDJtT19YbDU4/SUtZY2N2WDVzX0FH/UGRYSmtFRjRMMGRN/Z3RSVk9qS0FVPQ"
+                src="https://media.istockphoto.com/id/1201405341/photo/university-students-studying-with-teacher.jpg?s=2048x2048&w=is&k=20&c=NCRypRPOSZU4TRIG5tjj9yGlgiwW2gypnJUEEjmhuLA="
                 alt="Teacher helping students with technology"
                 className="w-100 h-100 object-fit-cover"
               />
@@ -90,7 +90,7 @@ const CommunitySection = () => {
         /* Image fade-in effect */
         .fade-in {
           opacity: 1;
-          transition: opacity 1.5s ease-in;
+          transition: opacity 1s ease-in;
         }
         .opacity-0 {
           opacity: 0;

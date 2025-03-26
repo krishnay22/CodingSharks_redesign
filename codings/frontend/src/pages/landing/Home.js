@@ -1,44 +1,67 @@
-import React from "react";
-import { Container, Row, Col, Form, Button } from "react-bootstrap";
+import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import LogoSlider from "../../components/homecomponents/logoslider";
 import EnquirySection from "../../components/homecomponents/Enquire";
 import CommunitySection from "../../components/homecomponents/Aboutus";
-import CustomVerticalScrollbar from "../../components/homecomponents/teachingMethods";
 import NFTCard from "../../components/homecomponents/cards";
 import ReviewSlider from "../../components/homecomponents/ReviewSlider";
 import RecruitmentStories from "../../components/homecomponents/Slider";
 import Footer from "../../components/homecomponents/FooterForLandingpage";
+
 const Home = () => {
+  const [offset, setOffset] = useState(0);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setOffset(window.scrollY);
+    };
+
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
+
   return (
-    <>
-      <div style={{ width: "100%", overflow: "hidden" }}>
-        <EnquirySection />
-        <div style={{ margin: "180px 0px 100px 0px" }}>
-          <CommunitySection />
-        </div>
-        <div style={{ margin: "180px 0px 100px 0px" }}>
+    <div className="w-full overflow-x-hidden">
+      <EnquirySection />
+
+      <div className="my-32">
+        <CommunitySection />
+      </div>
+
+      {/* Parallax NFT Card Over LogoSlider */}
+      <div className="relative w-full h-screen overflow-hidden">
+        <div
+          className="absolute inset-0 z-10"
+          style={{
+            transform: `translateY(${offset * 0.1}px)`,
+            transition: "transform 0.1s ease-out",
+          }}
+        >
           <LogoSlider />
         </div>
 
-        <div style={{ margin: "180px 0px 100px 0px" }}>
-          <CustomVerticalScrollbar />
-        </div>
-        <div style={{ margin: "180px 0px 100px 0px" }}>
+        <div
+          className="absolute inset-0 z-20 flex items-center justify-center"
+          style={{
+            transform: `translateY(${offset * 0.1}px)`,
+            transition: "transform 0.1s ease-out",
+          }}
+        >
           <NFTCard />
         </div>
-        <div style={{ margin: "80px 0px 80px 0px" }}>
-          <RecruitmentStories />
-        </div>
-        <div style={{ margin: "180px 0px 80px 0px" }}>
-          <ReviewSlider />
-        </div>
-
-        <div style={{ margin: "80px 0px 0px 0px" }}>
-          <Footer />
-        </div>
       </div>
-    </>
+
+      {/* Sections after NFT Card */}
+      <div className="my-32">
+        <RecruitmentStories />
+      </div>
+
+      <div className="my-32">
+        <ReviewSlider />
+      </div>
+
+      <Footer />
+    </div>
   );
 };
 

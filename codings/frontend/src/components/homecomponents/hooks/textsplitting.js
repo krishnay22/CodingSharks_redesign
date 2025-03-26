@@ -8,7 +8,6 @@ const useRepeatScrollTextSplitting = ({
   headingEase = "power4.out",
 } = {}) => {
   const headingContainerRef = useRef(null);
-  const textRef = useRef(null);
   const [isAnimationComplete, setIsAnimationComplete] = useState(false);
   const [headingVisible, setHeadingVisible] = useState(false);
   const lastHeadingY = useRef(0);
@@ -158,7 +157,6 @@ const useRepeatScrollTextSplitting = ({
 
   return {
     headingContainerRef,
-    textRef,
     isAnimationComplete,
   };
 };
