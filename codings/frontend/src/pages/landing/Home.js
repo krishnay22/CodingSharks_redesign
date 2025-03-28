@@ -31,27 +31,19 @@ const Home = () => {
       {/* Parallax NFT Card Over LogoSlider */}
       <div className="relative w-full h-screen overflow-hidden">
         <div
-          className="absolute inset-0 z-10"
           style={{
-            transform: `translateY(${offset * 0.1}px)`,
+            transform: `translateY(${offset}px)`,
             transition: "transform 0.1s ease-out",
           }}
         >
           <LogoSlider />
         </div>
 
-        <div
-          className="absolute inset-0 z-20 flex items-center justify-center"
-          style={{
-            transform: `translateY(${offset * 0.1}px)`,
-            transition: "transform 0.1s ease-out",
-          }}
-        >
+        <div>
           <NFTCard />
         </div>
       </div>
 
-      {/* Sections after NFT Card */}
       <div className="my-32">
         <RecruitmentStories />
       </div>
