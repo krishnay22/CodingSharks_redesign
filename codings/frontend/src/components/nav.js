@@ -8,7 +8,10 @@ function Homenav() {
       <Navbar className="homenav" expand="lg">
         {/* Move brand/logo to the far left */}
         <Navbar.Brand as={NavLink} to="/" className="brand-logo">
-          Coding Sharks
+          <img
+            src="https://www.thecodingsharks.in/image/Coding-Sharks-Logo.png"
+            style={{ width: "115px", height: "auto" }}
+          ></img>
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />

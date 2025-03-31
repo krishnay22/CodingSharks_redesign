@@ -5,17 +5,20 @@ import CommunitySection from "../../components/homecomponents/Aboutus";
 import ReviewSlider from "../../components/homecomponents/ReviewSlider";
 import RecruitmentStories from "../../components/homecomponents/Slider";
 import Footer from "../../components/homecomponents/FooterForLandingpage";
+import UseCases from "../../components/homecomponents/teachingMethods";
+import CourseCarousel from "../../components/CourseCarousel";
 
 const Home = () => {
   return (
     <div className="w-full overflow-x-hidden">
       <EnquirySection />
-
-      <div className="my-32">
+      <LogoSlider />
+      <div className="my-32" style={{ padding: "0px 0px 150px 0px" }}>
         <CommunitySection />
       </div>
-      <div>
-        <LogoSlider />
+      <UseCases />
+      <div style={{ padding: "150px 0px 0px 0px" }}>
+        <CourseCarousel />
       </div>
 
       <div className="my-32">

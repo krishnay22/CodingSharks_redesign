@@ -1,357 +1,266 @@
-import React, { useState, useEffect, useRef } from "react";
-import "bootstrap/dist/css/bootstrap.min.css";
-import { Container, Row, Col, Card } from "react-bootstrap";
+import React, { useEffect, useRef } from "react";
 
-const TeachingMethodsPage = () => {
-  const [scrollPercentage, setScrollPercentage] = useState(0);
-  const [isFixed, setIsFixed] = useState(false);
-  const [contentScrolled, setContentScrolled] = useState(false);
-  const scrollbarRef = useRef(null);
-  const contentRef = useRef(null);
-  const wrapperRef = useRef(null);
-  const continueScrollRef = useRef(null);
+const UseCases = () => {
+  const containerRef = useRef(null);
 
+  // Optional: Add smooth scrolling effect
   useEffect(() => {
-    // Function to handle initial scroll to position the title in the middle
-    const handleMainScroll = () => {
-      const scrollY = window.scrollY || window.pageYOffset;
-      const windowHeight = window.innerHeight;
-      const triggerPosition = windowHeight / 2; // Middle of the screen
+    const container = containerRef.current;
+    let isScrolling = false;
+    let scrollTimeout;
 
-      // Check if the wrapper is in position (title at middle of the screen)
-      if (wrapperRef.current) {
-        const wrapperRect = wrapperRef.current.getBoundingClientRect();
-        const titlePosition = wrapperRect.top + wrapperRect.height * 0.2; // Approximate position of title
-
-        // If title is at or past middle, fix the position and allow content scrolling
-        if (titlePosition <= triggerPosition && !contentScrolled) {
-          if (!isFixed) {
-            setIsFixed(true);
-
-            // Initialize the content scroll
-            if (contentRef.current) {
-              contentRef.current.scrollTop = 0;
-            }
-          }
-        } else if (contentScrolled) {
-          // Once content is fully scrolled, allow page to continue scrolling
-          setIsFixed(false);
-
-          // Check if we've scrolled past the continue section
-          if (continueScrollRef.current) {
-            const continueRect =
-              continueScrollRef.current.getBoundingClientRect();
-            // If we've scrolled past, reset the scrollbar
-            if (continueRect.top < 0) {
-              setScrollPercentage(0);
-            }
-          }
-        } else if (titlePosition > triggerPosition) {
-          // Reset if scrolling back up
-          setIsFixed(false);
-          setContentScrolled(false);
-          setScrollPercentage(0);
-        }
+    const handleScroll = () => {
+      if (!isScrolling) {
+        isScrolling = true;
+        container.classList.add("is-scrolling");
       }
+
+      clearTimeout(scrollTimeout);
+      scrollTimeout = setTimeout(() => {
+        isScrolling = false;
+        container.classList.remove("is-scrolling");
+      }, 100);
     };
 
-    // Function to handle the content scrolling
-    const handleContentScroll = () => {
-      if (isFixed && contentRef.current) {
-        const scrollHeight = contentRef.current.scrollHeight;
-        const clientHeight = contentRef.current.clientHeight;
-        const scrollTop = contentRef.current.scrollTop;
-
-        // Only calculate if we have room to scroll
-        if (scrollHeight > clientHeight) {
-          // Calculate scroll percentage
-          const scrolled = (scrollTop / (scrollHeight - clientHeight)) * 100;
-          const percentage = Math.min(scrolled, 100);
-          setScrollPercentage(percentage);
-
-          // Check if content is fully scrolled
-          if (percentage >= 99.5) {
-            setContentScrolled(true);
-            document.body.style.overflow = ""; // Re-enable page scrolling
-          }
-        } else {
-          setScrollPercentage(0);
-        }
-      }
-    };
-
-    // Handle scroll events for the main window and content
-    window.addEventListener("scroll", handleMainScroll);
-    if (contentRef.current) {
-      contentRef.current.addEventListener("scroll", handleContentScroll);
+    if (container) {
+      container.addEventListener("scroll", handleScroll);
     }
 
-    // Handle wheel events to control scrolling behavior
-    const handleWheel = (e) => {
-      if (isFixed && contentRef.current) {
-        const scrollHeight = contentRef.current.scrollHeight;
-        const clientHeight = contentRef.current.clientHeight;
-        const scrollTop = contentRef.current.scrollTop;
-
-        // If scrolling down and we're at the bottom of content
-        if (e.deltaY > 0 && scrollTop + clientHeight >= scrollHeight - 1) {
-          // Allow the page to continue scrolling
-          setContentScrolled(true);
-          document.body.style.overflow = "";
-          return;
-        }
-
-        // If we're fixed but not fully scrolled, intercept wheel events
-        if (!contentScrolled) {
-          contentRef.current.scrollTop += e.deltaY;
-          e.preventDefault();
-        }
-      }
-    };
-
-    window.addEventListener("wheel", handleWheel, { passive: false });
-
-    // Initial checks
-    handleMainScroll();
-
-    // Clean up event listeners
     return () => {
-      window.removeEventListener("scroll", handleMainScroll);
-      window.removeEventListener("wheel", handleWheel);
-      if (contentRef.current) {
-        contentRef.current.removeEventListener("scroll", handleContentScroll);
+      if (container) {
+        container.removeEventListener("scroll", handleScroll);
       }
-      document.body.style.overflow = "";
     };
-  }, [isFixed, contentScrolled]);
+  }, []);
 
-  // Handle click on the scrollbar
-  const handleScrollbarClick = (e) => {
-    if (!scrollbarRef.current || !contentRef.current) return;
-
-    const scrollbarHeight = scrollbarRef.current.clientHeight;
-    const clickPosition = e.nativeEvent.offsetY;
-    const clickPercentage = (clickPosition / scrollbarHeight) * 100;
-
-    // Get the inverted percentage (since we're displaying from bottom)
-    const invertedPercentage = 100 - clickPercentage;
-
-    // Apply to the content scrollable area
-    const scrollHeight = contentRef.current.scrollHeight;
-    const clientHeight = contentRef.current.clientHeight;
-    const scrollDistance = scrollHeight - clientHeight;
-
-    // Set the scroll position based on the click
-    contentRef.current.scrollTop = (invertedPercentage / 100) * scrollDistance;
-
-    // If user clicks at the very top of scrollbar, consider content fully scrolled
-    if (clickPercentage <= 1) {
-      setContentScrolled(true);
-      document.body.style.overflow = "";
-    }
+  // Inline styles object
+  const styles = {
+    container: {
+      display: "flex",
+      height: "100vh",
+      width: "100%",
+      overflowY: "auto",
+      fontFamily: "'Arial', sans-serif",
+      scrollBehavior: "smooth",
+      position: "relative",
+      // Hide scrollbar for different browsers while maintaining functionality
+      scrollbarWidth: "none", // Firefox
+      msOverflowStyle: "none", // IE and Edge
+      "&::-webkit-scrollbar": {
+        // For Chrome, Safari, and Opera
+        display: "none",
+      },
+    },
+    leftContent: {
+      width: "40%",
+      maxWidth: "500px",
+      padding: "0 40px",
+      position: "sticky",
+      top: "0",
+      height: "100vh",
+      display: "flex",
+      flexDirection: "column",
+      justifyContent: "center",
+    },
+    leftTitle: {
+      fontSize: "4rem",
+      color: "#333",
+      marginBottom: "20px",
+      fontWeight: "600",
+    },
+    leftDescription: {
+      fontSize: "1.2rem",
+      color: "#555",
+      lineHeight: "1.6",
+    },
+    rightContent: {
+      width: "60%",
+      padding: "60px 40px",
+      display: "flex",
+      flexDirection: "column",
+      gap: "40px",
+    },
+    card: {
+      padding: "40px",
+      borderRadius: "20px",
+      boxShadow: "0 4px 10px rgba(0, 0, 0, 0.05)",
+      minHeight: "200px",
+      display: "flex",
+      flexDirection: "column",
+      position: "relative",
+      transition: "transform 0.3s ease, box-shadow 0.3s ease",
+    },
+    cardHover: {
+      transform: "translateY(-5px)",
+      boxShadow: "0 8px 20px rgba(0, 0, 0, 0.1)",
+    },
+    category: {
+      fontSize: "1.2rem",
+      marginBottom: "10px",
+      fontWeight: "500",
+    },
+    cardTitle: {
+      fontSize: "2rem",
+      marginBottom: "20px",
+      fontWeight: "600",
+      color: "#333",
+    },
+    icons: {
+      display: "flex",
+      gap: "15px",
+      position: "absolute",
+      right: "40px",
+      top: "40%",
+    },
+    icon: {
+      fontSize: "1.8rem",
+      width: "40px",
+      height: "40px",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+    },
+    presentationCard: {
+      backgroundColor: "#FFF8ED",
+    },
+    presentationCategory: {
+      color: "#FF9500",
+    },
+    blogCard: {
+      backgroundColor: "#F8F0FF",
+    },
+    blogCategory: {
+      color: "#A259FF",
+    },
+    socialCard: {
+      backgroundColor: "#F0FFE9",
+    },
+    socialCategory: {
+      color: "#64D836",
+    },
+    docsCard: {
+      backgroundColor: "#E9F6FF",
+    },
+    docsCategory: {
+      color: "#36A2D8",
+    },
   };
 
-  // Teaching methods data
-  const leftColumnMethods = [
-    {
-      title: "Interactive Learning",
-      description:
-        "Engage students through hands-on activities and discussions.",
-    },
-    {
-      title: "Project-Based Learning",
-      description:
-        "Students learn by working on real-world projects and challenges.",
-    },
-    {
-      title: "Personalized Instruction",
-      description:
-        "Tailored approaches to meet individual student needs and learning styles.",
-    },
-    {
-      title: "Collaborative Learning",
-      description:
-        "Students work together to solve problems and complete tasks.",
-    },
-  ];
+  // Function to handle card hover
+  const [presentationHover, setPresentationHover] = React.useState(false);
+  const [blogHover, setBlogHover] = React.useState(false);
+  const [socialHover, setSocialHover] = React.useState(false);
+  const [docsHover, setDocsHover] = React.useState(false);
 
-  const rightColumnMethods = [
-    {
-      title: "Flipped Classroom",
-      description:
-        "Students review content at home and practice in class with teacher guidance.",
-    },
-    {
-      title: "Inquiry-Based Learning",
-      description:
-        "Students learn by asking questions and investigating to find answers.",
-    },
-    {
-      title: "Technology Integration",
-      description:
-        "Using digital tools and resources to enhance the learning experience.",
-    },
-  ];
+  // Add styles to hide scrollbar
+  useEffect(() => {
+    // Create a style element
+    const style = document.createElement("style");
+    // Add CSS rules to hide scrollbar
+    style.textContent = `
+      .use-cases-container::-webkit-scrollbar {
+        display: none;
+      }
+      .use-cases-container {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+      }
+    `;
+    // Append style to document head
+    document.head.appendChild(style);
 
-  const additionalContent = [
-    {
-      title: "Our Approach",
-      description:
-        "Our teaching methods are designed to create a dynamic, engaging learning environment where students are active participants in their educational journey. We believe in fostering critical thinking, creativity, and a love for lifelong learning.",
-    },
-    {
-      title: "Research-Based Methods",
-      description:
-        "All our teaching methods are grounded in educational research and best practices. We continuously update our approaches based on the latest findings in pedagogy and cognitive science.",
-    },
-    {
-      title: "Assessment and Feedback",
-      description:
-        "We use a variety of assessment methods to gauge student understanding and provide meaningful feedback that helps them grow and improve.",
-    },
-  ];
+    // Clean up
+    return () => {
+      document.head.removeChild(style);
+    };
+  }, []);
 
   return (
-    <div className="position-relative">
-      {/* Main content wrapper */}
-      <div
-        ref={wrapperRef}
-        className={`d-flex ${
-          isFixed ? "position-fixed top-0 left-0 right-0" : ""
-        }`}
-        style={{
-          height: "100vh",
-          width: "100%",
-          zIndex: 10,
-        }}
-      >
-        {/* Left section with title */}
-        <div
-          className="d-flex flex-column align-items-center justify-content-center"
-          style={{
-            width: "275px",
-            height: "100vh",
-          }}
-        >
-          <h2 className="fw-bold text-center">Our teaching methods</h2>
-        </div>
+    <div
+      style={styles.container}
+      ref={containerRef}
+      className="use-cases-container"
+    >
+      <div style={styles.leftContent}>
+        <h1 style={styles.leftTitle}>Use cases</h1>
+        <p style={styles.leftDescription}>
+          Captivate your audience with auto-generated infographics, diagrams,
+          flowcharts, and more.
+        </p>
+      </div>
 
-        {/* Center scrollbar */}
+      <div style={styles.rightContent}>
         <div
-          className="d-flex flex-column align-items-center justify-content-center"
           style={{
-            width: "50px",
-            height: "100vh",
+            ...styles.card,
+            ...styles.presentationCard,
+            ...(presentationHover ? styles.cardHover : {}),
           }}
+          onMouseEnter={() => setPresentationHover(true)}
+          onMouseLeave={() => setPresentationHover(false)}
         >
-          {/* Custom Scrollbar */}
-          <div
-            className="position-relative"
-            style={{ height: "50%" }}
-            onClick={handleScrollbarClick}
-            ref={scrollbarRef}
-          >
-            <div
-              style={{
-                width: "4px",
-                height: "100%",
-                backgroundColor: "#dee2e6",
-                borderRadius: "9999px",
-                overflow: "hidden",
-                position: "relative",
-                cursor: "pointer",
-              }}
-            >
-              <div
-                style={{
-                  position: "absolute",
-                  bottom: "0",
-                  width: "100%",
-                  backgroundColor: "#fd7e14",
-                  borderRadius: "9999px",
-                  height: `${scrollPercentage}%`,
-                  transition: "height 0.3s",
-                }}
-              />
-            </div>
+          <span style={{ ...styles.category, ...styles.presentationCategory }}>
+            Presentations
+          </span>
+          <h2 style={styles.cardTitle}>Make impactful slides</h2>
+          <div style={styles.icons}>
+            <div style={styles.icon}>📄</div>
+            <div style={styles.icon}>🎯</div>
+            <div style={styles.icon}>📊</div>
           </div>
         </div>
 
-        {/* Scrollable content area */}
         <div
-          ref={contentRef}
-          className="flex-grow-1 overflow-auto py-4 px-3"
           style={{
-            height: "100vh",
-            scrollbarWidth: "none" /* Firefox */,
-            msOverflowStyle: "none" /* IE and Edge */,
+            ...styles.card,
+            ...styles.blogCard,
+            ...(blogHover ? styles.cardHover : {}),
           }}
+          onMouseEnter={() => setBlogHover(true)}
+          onMouseLeave={() => setBlogHover(false)}
         >
-          {/* Hide scrollbar for Chrome, Safari and Opera */}
-          <style>
-            {`
-              #scrollable-content::-webkit-scrollbar {
-                display: none;
-              }
-            `}
-          </style>
+          <span style={{ ...styles.category, ...styles.blogCategory }}>
+            Blog
+          </span>
+          <h2 style={styles.cardTitle}>Leave an impression</h2>
+          <div style={styles.icons}>
+            <div style={styles.icon}>⏺️</div>
+            <div style={styles.icon}>🔖</div>
+          </div>
+        </div>
 
-          <Container fluid>
-            <Row>
-              {/* Left column */}
-              <Col md={6} className="mb-4">
-                {leftColumnMethods.map((method, index) => (
-                  <Card
-                    key={`left-${index}`}
-                    className="mb-4"
-                    style={{ minHeight: "160px" }}
-                  >
-                    <Card.Body>
-                      <Card.Title>{method.title}</Card.Title>
-                      <Card.Text>{method.description}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                ))}
-              </Col>
+        <div
+          style={{
+            ...styles.card,
+            ...styles.socialCard,
+            ...(socialHover ? styles.cardHover : {}),
+          }}
+          onMouseEnter={() => setSocialHover(true)}
+          onMouseLeave={() => setSocialHover(false)}
+        >
+          <span style={{ ...styles.category, ...styles.socialCategory }}>
+            Social Media
+          </span>
+          <h2 style={styles.cardTitle}>Engage your audience</h2>
+        </div>
 
-              {/* Right column */}
-              <Col md={6} className="mb-4">
-                {rightColumnMethods.map((method, index) => (
-                  <Card
-                    key={`right-${index}`}
-                    className="mb-4"
-                    style={{ minHeight: "160px" }}
-                  >
-                    <Card.Body>
-                      <Card.Title>{method.title}</Card.Title>
-                      <Card.Text>{method.description}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                ))}
-              </Col>
-            </Row>
-
-            {/* Additional content */}
-            <Row className="mt-2">
-              <Col xs={12}>
-                {additionalContent.map((content, index) => (
-                  <Card key={`additional-${index}`} className="mb-4">
-                    <Card.Body>
-                      <Card.Title>{content.title}</Card.Title>
-                      <Card.Text>{content.description}</Card.Text>
-                    </Card.Body>
-                  </Card>
-                ))}
-              </Col>
-            </Row>
-          </Container>
+        <div
+          style={{
+            ...styles.card,
+            ...styles.docsCard,
+            ...(docsHover ? styles.cardHover : {}),
+          }}
+          onMouseEnter={() => setDocsHover(true)}
+          onMouseLeave={() => setDocsHover(false)}
+        >
+          <span style={{ ...styles.category, ...styles.docsCategory }}>
+            Docs
+          </span>
+          <h2 style={styles.cardTitle}>Write easy to read docs</h2>
         </div>
       </div>
-
-      {/* Reference div to detect when user scrolls past the teaching methods section */}
-      <div ref={continueScrollRef} style={{ height: "1px" }}></div>
     </div>
   );
 };
 
-export default TeachingMethodsPage;
+export default UseCases;
