@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import Review from "./reviews";
 import { useScrollAnimation } from "./fadeuptext";
 
@@ -6,6 +6,45 @@ export default function ReviewSlider() {
   const headingRef = useScrollAnimation({
     startTrigger: 1.2, // Start animation before element enters viewport
   });
+
+  // Add responsive state
+  const [isMobile, setIsMobile] = useState(false);
+  const [isTablet, setIsTablet] = useState(false);
+
+  // Update device type on window resize
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 576);
+      setIsTablet(window.innerWidth >= 576 && window.innerWidth < 992);
+    };
+
+    // Initial check
+    handleResize();
+
+    // Add event listener
+    window.addEventListener("resize", handleResize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
+
+  // Responsive values
+  const sliderWidth = isMobile ? "350px" : isTablet ? "500px" : "650px";
+  const headingFontSize = isMobile ? "32px" : isTablet ? "42px" : "55px";
+  const headingPadding = isMobile
+    ? "40px 10px 0px 10px"
+    : isTablet
+    ? "60px 15px 0px 30px"
+    : "80px 20px 0px 50px";
+  const subtitlePadding = isMobile
+    ? "0px 10px 40px 10px"
+    : isTablet
+    ? "0px 15px 60px 30px"
+    : "0px 20px 80px 50px";
+  const sliderHeight = isMobile ? "200px" : isTablet ? "220px" : "250px";
+  const itemHeight = isMobile ? "300px" : isTablet ? "350px" : "400px";
+  const animationDuration = isMobile ? "25s" : "30s";
+
   return (
     <>
       <div
@@ -23,8 +62,8 @@ export default function ReviewSlider() {
       >
         <h2
           style={{
-            padding: "80px 20px 0px 50px",
-            fontSize: "55px",
+            padding: headingPadding,
+            fontSize: headingFontSize,
             fontWeight: "lighter",
           }}
         >
@@ -32,8 +71,9 @@ export default function ReviewSlider() {
         </h2>
         <p
           style={{
-            padding: "0px 20px 80px 50px",
+            padding: subtitlePadding,
             fontWeight: "lighter",
+            fontSize: isMobile ? "14px" : "16px",
           }}
         >
           Why Students Choose Coding Sharks
@@ -43,15 +83,15 @@ export default function ReviewSlider() {
       <div
         className="slider"
         style={{
-          "--width": "650px",
-          "--height": "250px", // Decreased slider height
-          "--item-height": "400px", // Keep item height at 400px
-          "--quantity": "6",
-          "--animation-duration": "30s",
+          "--width": sliderWidth,
+          "--height": sliderHeight,
+          "--item-height": itemHeight,
+          "--quantity": isMobile ? "4" : "6",
+          "--animation-duration": animationDuration,
         }}
       >
         <div className="list">
-          {[...Array(6)].map((_, index) => (
+          {[...Array(isMobile ? 4 : 6)].map((_, index) => (
             <div
               key={index}
               className="item"
@@ -66,10 +106,10 @@ export default function ReviewSlider() {
       <style jsx>{`
         .slider {
           width: 100%;
-          height: var(--height); /* Smaller slider height */
+          height: var(--height);
           overflow: hidden;
           display: flex;
-          align-items: center; /* Center items vertically */
+          align-items: center;
           mask-image: linear-gradient(
             to right,
             transparent,
@@ -89,13 +129,13 @@ export default function ReviewSlider() {
           width: 100%;
           min-width: calc(var(--width) * var(--quantity));
           position: relative;
-          height: var(--height); /* Keep it small */
-          align-items: center; /* Center items */
+          height: var(--height);
+          align-items: center;
         }
 
         .slider .list .item {
           width: var(--width);
-          height: var(--item-height); /* Keep item height at 400px */
+          height: var(--item-height);
           position: absolute;
           left: 100%;
           display: flex;
@@ -118,13 +158,34 @@ export default function ReviewSlider() {
           }
         }
 
-        .slider:hover .item {
-          animation-play-state: paused !important;
-          filter: grayscale(1);
+        /* Pause animations on hover for non-touch devices only */
+        @media (hover: hover) {
+          .slider:hover .item {
+            animation-play-state: paused !important;
+            filter: grayscale(1);
+          }
+
+          .slider .item:hover {
+            filter: grayscale(0);
+          }
         }
 
-        .slider .item:hover {
-          filter: grayscale(0);
+        /* Additional responsive styles */
+        @media (max-width: 576px) {
+          .slider {
+            mask-image: linear-gradient(
+              to right,
+              transparent,
+              #000 5% 95%,
+              transparent
+            );
+            -webkit-mask-image: linear-gradient(
+              to right,
+              transparent,
+              #000 5% 95%,
+              transparent
+            );
+          }
         }
       `}</style>
     </>

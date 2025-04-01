@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { Row, Col, Form } from "react-bootstrap";
+import { Row, Col, Form, Container } from "react-bootstrap";
 import gsap from "gsap";
 import CustomButton from "./Landingbutoon";
 
@@ -74,59 +74,66 @@ const EnquirySection = () => {
   }, []);
 
   return (
-    <div className="p-4 m-3">
-      <Row className="align-items-center">
-        <Col lg={6} className="pe-lg-5" style={{ paddingTop: "30px" }}>
-          <div ref={headingContainerRef} style={{ margin: 0, padding: 0 }}>
-            <h1 className="display-4">Crack your goal</h1>
-            <h1 className="display-4">with Indore's Top</h1>
-            <h1 className="display-4">Educator</h1>
-          </div>
-          <p
-            ref={textRef}
-            className="lead mb-4 fw-light fade-text"
-            style={{ color: "#FF9A70" }}
-          >
-            Learn from coders, not tutors.
-          </p>
-          <div className="mb-4">
-            <Form>
-              <Row>
-                <Col xs={9}>
-                  <div className="input-group mb-2">
-                    <span className="input-group-text bg-white border-end-0">
-                      +91
-                    </span>
-                    <Form.Control
-                      type="text"
-                      placeholder="Enter your mobile number"
-                      className="border-start-0"
-                    />
-                  </div>
-                </Col>
-                <Col xs={9}>
-                  <CustomButton
-                    text="Enquire for free"
-                    accentColor="#212529"
-                    primaryColor="#ffffff"
-                    className="w-100 py-3"
-                  />
-                </Col>
-              </Row>
-            </Form>
-          </div>
-        </Col>
-        <Col lg={6} style={{ padding: "0px 10px 0px 0px" }}>
-          <div className="building-image">
-            <img
-              src="https://cdn.shopify.com/s/files/1/0070/5901/3716/files/ubiqum-coding-bootcamp.jpg?v=1686797831"
-              alt="Building with MOCKUP sign"
-              className="img-fluid rounded shadow-lg"
-            />
-          </div>
-        </Col>
-      </Row>
+    <Container fluid>
+      <div className="enquiry-section p-3 p-md-4 my-2 my-md-3">
+        <Row className="align-items-center">
+          <Col lg={6} className="pe-lg-4 mb-4 mb-lg-0">
+            <div ref={headingContainerRef} className="heading-container">
+              <h1 className="heading-text">Crack your goal</h1>
+              <h1 className="heading-text">with Indore's Top</h1>
+              <h1 className="heading-text">Educator</h1>
+            </div>
+            <p
+              ref={textRef}
+              className="lead mb-4 fw-light fade-text"
+              style={{ color: "#FF9A70" }}
+            >
+              Learn from coders, not tutors.
+            </p>
+            <div className="mb-4">
+              <Form>
+                <Row>
+                  <Col xs={12} md={9} className="mb-3">
+                    <div className="input-group">
+                      <span className="input-group-text bg-white border-end-0">
+                        +91
+                      </span>
+                      <Form.Control
+                        type="text"
+                        placeholder="Enter your mobile number"
+                        className="border-start-0"
+                      />
+                    </div>
+                  </Col>
+                  <Col xs={12} md={9}>
+                    <div className="button-wrapper">
+                      <CustomButton
+                        text="Enquire for free"
+                        accentColor="#212529"
+                        primaryColor="#ffffff"
+                        className="w-100 py-2 py-md-3"
+                      />
+                    </div>
+                  </Col>
+                </Row>
+              </Form>
+            </div>
+          </Col>
+          <Col lg={6}>
+            <div className="building-image">
+              <img
+                src="https://cdn.shopify.com/s/files/1/0070/5901/3716/files/ubiqum-coding-bootcamp.jpg?v=1686797831"
+                alt="Building with MOCKUP sign"
+                className="img-fluid rounded shadow-lg"
+              />
+            </div>
+          </Col>
+        </Row>
+      </div>
       <style jsx>{`
+        .enquiry-section {
+          overflow-x: hidden;
+        }
         .char-wrapper {
           display: inline-block;
           overflow: hidden;
@@ -143,23 +150,26 @@ const EnquirySection = () => {
           font-weight: 300;
           transition: opacity 0.3s ease-in-out;
         }
-        .navbar-nav .nav-link {
-          margin: 0 15px;
-          font-size: 1.1rem;
-        }
-        .display-4 {
-          font-size: 3.3rem;
+        .heading-text {
+          font-size: calc(2rem + 1.5vw);
           line-height: 1.2;
           font-weight: 800;
+          margin-bottom: 0.5rem;
         }
         .lead {
-          font-size: 1.8rem;
+          font-size: calc(1.2rem + 0.5vw);
           font-weight: 400;
         }
-        .building-image img {
+        .building-image {
           border-radius: 12px;
+          overflow: hidden;
+        }
+        .building-image img {
           width: 100%;
-          height: 100%;
+          height: auto;
+          object-fit: cover;
+          border-radius: 12px;
+          transition: transform 0.3s ease;
         }
         .input-group-text,
         .form-control {
@@ -169,7 +179,10 @@ const EnquirySection = () => {
           border: 1px solid;
           border-radius: 10px;
         }
-        /* ❌ Remove focus effect completely */
+        /* Button spacing - works across all screen sizes */
+        .button-wrapper {
+        }
+        /* Remove focus effect */
         .form-control:focus,
         .input-group:focus-within .form-control,
         .input-group:focus-within .input-group-text {
@@ -177,8 +190,39 @@ const EnquirySection = () => {
           border-color: inherit !important;
           box-shadow: none !important;
         }
+
+        /* Media Queries */
+        @media (max-width: 767px) {
+          .heading-text {
+            font-size: calc(1.8rem + 1vw);
+          }
+          .lead {
+            font-size: calc(1rem + 0.5vw);
+          }
+          .input-group-text,
+          .form-control {
+            padding: 0.5rem 0.8rem;
+            font-size: 0.9rem;
+          }
+          /* Slightly increase spacing on mobile */
+          .button-wrapper {
+          }
+        }
+
+        @media (max-width: 575px) {
+          .heading-text {
+            font-size: calc(1.5rem + 1vw);
+          }
+          .lead {
+            font-size: 1.2rem;
+            margin-bottom: 1rem;
+          }
+          .enquiry-section {
+            padding: 1rem !important;
+          }
+        }
       `}</style>
-    </div>
+    </Container>
   );
 };
 

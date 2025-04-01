@@ -4,6 +4,11 @@ import CourseCard from "./CourseCard";
 const CourseCarousel = () => {
   const [activeIndex, setActiveIndex] = useState(1);
   const [isAnimating, setIsAnimating] = useState(false);
+  const [screenSize, setScreenSize] = useState({
+    isTablet: false,
+    isMobile: false,
+    isSmallMobile: false,
+  });
 
   const courses = [
     {
@@ -35,6 +40,26 @@ const CourseCarousel = () => {
     },
   ];
 
+  // Handle screen size detection with useEffect to avoid SSR issues
+  useEffect(() => {
+    const checkScreenSize = () => {
+      setScreenSize({
+        isTablet: window.innerWidth <= 1024 && window.innerWidth > 768,
+        isMobile: window.innerWidth <= 768 && window.innerWidth > 480,
+        isSmallMobile: window.innerWidth <= 480,
+      });
+    };
+
+    // Initial check
+    checkScreenSize();
+
+    // Add event listener for window resize
+    window.addEventListener("resize", checkScreenSize);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkScreenSize);
+  }, []);
+
   const handleCardClick = (index) => {
     if (isAnimating || index === activeIndex) return;
 
@@ -59,7 +84,7 @@ const CourseCarousel = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, [isAnimating]);
+  }, [isAnimating, courses.length]);
 
   // CSS in JS styles
   const styles = {
@@ -68,32 +93,53 @@ const CourseCarousel = () => {
       maxWidth: "1200px",
       margin: "0 auto",
       position: "relative",
+      padding: "0 15px",
     },
     carouselTrack: {
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
-      minHeight: "500px",
+      minHeight: screenSize.isSmallMobile ? "400px" : "500px",
       position: "relative",
       perspective: "1000px",
     },
     carouselCardWrapper: {
       position: "absolute",
-      width: "300px",
-      height: "400px",
+      width: screenSize.isSmallMobile
+        ? "220px"
+        : screenSize.isMobile
+        ? "250px"
+        : "300px",
+      height: screenSize.isSmallMobile
+        ? "320px"
+        : screenSize.isMobile
+        ? "350px"
+        : "400px",
       transition: "all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)",
       cursor: "pointer",
       zIndex: 1,
     },
     leftCard: {
-      transform: "translateX(-320px) scale(0.85)",
+      transform: screenSize.isSmallMobile
+        ? "translateX(-120px) scale(0.7)"
+        : screenSize.isMobile
+        ? "translateX(-180px) scale(0.75)"
+        : screenSize.isTablet
+        ? "translateX(-220px) scale(0.8)"
+        : "translateX(-320px) scale(0.85)",
       zIndex: 0,
-      opacity: 0.7,
+      opacity: screenSize.isSmallMobile ? 0.4 : 0.7,
     },
     rightCard: {
-      transform: "translateX(320px) scale(0.85)",
+      transform: screenSize.isSmallMobile
+        ? "translateX(120px) scale(0.7)"
+        : screenSize.isMobile
+        ? "translateX(180px) scale(0.75)"
+        : screenSize.isTablet
+        ? "translateX(220px) scale(0.8)"
+        : "translateX(320px) scale(0.85)",
       zIndex: 0,
-      opacity: 0.7,
+      opacity: screenSize.isSmallMobile ? 0.4 : 0.7,
     },
     activeCard: {
       transform: "translateY(-20px) scale(1.1)",
@@ -106,8 +152,8 @@ const CourseCarousel = () => {
       gap: "10px",
     },
     carouselIndicator: {
-      width: "12px",
-      height: "12px",
+      width: screenSize.isSmallMobile ? "10px" : "12px",
+      height: screenSize.isSmallMobile ? "10px" : "12px",
       borderRadius: "50%",
       backgroundColor: "#ddd",
       border: "none",
@@ -118,111 +164,38 @@ const CourseCarousel = () => {
       backgroundColor: "var(--primary-color, #ff9a70)",
       transform: "scale(1.2)",
     },
-    // Media query styles to be applied conditionally
-    tablet: {
-      leftCard: {
-        transform: "translateX(-220px) scale(0.8)",
-      },
-      rightCard: {
-        transform: "translateX(220px) scale(0.8)",
-      },
-    },
-    mobile: {
-      carouselCardWrapper: {
-        width: "250px",
-        height: "350px",
-      },
-      leftCard: {
-        transform: "translateX(-180px) scale(0.75)",
-      },
-      rightCard: {
-        transform: "translateX(180px) scale(0.75)",
-      },
-    },
-    smallMobile: {
-      carouselTrack: {
-        minHeight: "400px",
-      },
-      carouselCardWrapper: {
-        width: "220px",
-        height: "320px",
-      },
-      leftCard: {
-        opacity: 0.4,
-        transform: "translateX(-120px) scale(0.7)",
-      },
-      rightCard: {
-        opacity: 0.4,
-        transform: "translateX(120px) scale(0.7)",
-      },
+    heading: {
+      fontSize: screenSize.isSmallMobile
+        ? "32px"
+        : screenSize.isMobile
+        ? "42px"
+        : "60px",
+      fontWeight: "lighter",
+      paddingLeft: "20px",
+      paddingBottom: "20px",
+      textAlign: screenSize.isSmallMobile ? "center" : "left",
     },
   };
 
-  // Determine screen size for responsive styling
-  const isTablet = window.matchMedia("(max-width: 1024px)").matches;
-  const isMobile = window.matchMedia("(max-width: 768px)").matches;
-  const isSmallMobile = window.matchMedia("(max-width: 480px)").matches;
-
-  // Function to get card wrapper styles based on index and screen size
+  // Function to get card wrapper style based on index
   const getCardWrapperStyle = (index) => {
-    let cardStyle = { ...styles.carouselCardWrapper };
+    const baseStyle = styles.carouselCardWrapper;
 
-    // Apply responsive styles based on screen size
-    if (isSmallMobile) {
-      cardStyle = { ...cardStyle, ...styles.smallMobile.carouselCardWrapper };
-    } else if (isMobile) {
-      cardStyle = { ...cardStyle, ...styles.mobile.carouselCardWrapper };
-    }
-
-    // Apply position styles based on index relative to active index
     if (index < activeIndex) {
-      if (isSmallMobile) {
-        return { ...cardStyle, ...styles.smallMobile.leftCard };
-      } else if (isMobile) {
-        return { ...cardStyle, ...styles.mobile.leftCard };
-      } else if (isTablet) {
-        return { ...cardStyle, ...styles.tablet.leftCard };
-      } else {
-        return { ...cardStyle, ...styles.leftCard };
-      }
+      return { ...baseStyle, ...styles.leftCard };
     } else if (index > activeIndex) {
-      if (isSmallMobile) {
-        return { ...cardStyle, ...styles.smallMobile.rightCard };
-      } else if (isMobile) {
-        return { ...cardStyle, ...styles.mobile.rightCard };
-      } else if (isTablet) {
-        return { ...cardStyle, ...styles.tablet.rightCard };
-      } else {
-        return { ...cardStyle, ...styles.rightCard };
-      }
+      return { ...baseStyle, ...styles.rightCard };
     } else {
-      return { ...cardStyle, ...styles.activeCard };
+      return { ...baseStyle, ...styles.activeCard };
     }
-  };
-
-  // Get track style based on screen size
-  const getTrackStyle = () => {
-    if (isSmallMobile) {
-      return { ...styles.carouselTrack, ...styles.smallMobile.carouselTrack };
-    }
-    return styles.carouselTrack;
   };
 
   return (
     <>
-      <h4
-        style={{
-          fontSize: "60px",
-          fontWeight: "lighter",
-          paddingLeft: "20px",
-          paddingBottom: "20px",
-        }}
-      >
-        Choose Your path:
-      </h4>
+      <h4 style={styles.heading}>Choose Your path:</h4>
 
       <div style={styles.carouselContainer}>
-        <div style={getTrackStyle()}>
+        <div style={styles.carouselTrack}>
           {courses.map((course, index) => (
             <div
               key={course.id}

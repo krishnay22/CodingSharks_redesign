@@ -36,6 +36,25 @@ const RecruitmentStoriesCarousel = () => {
     },
   ];
 
+  // Check if viewport is mobile
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Update device type on window resize
+  useEffect(() => {
+    const checkIfMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    // Initial check
+    checkIfMobile();
+
+    // Add event listener
+    window.addEventListener("resize", checkIfMobile);
+
+    // Cleanup
+    return () => window.removeEventListener("resize", checkIfMobile);
+  }, []);
+
   // Advance to next slide
   const nextSlide = useCallback(() => {
     if (!isTransitioning) {
@@ -57,7 +76,7 @@ const RecruitmentStoriesCarousel = () => {
   // Handle automatic slide transitions
   useEffect(() => {
     const transitionTime = 500; // Time for slide transition animation
-    const slideInterval = 1500; // Time between slides (3 seconds)
+    const slideInterval = 5000; // Time between slides (5 seconds)
 
     let slideTimer;
 
@@ -135,8 +154,8 @@ const RecruitmentStoriesCarousel = () => {
       position: "relative",
       maxWidth: "1100px",
       margin: "0 auto",
-      padding: "0 60px", // Space for outside buttons
-      height: "500px",
+      padding: isMobile ? "0 30px" : "0 60px", // Reduced padding for mobile
+      height: isMobile ? "auto" : "500px",
     },
     slideWindow: {
       width: "100%",
@@ -154,14 +173,16 @@ const RecruitmentStoriesCarousel = () => {
     },
     slide: {
       display: "flex",
+      flexDirection: isMobile ? "column" : "row", // Stack vertically on mobile
       borderRadius: "8px",
       boxShadow: "0 4px 8px rgba(0, 0, 0, 0.2)",
       backgroundColor: "#f8f9fa",
       height: "100%",
     },
     imageContainer: {
-      flex: "0 0 300px",
-      marginRight: "2rem",
+      flex: isMobile ? "0 0 250px" : "0 0 300px",
+      marginRight: isMobile ? "0" : "2rem",
+      marginBottom: isMobile ? "1rem" : "0",
       overflow: "hidden",
       boxShadow: "0 2px 4px rgba(0, 0, 0, 0.1)",
     },
@@ -177,14 +198,15 @@ const RecruitmentStoriesCarousel = () => {
       display: "flex",
       flexDirection: "column",
       justifyContent: "center",
+      padding: isMobile ? "1rem" : "0",
     },
     heading: {
-      fontSize: "2rem",
+      fontSize: isMobile ? "1.5rem" : "2rem",
       marginBottom: "1rem",
       color: "#333",
     },
     paragraph: {
-      fontSize: "1rem",
+      fontSize: isMobile ? "0.9rem" : "1rem",
       lineHeight: "1.6",
       color: "#555",
     },
@@ -204,13 +226,13 @@ const RecruitmentStoriesCarousel = () => {
       color: "white",
       border: "none",
       borderRadius: "50%",
-      width: "50px",
-      height: "50px",
+      width: isMobile ? "40px" : "50px",
+      height: isMobile ? "40px" : "50px",
       display: "flex",
       justifyContent: "center",
       alignItems: "center",
       cursor: "pointer",
-      fontSize: "1.8rem",
+      fontSize: isMobile ? "1.4rem" : "1.8rem",
       transition: "background-color 0.3s ease",
       position: "absolute",
     },
@@ -221,6 +243,19 @@ const RecruitmentStoriesCarousel = () => {
     rightButton: {
       right: "0",
       transform: "translateX(50%)",
+    },
+    indicators: {
+      display: "flex",
+      justifyContent: "center",
+      marginTop: "20px",
+    },
+    indicator: {
+      width: "10px",
+      height: "10px",
+      borderRadius: "50%",
+      margin: "0 5px",
+      cursor: "pointer",
+      transition: "background-color 0.3s ease",
     },
   };
 
@@ -233,6 +268,13 @@ const RecruitmentStoriesCarousel = () => {
     }, 300);
   };
 
+  // Adjust slide height for mobile view
+  const slideHeight = isMobile
+    ? activeIndex !== null
+      ? "500px"
+      : "auto"
+    : "500px";
+
   return (
     <>
       <h2
@@ -241,25 +283,35 @@ const RecruitmentStoriesCarousel = () => {
           opacity: 0,
           transform: "translateY(200px)",
           transition: "transform 0.2s ease-out, opacity 0.8s ease-out",
-          padding: "80px 20px 60px 50px",
-          fontSize: "55px",
+          padding: isMobile ? "40px 20px 30px 20px" : "80px 20px 60px 50px",
+          fontSize: isMobile ? "32px" : "55px",
           fontWeight: "lighter",
+          textAlign: isMobile ? "center" : "left",
         }}
       >
-        Student's who got placed by us:
+        Students who got placed by us:
       </h2>
       <div
-        style={styles.outerContainer}
+        style={{
+          ...styles.outerContainer,
+          height: slideHeight,
+        }}
         onMouseEnter={() => setIsPaused(true)}
         onMouseLeave={() => setIsPaused(false)}
       >
-        <div style={styles.slideWindow}>
+        <div
+          style={{
+            ...styles.slideWindow,
+            height: slideHeight,
+          }}
+        >
           {stories.map((story, index) => (
             <div
               key={story.id}
               style={{
                 ...styles.slideContainer,
                 ...getSlideStyle(index),
+                height: slideHeight,
               }}
             >
               <div style={styles.slide}>
@@ -292,6 +344,7 @@ const RecruitmentStoriesCarousel = () => {
             style={{ ...styles.navButton, ...styles.leftButton }}
             onClick={prevSlide}
             disabled={isTransitioning}
+            aria-label="Previous slide"
           >
             &#10094;
           </button>
@@ -299,10 +352,34 @@ const RecruitmentStoriesCarousel = () => {
             style={{ ...styles.navButton, ...styles.rightButton }}
             onClick={nextSlide}
             disabled={isTransitioning}
+            aria-label="Next slide"
           >
             &#10095;
           </button>
         </div>
+
+        {/* Add indicators for mobile view */}
+        {isMobile && (
+          <div style={styles.indicators}>
+            {stories.map((_, index) => (
+              <div
+                key={index}
+                style={{
+                  ...styles.indicator,
+                  backgroundColor: index === activeIndex ? "#ff996e" : "#ddd",
+                }}
+                onClick={() => {
+                  if (!isTransitioning) {
+                    setIsTransitioning(true);
+                    setDirection(index > activeIndex ? "left" : "right");
+                    setActiveIndex(index);
+                  }
+                }}
+                aria-label={`Go to slide ${index + 1}`}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </>
   );
