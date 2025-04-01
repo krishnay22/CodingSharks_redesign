@@ -61,8 +61,8 @@ const CourseCard = ({ course, isActive }) => {
       left: 0,
       width: "100%",
       height: "100%",
-      background:
-        "linear-gradient(to bottom, rgba(255, 154, 112, 0.2), rgba(255, 154, 112, 0.6))",
+      // background:
+      //   "linear-gradient(to bottom, rgba(255, 154, 112, 0.2), rgba(255, 154, 112, 0.6))",
       opacity: 0,
       transition: "opacity 0.3s ease",
     },
@@ -212,7 +212,7 @@ const CourseCard = ({ course, isActive }) => {
           <span style={categoryStyle}>{course.category}</span>
           <h3 style={titleStyle}>{course.title}</h3>
           <p style={descriptionStyle}>{course.description}</p>
-          <button style={buttonStyle}>Enroll Now</button>
+          <button style={buttonStyle}>View Details</button>
         </div>
       </div>
     </div>

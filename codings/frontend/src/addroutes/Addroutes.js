@@ -5,6 +5,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import UserDashboard from "../pages/user/Dashboard";
 import CourseTimeline from "../pages/user/CourseTimeline";
 import LeagueBoard from "../pages/user/LeagueBoard";
+import CourseCarousel from "../components/CourseCarousel";
 const AppRoutes = () => {
   return (
     <Router>
@@ -12,6 +13,7 @@ const AppRoutes = () => {
         {/* Landing Page Routes */}
         <Route path="/" element={<LandingLayout />}>
           <Route index element={<Home />} />
+          <Route path="courses" element={<CourseCarousel />} />
         </Route>
 
         {/* Dashboard Routes */}

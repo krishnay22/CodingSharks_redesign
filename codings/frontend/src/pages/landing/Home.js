@@ -17,7 +17,7 @@ const Home = () => {
         <CommunitySection />
       </div>
       <UseCases />
-      <div style={{ padding: "150px 0px 0px 0px" }}>
+      <div style={{ padding: "40px 0px 0px 0px" }}>
         <CourseCarousel />
       </div>
 

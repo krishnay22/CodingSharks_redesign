@@ -169,10 +169,12 @@ const CourseCarousel = () => {
         ? "32px"
         : screenSize.isMobile
         ? "42px"
-        : "60px",
+        : "50px",
       fontWeight: "lighter",
       paddingLeft: "20px",
       paddingBottom: "20px",
+      paddingTop: "20px",
+
       textAlign: screenSize.isSmallMobile ? "center" : "left",
     },
   };
@@ -192,7 +194,7 @@ const CourseCarousel = () => {
 
   return (
     <>
-      <h4 style={styles.heading}>Choose Your path:</h4>
+      <h4 style={styles.heading}>Choose your path:</h4>
 
       <div style={styles.carouselContainer}>
         <div style={styles.carouselTrack}>
