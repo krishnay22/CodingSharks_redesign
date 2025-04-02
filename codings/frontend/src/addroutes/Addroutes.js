@@ -7,6 +7,7 @@ import CourseTimeline from "../pages/user/CourseTimeline";
 import LeagueBoard from "../pages/user/LeagueBoard";
 import CourseCarousel from "../components/CourseCarousel";
 import CourseDetails from "../components/homecomponents/Courses";
+import { pythonCourseData } from "../components/homecomponents/CoursesData";
 const AppRoutes = () => {
   return (
     <Router>
@@ -15,7 +16,10 @@ const AppRoutes = () => {
         <Route path="/" element={<LandingLayout />}>
           <Route index element={<Home />} />
           <Route path="courses" element={<CourseCarousel />} />
-          <Route path="coursesDetails" element={<CourseDetails />} />
+          <Route
+            path="coursesDetails"
+            element={<CourseDetails {...pythonCourseData} />}
+          />
         </Route>
 
         {/* Dashboard Routes */}
