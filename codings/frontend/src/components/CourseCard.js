@@ -61,8 +61,6 @@ const CourseCard = ({ course, isActive }) => {
       left: 0,
       width: "100%",
       height: "100%",
-      // background:
-      //   "linear-gradient(to bottom, rgba(255, 154, 112, 0.2), rgba(255, 154, 112, 0.6))",
       opacity: 0,
       transition: "opacity 0.3s ease",
     },
@@ -120,6 +118,8 @@ const CourseCard = ({ course, isActive }) => {
       transform: "translateY(10px)",
       transitionDelay: "0.3s",
       alignSelf: "flex-start",
+      textDecoration: "none",
+      display: "inline-block",
     },
     cardButtonHover: {
       backgroundColor: "#ff8a57",
@@ -190,7 +190,13 @@ const CourseCard = ({ course, isActive }) => {
     ...(isSmallScreen && styles.smallScreen.cardButton),
   };
 
-  // Button hover state would be handled with onMouseEnter/onMouseLeave in real implementation
+  // Function to handle button hover state
+  const [isButtonHovered, setIsButtonHovered] = useState(false);
+
+  const combinedButtonStyle = {
+    ...buttonStyle,
+    ...(isButtonHovered && styles.cardButtonHover),
+  };
 
   return (
     <div
@@ -212,7 +218,14 @@ const CourseCard = ({ course, isActive }) => {
           <span style={categoryStyle}>{course.category}</span>
           <h3 style={titleStyle}>{course.title}</h3>
           <p style={descriptionStyle}>{course.description}</p>
-          <button style={buttonStyle}>View Details</button>
+          <a
+            href={course.url}
+            style={combinedButtonStyle}
+            onMouseEnter={() => setIsButtonHovered(true)}
+            onMouseLeave={() => setIsButtonHovered(false)}
+          >
+            View Details
+          </a>
         </div>
       </div>
     </div>

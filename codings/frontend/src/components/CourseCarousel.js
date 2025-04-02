@@ -19,6 +19,7 @@ const CourseCarousel = () => {
       image:
         "https://blog.nextideatech.com/wp-content/uploads/2022/12/1_FVtCyRdJ6KOr4YswTtwMeA.jpeg",
       category: "Web Development",
+      url: "/coursesDetails",
     },
     {
       id: 2,
@@ -28,6 +29,7 @@ const CourseCarousel = () => {
       image:
         "https://venus-online-software-training.com/wp-content/uploads/2023/12/Python-Symbol.png",
       category: "Programming",
+      url: "/coursesDetails",
     },
     {
       id: 3,
@@ -37,6 +39,7 @@ const CourseCarousel = () => {
       image:
         "https://www.ishir.com/wp-content/uploads/2024/01/Data-Scientist-vs-Data-Analyst-vs-Data-Engineer-ISHIR.jpg",
       category: "Data Science",
+      url: "/coursesDetails",
     },
   ];
 
@@ -174,7 +177,6 @@ const CourseCarousel = () => {
       paddingLeft: "20px",
       paddingBottom: "20px",
       paddingTop: "20px",
-
       textAlign: screenSize.isSmallMobile ? "center" : "left",
     },
   };
