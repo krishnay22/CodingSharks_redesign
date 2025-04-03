@@ -13,7 +13,7 @@ const Home = () => {
     <div className="w-full overflow-x-hidden">
       <EnquirySection />
       <LogoSlider />
-      <div className="my-32" style={{ padding: "0px 0px 150px 0px" }}>
+      <div className="my-32" style={{ padding: "0px 0px 40px 0px" }}>
         <CommunitySection />
       </div>
       <UseCases />

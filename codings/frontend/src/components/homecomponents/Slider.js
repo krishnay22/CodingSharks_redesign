@@ -283,7 +283,7 @@ const RecruitmentStoriesCarousel = () => {
           opacity: 0,
           transform: "translateY(200px)",
           transition: "transform 0.2s ease-out, opacity 0.8s ease-out",
-          padding: isMobile ? "40px 20px 30px 20px" : "80px 20px 60px 50px",
+          padding: isMobile ? "40px 20px 30px 20px" : "40px 20px 60px 50px",
           fontSize: isMobile ? "32px" : "55px",
           fontWeight: "lighter",
           textAlign: isMobile ? "center" : "left",

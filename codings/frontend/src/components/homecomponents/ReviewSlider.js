@@ -37,10 +37,10 @@ export default function ReviewSlider() {
     ? "60px 15px 0px 30px"
     : "80px 20px 0px 50px";
   const subtitlePadding = isMobile
-    ? "0px 10px 40px 10px"
+    ? "0px 10px 20px 10px"
     : isTablet
-    ? "0px 15px 60px 30px"
-    : "0px 20px 80px 50px";
+    ? "0px 15px 20px 30px"
+    : "0px 20px 20px 50px";
   const sliderHeight = isMobile ? "200px" : isTablet ? "220px" : "250px";
   const itemHeight = isMobile ? "300px" : isTablet ? "350px" : "400px";
   const animationDuration = isMobile ? "25s" : "30s";

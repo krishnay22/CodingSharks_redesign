@@ -210,20 +210,6 @@ const CourseCarousel = () => {
             </div>
           ))}
         </div>
-
-        <div style={styles.carouselIndicators}>
-          {courses.map((_, index) => (
-            <button
-              key={index}
-              style={{
-                ...styles.carouselIndicator,
-                ...(index === activeIndex && styles.activeIndicator),
-              }}
-              onClick={() => handleCardClick(index)}
-              aria-label={`Go to slide ${index + 1}`}
-            />
-          ))}
-        </div>
       </div>
     </>
   );
