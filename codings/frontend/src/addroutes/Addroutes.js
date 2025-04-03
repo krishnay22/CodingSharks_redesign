@@ -6,8 +6,9 @@ import UserDashboard from "../pages/user/Dashboard";
 import CourseTimeline from "../pages/user/CourseTimeline";
 import LeagueBoard from "../pages/user/LeagueBoard";
 import CourseCarousel from "../components/CourseCarousel";
-import CourseDetails from "../components/homecomponents/Courses";
-import { pythonCourseData } from "../components/homecomponents/CoursesData";
+import PythonCourseDetails from "../components/homecomponents/PythonCourseDetails";
+import MERNStackCourseDetails from "../components/homecomponents/MernCourseDetails";
+import DataAnalystCourseDetails from "../components/homecomponents/DataanalystCoursedetails";
 const AppRoutes = () => {
   return (
     <Router>
@@ -17,8 +18,17 @@ const AppRoutes = () => {
           <Route index element={<Home />} />
           <Route path="courses" element={<CourseCarousel />} />
           <Route
-            path="coursesDetails"
-            element={<CourseDetails {...pythonCourseData} />}
+            path="PythonCoursesDetails"
+            element={<PythonCourseDetails />}
+          />
+          <Route
+            path="MERNStackCourseDetails"
+            element={<MERNStackCourseDetails />}
+          />
+
+          <Route
+            path="DataAnalystCourseDetails"
+            element={<DataAnalystCourseDetails />}
           />
         </Route>
 
