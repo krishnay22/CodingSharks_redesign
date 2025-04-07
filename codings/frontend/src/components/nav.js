@@ -30,7 +30,7 @@ function Homenav() {
             <Nav.Link as={NavLink} to="/students-work" activeClassName="active">
               Students Work
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/about" activeClassName="active">
+            <Nav.Link as={NavLink} to="/AboutUsPage" activeClassName="active">
               About us
             </Nav.Link>
           </Nav>

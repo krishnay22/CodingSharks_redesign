@@ -1,5 +1,6 @@
 import { Outlet } from "react-router-dom";
 import Homenav from "../components/nav";
+import Footer from "../components/homecomponents/FooterForLandingpage";
 
 const LandingLayout = () => {
   return (
@@ -8,6 +9,7 @@ const LandingLayout = () => {
       <main>
         <Outlet />
       </main>
+      <Footer />
     </>
   );
 };

@@ -4,7 +4,6 @@ import EnquirySection from "../../components/homecomponents/Enquire";
 import CommunitySection from "../../components/homecomponents/Aboutus";
 import ReviewSlider from "../../components/homecomponents/ReviewSlider";
 import RecruitmentStories from "../../components/homecomponents/Slider";
-import Footer from "../../components/homecomponents/FooterForLandingpage";
 import UseCases from "../../components/homecomponents/teachingMethods";
 import CourseCarousel from "../../components/CourseCarousel";
 
@@ -28,8 +27,6 @@ const Home = () => {
       <div className="my-32">
         <ReviewSlider />
       </div>
-
-      <Footer />
     </div>
   );
 };

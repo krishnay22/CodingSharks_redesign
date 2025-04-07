@@ -9,6 +9,7 @@ import CourseCarousel from "../components/CourseCarousel";
 import PythonCourseDetails from "../components/homecomponents/PythonCourseDetails";
 import MERNStackCourseDetails from "../components/homecomponents/MernCourseDetails";
 import DataAnalystCourseDetails from "../components/homecomponents/DataanalystCoursedetails";
+import AboutUsPage from "../components/homecomponents/AboutusPage";
 const AppRoutes = () => {
   return (
     <Router>
@@ -30,6 +31,7 @@ const AppRoutes = () => {
             path="DataAnalystCourseDetails"
             element={<DataAnalystCourseDetails />}
           />
+          <Route path="AboutUsPage" element={<AboutUsPage />} />
         </Route>
 
         {/* Dashboard Routes */}
