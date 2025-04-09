@@ -10,6 +10,7 @@ import PythonCourseDetails from "../components/homecomponents/PythonCourseDetail
 import MERNStackCourseDetails from "../components/homecomponents/MernCourseDetails";
 import DataAnalystCourseDetails from "../components/homecomponents/DataanalystCoursedetails";
 import AboutUsPage from "../components/homecomponents/AboutusPage";
+import Dailyquestions from "../pages/user/DailyQuest";
 const AppRoutes = () => {
   return (
     <Router>
@@ -39,6 +40,7 @@ const AppRoutes = () => {
           <Route index element={<UserDashboard />} />
           <Route path="CourseTimeline" element={<CourseTimeline />} />
           <Route path="LeagueBoard" element={<LeagueBoard />} />
+          <Route path="Dailyquestions" element={<Dailyquestions />} />
         </Route>
       </Routes>
     </Router>

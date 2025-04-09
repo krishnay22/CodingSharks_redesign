@@ -131,7 +131,6 @@ const CourseCarousel = () => {
         ? "translateX(-220px) scale(0.8)"
         : "translateX(-320px) scale(0.85)",
       zIndex: 0,
-      opacity: screenSize.isSmallMobile ? 0.4 : 0.7,
     },
     rightCard: {
       transform: screenSize.isSmallMobile
@@ -142,7 +141,6 @@ const CourseCarousel = () => {
         ? "translateX(220px) scale(0.8)"
         : "translateX(320px) scale(0.85)",
       zIndex: 0,
-      opacity: screenSize.isSmallMobile ? 0.4 : 0.7,
     },
     activeCard: {
       transform: "translateY(-20px) scale(1.1)",

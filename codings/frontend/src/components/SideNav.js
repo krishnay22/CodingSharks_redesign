@@ -78,7 +78,7 @@ const SideNav = () => {
             </li>
             <li className="nav-item">
               <NavLink
-                to="/daily-questions"
+                to="/dashboard/Dailyquestions"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
