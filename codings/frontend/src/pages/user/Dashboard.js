@@ -9,7 +9,7 @@ const NewComponent = () => {
     
     <div
       style={{
-        border: "2px solid black",
+        
         padding: "20px",
         borderRadius: "10px",
         position: "relative",
@@ -48,7 +48,7 @@ const NewComponent = () => {
             <div className="right-box">
               <div className="progress-header">Web Development Progress</div>
               <div className="divider"></div>
-              <p className="role">Front-end Developer</p>
+              <p className="role">Front-End Developer</p>
               <ul className="progress-list">
                 <li>Basic Document Structure</li>
                 <li>Tags and Attributes</li>
@@ -177,7 +177,7 @@ const NewComponent = () => {
           }
           .right-box {
             width: 98%;
-            padding: 16px;
+            padding: 15px;
             background: white;
             border: 2px solid black;
             border-radius: 19px;
@@ -189,23 +189,32 @@ const NewComponent = () => {
           .progress-header {
             font-weight: bold;
             text-align: center;
+            position: absolute;
+            top: 167px;
+            left: 683px;
+            color: #333;
+            background-color: white;
+            border: 2px solid #ff996e;
+            border-radius: 8px;
+            padding: 10px 80px;
           }
           .role {
-            font-size: 16px;
-            color: #333;
-            text-align: center;
-            margin: 10px 0;
+           font-size: 21px;
+           color: #333;
+           position: relative; left: 50px;">
+           margin: 10px 0;
           }
           .progress-list {
-            list-style: none;
-            padding: 0;
+          list-style: none;
+          padding: 0;
           }
           .progress-list li {
-            padding: 5px 0;
-            text-align: center;
+          padding: 10px 0;
+          position: relative; left: 50px;">
+          font-size: 21px;
           }
           .progress-circle {
-            width: 100px;
+            width: 75px;
             height: 100px;
             margin: 15px auto;
           }

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import ProgressBar from "react-bootstrap/ProgressBar";
+import ProgressBar from 'react-bootstrap/ProgressBar';
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { motion } from "framer-motion";
 
@@ -50,7 +50,6 @@ export default function CourseTimeline() {
   return (
     <div
       style={{
-        border: "2px solid black",
         padding: "20px",
         borderRadius: "20px",
         position: "relative",
@@ -108,19 +107,16 @@ export default function CourseTimeline() {
               marginBottom: "30px",
             }}
           >
-            <ProgressBar
-              now={30}
-              style={{
-                width: "35%",
-                height: "4px",
-                backgroundColor: " #ff6600",
-              }}
-              variant="warning"
-            />
+            <div style={{ width: "35%" }}>
+              <ProgressBar now={60} style={{ height: "4px" }} />
+            </div>
             <style>
               {`
     .progress-bar {
       background-color: #ff6600 !important; /* Orange color */
+    }
+    .progress {
+      height: 4px !important;
     }
   `}
             </style>
