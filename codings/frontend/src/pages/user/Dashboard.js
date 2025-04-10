@@ -229,7 +229,7 @@ const NewComponent = () => {
             margin: clamp(-9px, 2vw, -10px) auto;
           }
 
-          @media (min-width: 768px) {
+          @media (min-width: 992px) {
             .col-md-6 {
               flex: 0 0 50%;
               max-width: 50%;
@@ -240,6 +240,26 @@ const NewComponent = () => {
             }
             .offset-md-1 {
               margin-left: 8.333333%;
+            }
+            .box1 {
+              width: 119%; /* Original width for desktop */
+            }
+          }
+
+          @media (min-width: 768px) and (max-width: 991px) {
+            .col-md-6 {
+              flex: 0 0 50%;
+              max-width: 50%;
+            }
+            .col-md-5 {
+              flex: 0 0 41.666667%;
+              max-width: 41.666667%;
+            }
+            .offset-md-1 {
+              margin-left: 8.333333%;
+            }
+            .box1 {
+              width: 100%; /* Adjusted for tablet to avoid overflow */
             }
           }
 
@@ -267,8 +287,7 @@ const NewComponent = () => {
               left: clamp(10px, 3vw, 20px);
             }
             .box1 {
-              height: auto;
-              min-height: clamp(120px, 25vw, 180px);
+              width: 100%; /* Adjusted for mobile to avoid overflow */
             }
           }
 
