@@ -179,8 +179,8 @@ const NewComponent = () => {
             border-radius: 19px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
             position: relative;
-            height: auto;
-            height: 390px;
+            height: auto; /* Changed to auto to accommodate content */
+            min-height: 390px; /* Use min-height instead of fixed height */
           }
           .right-box:hover {
             border-color: #ff6600;
@@ -274,8 +274,8 @@ const NewComponent = () => {
             }
             .right-box {
               margin-top: clamp(1rem, 2vw, 1.5rem);
-              min-height: 300px;
               padding: clamp(15px, 3vw, 20px);
+              min-height: 300px; /* Adjusted min-height for mobile */
             }
             .progress-header {
               padding: clamp(5px, 1vw, 10px) clamp(10px, 3vw, 20px);
@@ -320,6 +320,9 @@ const NewComponent = () => {
             }
             .role {
               font-size: clamp(14px, 4vw, 16px);
+            }
+            .right-box {
+              min-height: 340px; /* Adjusted to fit progress circle */
             }
           }
         `}</style>
