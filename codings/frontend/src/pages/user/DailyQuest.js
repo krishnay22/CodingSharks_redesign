@@ -55,7 +55,7 @@ export default function QuestionTimer() {
     questionBox: {
       padding: '20px',
       border: '1px solid #ccc',
-      borderRadius: '15px',
+      borderRadius: '25px',
       marginBottom: '20px',
       color: '#555',
       fontSize: '25px',
@@ -112,30 +112,16 @@ export default function QuestionTimer() {
 
   return (
     <div style={styles.container}>
-      <motion.div
-        style={styles.questionBox}
-        initial={{ opacity: 0, y: -50 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.7 }}
-      >
+      <div style={styles.questionBox}>
         <p>
           Write a JavaScript function named <strong>sum</strong> that takes two parameters and returns their sum. Then, call the function with the numbers 5 and 7 and log the result to the console.
         </p>
-      </motion.div>
+      </div>
 
-      <motion.div
-        style={styles.timerContainer}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5, duration: 1 }}
-      >
-        <motion.div
-          style={styles.timer}
-          animate={{ scale: [1, 1.05, 1] }}
-          transition={{ repeat: Infinity, repeatType: 'loop', duration: 2 }}
-        >
+      <div style={styles.timerContainer}>
+        <div style={styles.timer}>
           {time}
-        </motion.div>
+        </div>
 
         <div style={styles.progressBarContainer}>
           <div style={styles.progressBar}></div>
@@ -145,12 +131,13 @@ export default function QuestionTimer() {
         <motion.button
           style={styles.button}
           whileHover={{ scale: 1.1, backgroundColor: '#ff9d76', color: 'white' }}
-          whileTap={{ scale: 0.95 }}
+          whileTap={{ scale: 0.9, rotate: 5 }}
+          transition={{ type: 'spring', stiffness: 300, damping: 10 }}
           onClick={handleSubmit}
         >
           send answer
         </motion.button>
-      </motion.div>
+      </div>
     </div>
   );
 }
