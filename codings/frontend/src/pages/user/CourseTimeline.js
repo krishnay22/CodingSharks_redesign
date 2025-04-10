@@ -1,7 +1,9 @@
 import { useEffect, useState } from "react";
-import ProgressBar from 'react-bootstrap/ProgressBar';
+import ProgressBar from "react-bootstrap/ProgressBar";
 import { CircularProgressbar, buildStyles } from "react-circular-progressbar";
 import { motion } from "framer-motion";
+import "react-circular-progressbar/dist/styles.css";
+import "bootstrap/dist/css/bootstrap.min.css"; // Ensure Bootstrap CSS is imported
 
 export default function CourseTimeline() {
   const [selectedTopic, setSelectedTopic] = useState(null);
@@ -41,7 +43,7 @@ export default function CourseTimeline() {
   };
 
   useEffect(() => {
-    document.body.style.backgroundColor = "#F8F8F8";
+    
     return () => {
       document.body.style.backgroundColor = "";
     };
@@ -50,11 +52,13 @@ export default function CourseTimeline() {
   return (
     <div
       style={{
-        padding: "20px",
+        padding: "clamp(10px, 2vw, 20px)",
         borderRadius: "20px",
         position: "relative",
-        minHeight: "650px",
+        minHeight: "clamp(400px, 80vh, 650px)",
         background: "#F8F8F8",
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
       <div
@@ -63,15 +67,15 @@ export default function CourseTimeline() {
           alignItems: "center",
           justifyContent: "center",
           width: "100%",
-          padding: "30px 0",
+          padding: "clamp(15px, 2vw, 30px) 0",
         }}
       >
         <motion.div
           style={{
-            width: "102%",
+            width: "100%",
             maxWidth: "1232px",
             height: "auto",
-            minHeight: "580px",
+            minHeight: "clamp(300px, 70vh, 580px)",
             borderRadius: "30px",
             backgroundColor: "white",
             border: "2px solid black",
@@ -79,10 +83,9 @@ export default function CourseTimeline() {
             flexDirection: "column",
             alignItems: "center",
             justifyContent: "flex-start",
-            paddingTop: "40px",
-            paddingBottom: "40px",
+            padding: "clamp(20px, 3vw, 40px)",
             position: "relative",
-            margin: "auto",
+            margin: "0 auto",
           }}
           initial={{ opacity: 0, scale: 0.8 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -90,9 +93,9 @@ export default function CourseTimeline() {
         >
           <h3
             style={{
-              fontSize: "18px",
+              fontSize: "clamp(14px, 2vw, 18px)",
               fontWeight: "bold",
-              marginBottom: "15px",
+              marginBottom: "clamp(10px, 1.5vw, 15px)",
             }}
           >
             Web Development
@@ -100,32 +103,33 @@ export default function CourseTimeline() {
 
           <div
             style={{
-              width: "67%",
+              width: "clamp(200px, 50%, 67%)",
               display: "flex",
               flexDirection: "column",
               alignItems: "center",
-              marginBottom: "30px",
+              marginBottom: "clamp(15px, 2vw, 30px)",
             }}
           >
-            <div style={{ width: "35%" }}>
-              <ProgressBar now={60} style={{ height: "4px" }} />
+            <div style={{ width: "58%" }}>
+              <ProgressBar
+                now={60}
+                style={{ height: "clamp(2px, 0.5vw, 4px)" }}
+              />
             </div>
-            <style>
-              {`
-    .progress-bar {
-      background-color: #ff6600 !important; /* Orange color */
-    }
-    .progress {
-      height: 4px !important;
-    }
-  `}
-            </style>
+            <style jsx>{`
+              .progress-bar {
+                background-color: #ff6600 !important;
+              }
+              .progress {
+                height: clamp(2px, 0.5vw, 4px) !important;
+              }
+            `}</style>
             <p
               style={{
                 color: "#ff6600",
-                fontSize: "18px",
+                fontSize: "clamp(14px, 2vw, 18px)",
                 fontWeight: "bold",
-                marginTop: "12px",
+                marginTop: "clamp(8px, 1.5vw, 12px)",
               }}
             >
               51% Complete
@@ -135,10 +139,10 @@ export default function CourseTimeline() {
           <div
             style={{
               display: "flex",
-              flexDirection: "column", 
-              gap: "25px",
+              flexDirection: "column",
+              gap: "clamp(15px, 2vw, 25px)",
               width: "90%",
-              maxWidth: "1087px", 
+              maxWidth: "1087px",
             }}
           >
             {Object.keys(topics).map((topic) => (
@@ -149,7 +153,7 @@ export default function CourseTimeline() {
                   borderRadius: "30px",
                   display: "flex",
                   flexDirection: "column",
-                  padding: "25px",
+                  padding: "clamp(15px, 2vw, 25px)",
                   cursor: "pointer",
                 }}
                 onClick={() =>
@@ -159,21 +163,35 @@ export default function CourseTimeline() {
                 whileTap={{ scale: 0.98 }}
               >
                 <div
-                  style={{ display: "flex", alignItems: "center", gap: "25px" }}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "clamp(15px, 2vw, 25px)",
+                  }}
                 >
-                  <div style={{ width: "70px", height: "70px" }}>
+                  <div
+                    style={{
+                      width: "clamp(50px, 10vw, 70px)",
+                      height: "clamp(50px, 10vw, 70px)",
+                    }}
+                  >
                     <CircularProgressbar
                       value={51}
                       text={`94s`}
                       styles={buildStyles({
-                        textSize: "18px",
+                        textSize: "clamp(12px, 2vw, 18px)",
                         pathColor: "#ff6600",
                         textColor: "#ff6600",
                         trailColor: "#d6d6d6",
                       })}
                     />
                   </div>
-                  <p style={{ fontSize: "18px", fontWeight: "bold" }}>
+                  <p
+                    style={{
+                      fontSize: "clamp(14px, 2vw, 18px)",
+                      fontWeight: "bold",
+                    }}
+                  >
                     {topic}
                   </p>
                 </div>
@@ -181,8 +199,8 @@ export default function CourseTimeline() {
                   <motion.div
                     style={{
                       width: "100%",
-                      marginTop: "15px",
-                      paddingTop: "15px",
+                      marginTop: "clamp(10px, 1.5vw, 15px)",
+                      paddingTop: "clamp(10px, 1.5vw, 15px)",
                       borderTop: "1px solid black",
                       textAlign: "left",
                     }}
@@ -190,14 +208,19 @@ export default function CourseTimeline() {
                     animate={{ opacity: 1, height: "auto" }}
                     transition={{ duration: 0.3 }}
                   >
-                    <h3 style={{ fontSize: "18px", fontWeight: "bold" }}>
+                    <h3
+                      style={{
+                        fontSize: "clamp(14px, 2vw, 18px)",
+                        fontWeight: "bold",
+                      }}
+                    >
                       {topic}
                     </h3>
                     <ul
                       style={{
                         listStyleType: "none",
                         padding: "0",
-                        margin: "10px 0 0 0",
+                        margin: "clamp(5px, 1vw, 10px) 0 0 0",
                       }}
                     >
                       {topics[topic].map((item, index) => (
@@ -206,8 +229,8 @@ export default function CourseTimeline() {
                           style={{
                             display: "flex",
                             alignItems: "center",
-                            gap: "15px",
-                            marginBottom: "8px",
+                            gap: "clamp(10px, 1.5vw, 15px)",
+                            marginBottom: "clamp(5px, 1vw, 8px)",
                             cursor: "pointer",
                           }}
                           initial={{ opacity: 0, x: -20 }}
@@ -217,8 +240,8 @@ export default function CourseTimeline() {
                         >
                           <span
                             style={{
-                              width: "10px",
-                              height: "10px",
+                              width: "clamp(6px, 1vw, 10px)",
+                              height: "clamp(6px, 1vw, 10px)",
                               backgroundColor: "#ff6600",
                               borderRadius: "50%",
                             }}

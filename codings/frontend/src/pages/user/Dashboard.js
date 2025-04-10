@@ -6,16 +6,16 @@ const NewComponent = () => {
   const [percentage, setPercentage] = useState(65);
 
   return (
-    
     <div
       style={{
-        
-        padding: "20px",
+        padding: "clamp(10px, 2vw, 20px)",
         borderRadius: "10px",
         position: "relative",
-        minHeight: "650px",
+        minHeight: "clamp(400px, 100vh, 650px)",
         overflow: "hidden",
         background: "#F8F8F8",
+        width: "100%",
+        boxSizing: "border-box",
       }}
     >
       <div className="container">
@@ -36,14 +36,14 @@ const NewComponent = () => {
                 <p>This will include future events</p>
               </div>
             </div>
-            
+
             <div className="box1 mt-4">
               <h4 className="box3">News</h4>
               <div className="divider"></div>
               <div className="nested-box"></div>
             </div>
           </div>
-          
+
           <div className="col-md-5 col-sm-12 offset-md-1">
             <div className="right-box">
               <div className="progress-header">Web Development Progress</div>
@@ -62,6 +62,7 @@ const NewComponent = () => {
                     textColor: "#333",
                     pathColor: "#ff6600",
                     trailColor: "#d6d6d6",
+                    textSize: "16px",
                   })}
                 />
               </div>
@@ -71,8 +72,10 @@ const NewComponent = () => {
 
         <style jsx>{`
           .container {
-            padding: 20px;
+            padding: clamp(10px, 2vw, 20px);
             width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
           }
           .row {
             display: flex;
@@ -86,27 +89,27 @@ const NewComponent = () => {
             padding: 0 15px;
           }
           .col-md-6 {
-            flex: 0 0 50%;
-            max-width: 50%;
+            flex: 0 0 100%;
+            max-width: 100%;
             padding: 0 15px;
           }
           .col-md-5 {
-            flex: 0 0 41.666667%;
-            max-width: 41.666667%;
+            flex: 0 0 100%;
+            max-width: 100%;
             padding: 0 15px;
           }
           .offset-md-1 {
-            margin-left: 8.333333%;
+            margin-left: 0;
           }
           .col-sm-12 {
             padding: 0 15px;
           }
           .mt-4 {
-            margin-top: 1.5rem;
+            margin-top: clamp(1rem, 2vw, 1.5rem);
           }
           .box {
             width: 100%;
-            padding: 65px;
+            padding: clamp(20px, 5vw, 65px);
             background: white;
             border: 2px solid black;
             border-radius: 34px;
@@ -121,16 +124,17 @@ const NewComponent = () => {
           .box h4 {
             position: absolute;
             top: -15px;
-            left: -19px;
+            left: clamp(10px, 2vw, 20px);
             color: #333;
             background-color: white;
             border: 2px solid #ff996e;
             border-radius: 8px;
-            padding: 5px 10px;
+            padding: clamp(3px, 1vw, 5px) clamp(5px, 1.5vw, 10px);
+            font-size: clamp(26px, 2vw, 18px);
           }
           .box1 {
             width: 119%;
-            height: 180px;
+            height: clamp(120px, 25vw, 180px);
             background: white;
             border: 2px solid black;
             border-radius: 34px;
@@ -139,49 +143,44 @@ const NewComponent = () => {
           .box1:hover {
             border-color: #ff6600;
           }
-          .box2 {
-            position: absolute;
-            top: -15px;
-            left: -19px;
-            color: #333;
-            background-color: white;
-            border: 2px solid #ff996e;
-            border-radius: 8px;
-            padding: 4px 10px;
-          }
+          .box2,
           .box3 {
             position: absolute;
             top: -15px;
-            left: -19px;
+            left: clamp(10px, 2vw, 20px);
             color: #333;
             background-color: white;
             border: 2px solid #ff996e;
             border-radius: 8px;
-            padding: 4px 10px;
+            padding: clamp(3px, 1vw, 4px) clamp(5px, 1.5vw, 10px);
+            font-size: clamp(24px, 2vw, 18px);
           }
           .divider {
             width: 96%;
             height: 1px;
             background: #ff996e;
-            margin: 22px 0;
+            margin: clamp(15px, 2vw, 22px) auto;
           }
           .nested-box {
             width: 90%;
             margin-left: 5%;
-            height: 87px;
-            padding: 10px;
+            height: clamp(60px, 15vw, 87px);
+            padding: clamp(5px, 1.5vw, 10px);
             background: white;
             border: 2px solid black;
             border-radius: 19px;
-             margin-top: 45px;
+            margin-top: clamp(10px, 5vw, 30px);
           }
           .right-box {
-            width: 98%;
-            padding: 15px;
+            width: 100%;
+            padding: clamp(10px, 2vw, 15px);
             background: white;
             border: 2px solid black;
             border-radius: 19px;
             box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
+            position: relative;
+            height: auto;
+            height: 390px;
           }
           .right-box:hover {
             border-color: #ff6600;
@@ -189,38 +188,64 @@ const NewComponent = () => {
           .progress-header {
             font-weight: bold;
             text-align: center;
-            position: absolute;
-            top: 167px;
-            left: 683px;
             color: #333;
             background-color: white;
             border: 2px solid #ff996e;
             border-radius: 8px;
-            padding: 10px 80px;
+            padding: clamp(5px, 1vw, 10px) clamp(10px, 5vw, 40px);
+            font-size: clamp(14px, 2vw, 18px);
+            position: relative;
+            top: 0;
+            left: 0;
+            transform: none;
+            margin-bottom: clamp(10px, 2vw, 20px);
+            display: inline-block;
           }
           .role {
-           font-size: 21px;
-           color: #333;
-           position: relative; left: 50px;">
-           margin: 10px 0;
+            font-size: clamp(16px, 2vw, 21px);
+            color: #333;
+            margin: clamp(5px, 1vw, 10px) 0;
+            position: relative;
+            left: clamp(20px, 5vw, 50px);
           }
           .progress-list {
-          list-style: none;
-          padding: 0;
+            list-style-type: disc;
+            padding-left: clamp(40px, 6vw, 70px);
+            margin: 0;
           }
           .progress-list li {
-          padding: 10px 0;
-          position: relative; left: 50px;">
-          font-size: 21px;
+            padding: clamp(5px, 1vw, 10px) 0;
+            position: relative;
+            left: clamp(20px, 5vw, 50px);
+            font-size: clamp(14px, 2vw, 16px);
+            color: #333; /* Text color black */
+          }
+          .progress-list li::marker {
+            color: #ff6600; /* Bullet color orange */
           }
           .progress-circle {
-            width: 75px;
-            height: 100px;
-            margin: 15px auto;
+            width: clamp(80px, 15vw, 50px);
+            height: clamp(80px, 15vw, 120px);
+            margin: clamp(-9px, 2vw, -10px) auto;
           }
-          
-          @media (max-width: 768px) {
-            .col-md-6, .col-md-5 {
+
+          @media (min-width: 768px) {
+            .col-md-6 {
+              flex: 0 0 50%;
+              max-width: 50%;
+            }
+            .col-md-5 {
+              flex: 0 0 41.666667%;
+              max-width: 41.666667%;
+            }
+            .offset-md-1 {
+              margin-left: 8.333333%;
+            }
+          }
+
+          @media (max-width: 767px) {
+            .col-md-6,
+            .col-md-5 {
               flex: 0 0 100%;
               max-width: 100%;
             }
@@ -228,7 +253,54 @@ const NewComponent = () => {
               margin-left: 0;
             }
             .right-box {
-              margin-top: 1.5rem;
+              margin-top: clamp(1rem, 2vw, 1.5rem);
+              min-height: 300px;
+              padding: clamp(15px, 3vw, 20px);
+            }
+            .progress-header {
+              padding: clamp(5px, 1vw, 10px) clamp(10px, 3vw, 20px);
+              margin: 0 auto;
+              display: table;
+            }
+            .role,
+            .progress-list li {
+              left: clamp(10px, 3vw, 20px);
+            }
+            .box1 {
+              height: auto;
+              min-height: clamp(120px, 25vw, 180px);
+            }
+          }
+
+          @media (max-width: 480px) {
+            .box1 {
+              height: auto;
+              min-height: clamp(100px, 20vw, 150px);
+            }
+            .nested-box {
+              height: auto;
+              min-height: clamp(50px, 12vw, 70px);
+              margin-top: clamp(5px, 3vw, 15px);
+            }
+            .progress-circle {
+              width: clamp(60px, 15vw, 90px);
+              height: clamp(60px, 15vw, 90px);
+            }
+            .box h4,
+            .box2,
+            .box3 {
+              font-size: clamp(14px, 4vw, 16px);
+              padding: clamp(2px, 0.8vw, 4px) clamp(4px, 1.2vw, 8px);
+            }
+            .progress-list li {
+              font-size: clamp(12px, 3.5vw, 14px);
+              color: #333; /* Text color black on small screens */
+            }
+            .progress-list li::marker {
+              color: #ff6600; /* Bullet color orange on small screens */
+            }
+            .role {
+              font-size: clamp(14px, 4vw, 16px);
             }
           }
         `}</style>
