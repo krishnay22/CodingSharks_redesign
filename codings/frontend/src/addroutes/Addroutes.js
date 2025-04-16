@@ -1,4 +1,4 @@
-                                        import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import Home from "../pages/landing/Home";
 import LandingLayout from "../layouts/LandingLayout";
 import DashboardLayout from "../layouts/DashboardLayout";
@@ -12,6 +12,7 @@ import DataAnalystCourseDetails from "../components/homecomponents/DataanalystCo
 import AboutUsPage from "../components/homecomponents/AboutusPage";
 import Dailyquestions from "../pages/user/DailyQuest";
 import Profile from "../pages/user/Profil";
+import StudentWorkPage from "../components/StudentsWork";
 const AppRoutes = () => {
   return (
     <Router>
@@ -34,6 +35,7 @@ const AppRoutes = () => {
             element={<DataAnalystCourseDetails />}
           />
           <Route path="AboutUsPage" element={<AboutUsPage />} />
+          <Route path="StudentWorkPage" element={<StudentWorkPage />} />
         </Route>
 
         {/* Dashboard Routes */}
