@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { motion } from "framer-motion";
 
-// ToggleButton Component
+
 const ToggleButton = ({ onChange, defaultMonthly = true, children }) => {
   const [isMonthly, setIsMonthly] = useState(defaultMonthly);
 
@@ -15,18 +15,18 @@ const ToggleButton = ({ onChange, defaultMonthly = true, children }) => {
   return (
     <div
       style={{
-        padding: "clamp(0.5rem, 2vw, 1rem)", // Responsive padding
+        padding: "clamp(0.5rem, 2vw, 1rem)", 
         borderRadius: "clamp(1rem, 2vw, 1.25rem)",
         position: "relative",
         background: "#F8F8F8",
         width: "100%",
         boxSizing: "border-box",
-        maxWidth: "clamp(20rem, 90vw, 68.75rem)", // Responsive max-width (320px to 1100px)
+        maxWidth: "clamp(20rem, 90vw, 68.75rem)", 
         margin: "0 auto",
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
-        height: "auto", // Let height adjust to content
+        height: "auto", 
       }}
     >
       <div
