@@ -45,6 +45,7 @@ const AppRoutes = () => {
           <Route path="LeagueBoard" element={<LeagueBoard />} />
           <Route path="Dailyquestions" element={<Dailyquestions />} />
           <Route path="Profile" element={<Profile />} />
+          <Route path="Projects" element={<StudentWorkPage />} />
         </Route>
       </Routes>
     </Router>
