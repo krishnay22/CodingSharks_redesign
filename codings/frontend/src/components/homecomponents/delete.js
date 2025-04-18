@@ -103,7 +103,7 @@ export default function AboutUs() {
       <motion.h2
         initial={{ opacity: 0, y: 20 }}
         whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, margin: "-100px" }}
+        viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.5 }}
       >
         {children}
@@ -112,7 +112,7 @@ export default function AboutUs() {
         className="heading-underline"
         initial={{ width: 0 }}
         whileInView={{ width: "80px" }}
-        viewport={{ once: false, margin: "-100px" }}
+        viewport={{ once: true, margin: "-100px" }}
         transition={{ duration: 0.7, delay: 0.3 }}
       />
     </div>
