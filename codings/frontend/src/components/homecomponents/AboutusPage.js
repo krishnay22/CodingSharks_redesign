@@ -1,12 +1,29 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { motion } from "framer-motion";
+import {
+  Award,
+  Rocket,
+  Target,
+  Search,
+  Sparkles,
+  Lightbulb,
+  Users,
+  Globe,
+  Sprout,
+  Calendar,
+  Code,
+  Presentation,
+} from "lucide-react";
 
 export default function AboutUs() {
   // State for active sections
   const [activeSection, setActiveSection] = useState(0);
   const [activeTimelineIndex, setActiveTimelineIndex] = useState(0);
+
+  // Ref to track which headings have been animated
+  const animatedHeadings = useRef(new Set());
 
   // Sample data
   const timelineItems = [
@@ -39,16 +56,19 @@ export default function AboutUs() {
       name: "Code Camp 2023",
       description: "3-day intensive bootcamp for beginners",
       image: "/placeholder.svg?height=200&width=350",
+      icon: <Code className="h-6 w-6 text-white" />,
     },
     {
       name: "Hackathon for Good",
       description: "Building solutions for local non-profits",
       image: "/placeholder.svg?height=200&width=350",
+      icon: <Calendar className="h-6 w-6 text-white" />,
     },
     {
       name: "Tech Talk Series",
       description: "Weekly webinars with industry experts",
       image: "/placeholder.svg?height=200&width=350",
+      icon: <Presentation className="h-6 w-6 text-white" />,
     },
   ];
 
@@ -97,33 +117,39 @@ export default function AboutUs() {
     },
   };
 
-  // Heading with animated underline
-  const SectionHeading = ({ children }) => (
-    <div className="section-heading">
-      <motion.h2
-        initial={{ opacity: 0, y: 20 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: false, margin: "-100px" }}
-        transition={{ duration: 0.5 }}
-      >
-        {children}
-      </motion.h2>
-      <motion.div
-        className="heading-underline"
-        initial={{ width: 0 }}
-        whileInView={{ width: "80px" }}
-        viewport={{ once: false, margin: "-100px" }}
-        transition={{ duration: 0.7, delay: 0.3 }}
-      />
-    </div>
-  );
+  // Heading with animated underline that only animates once
+  const SectionHeading = ({ children, id }) => {
+    const headingId = id || children.toString();
+    const hasAnimated = animatedHeadings.current.has(headingId);
+
+    return (
+      <div className="section-heading">
+        <motion.h2
+          initial={hasAnimated ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          onAnimationComplete={() => {
+            animatedHeadings.current.add(headingId);
+          }}
+        >
+          {children}
+        </motion.h2>
+        <motion.div
+          className="heading-underline"
+          initial={hasAnimated ? { width: "80px" } : { width: 0 }}
+          animate={{ width: "80px" }}
+          transition={{ duration: 0.7, delay: 0.3 }}
+        />
+      </div>
+    );
+  };
 
   return (
     <>
       <div
         style={{
           backgroundImage:
-            'linear-gradient(to right, rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0)), url("https://media.gettyimages.com/id/1263676100/video/group-of-business-people-working-in-a-office.jpg?s=640x640&k=20&c=5ADwA4PPsxX_jG8QFqAwvfr_3rdn7gtlsG64VUh_Fyc=")',
+            'linear-gradient(to right, rgba(0, 0, 0, 0.7), rgba(0, 0, 0, 0.4)), url("https://media.gettyimages.com/id/1263676100/video/group-of-business-people-working-in-a-office.jpg?s=640x640&k=20&c=5ADwA4PPsxX_jG8QFqAwvfr_3rdn7gtlsG64VUh_Fyc=")',
           backgroundSize: "cover",
           backgroundPosition: "center",
           width: "auto",
@@ -135,7 +161,10 @@ export default function AboutUs() {
         }}
       >
         <div>
-          <h1
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.2 }}
             style={{
               display: "inline-block",
               borderBottom: "1px solid white",
@@ -144,13 +173,21 @@ export default function AboutUs() {
             }}
           >
             About Us
-          </h1>
-          <h2 style={{ marginBottom: "2rem", color: "white" }}>
+          </motion.h1>
+          <motion.h2
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.4 }}
+            style={{ marginBottom: "2rem", color: "white" }}
+          >
             Where passion meets
             <br />
             programming
-          </h2>
-          <div
+          </motion.h2>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 0.8 }}
             style={{
               position: "relative",
               display: "flex",
@@ -171,7 +208,7 @@ export default function AboutUs() {
               <div className="scroll-line"></div>
               <div className="scroll-arrow"></div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </div>
 
@@ -183,7 +220,13 @@ export default function AboutUs() {
         </div>
 
         {/* Right section with white background and text content */}
-        <div className="profile-right">
+        <motion.div
+          className="profile-right"
+          initial={{ opacity: 0, x: 50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
           <h1 className="profile-name">Alex Morgan</h1>
           <h2 className="profile-title">
             Lead Instructor & Full-Stack Developer
@@ -200,39 +243,47 @@ export default function AboutUs() {
           <div>
             <h3 className="profile-experience-title">Previously worked at</h3>
             <p className="profile-experience-list">
-              1. company 2. company 3. company
+              <span className="company-tag">Google</span>
+              <span className="company-tag">Microsoft</span>
+              <span className="company-tag">Amazon</span>
             </p>
           </div>
-        </div>
+        </motion.div>
       </div>
 
       {/* New Reversed Profile Card Section - Exact Copy with Flipped Layout */}
       <div className="profile-card">
         {/* Right section with white background and text content - now on left */}
-        <div className="profile-right">
-          <h1 className="profile-name">Alex Morgan</h1>
-          <h2 className="profile-title">
-            Lead Instructor & Full-Stack Developer
-          </h2>
+        <motion.div
+          className="profile-right"
+          initial={{ opacity: 0, x: -50 }}
+          whileInView={{ opacity: 1, x: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.8 }}
+        >
+          <h1 className="profile-name">Sarah Chen</h1>
+          <h2 className="profile-title">Curriculum Director & UX Specialist</h2>
 
           <div className="profile-divider"></div>
 
           <p className="profile-bio">
-            10+ years of experience specializing in React, Node.js, and cloud
-            architecture. Passionate about mentoring the next generation of
-            developers.
+            Award-winning educator with a background in cognitive science and UX
+            design. Focused on creating intuitive learning experiences that
+            bridge theory and practice.
           </p>
 
           <div>
             <h3 className="profile-experience-title">Previously worked at</h3>
             <p className="profile-experience-list">
-              1. company 2. company 3. company
+              <span className="company-tag">Apple</span>
+              <span className="company-tag">Stanford</span>
+              <span className="company-tag">Airbnb</span>
             </p>
           </div>
-        </div>
+        </motion.div>
 
         {/* Left section with teal background - now on right */}
-        <div className="profile-left">
+        <div className="profile-left profile-left-alt">
           {/* Placeholder for profile image */}
         </div>
       </div>
@@ -247,7 +298,9 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>When & Why We Started</SectionHeading>
+            <SectionHeading id="establishment">
+              When & Why We Started
+            </SectionHeading>
 
             <motion.div className="content-card" variants={itemVariants}>
               <div className="content-year">2018</div>
@@ -279,7 +332,9 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>Why Choose Coding Sharks?</SectionHeading>
+            <SectionHeading id="why-choose">
+              Why Choose Coding Sharks?
+            </SectionHeading>
 
             <motion.div className="features-grid" variants={containerVariants}>
               {[
@@ -287,21 +342,25 @@ export default function AboutUs() {
                   title: "Industry-Active Instructors",
                   description:
                     "Learn from professionals who work in the field and bring real-world experience to the classroom.",
+                  icon: <Award className="feature-icon" />,
                 },
                 {
                   title: "Project-Based Curriculum",
                   description:
                     "Build your portfolio while you learn with projects that simulate real development environments.",
+                  icon: <Code className="feature-icon" />,
                 },
                 {
                   title: "Small Class Sizes",
                   description:
                     "Enjoy personalized attention with our maximum 8:1 student-to-instructor ratio.",
+                  icon: <Users className="feature-icon" />,
                 },
                 {
                   title: "1-on-1 Mentorship",
                   description:
                     "Get paired with a dedicated mentor who guides your learning journey and career development.",
+                  icon: <Rocket className="feature-icon" />,
                 },
               ].map((feature, index) => (
                 <motion.div
@@ -314,6 +373,7 @@ export default function AboutUs() {
                   }}
                   transition={{ duration: 0.3 }}
                 >
+                  <div className="feature-icon-wrapper">{feature.icon}</div>
                   <div className="feature-number">0{index + 1}</div>
                   <h3>{feature.title}</h3>
                   <p>{feature.description}</p>
@@ -332,11 +392,15 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>How to Choose the Right Class</SectionHeading>
+            <SectionHeading id="right-class">
+              How to Choose the Right Class
+            </SectionHeading>
 
             <motion.div className="tips-container" variants={containerVariants}>
               <motion.div className="tip-card" variants={itemVariants}>
-                <div className="tip-icon">🎯</div>
+                <div className="tip-icon-wrapper">
+                  <Target className="tip-icon" />
+                </div>
                 <h3>Assess Your Current Level</h3>
                 <p>
                   Be honest about your skills. Taking a class that's too
@@ -346,7 +410,9 @@ export default function AboutUs() {
               </motion.div>
 
               <motion.div className="tip-card" variants={itemVariants}>
-                <div className="tip-icon">🚀</div>
+                <div className="tip-icon-wrapper">
+                  <Rocket className="tip-icon" />
+                </div>
                 <h3>Consider Your Goals</h3>
                 <p>
                   Are you learning to change careers, enhance current skills, or
@@ -356,7 +422,9 @@ export default function AboutUs() {
               </motion.div>
 
               <motion.div className="tip-card" variants={itemVariants}>
-                <div className="tip-icon">🔍</div>
+                <div className="tip-icon-wrapper">
+                  <Search className="tip-icon" />
+                </div>
                 <h3>Try Before You Commit</h3>
                 <p>
                   Take advantage of our free intro sessions to get a feel for
@@ -376,18 +444,33 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>Our Vision & Values</SectionHeading>
+            <SectionHeading id="vision">Our Vision & Values</SectionHeading>
 
             <motion.div
               className="values-container"
               variants={containerVariants}
             >
               {[
-                { name: "Excellence", icon: "✨" },
-                { name: "Innovation", icon: "💡" },
-                { name: "Community", icon: "🤝" },
-                { name: "Accessibility", icon: "🌐" },
-                { name: "Growth Mindset", icon: "🌱" },
+                {
+                  name: "Excellence",
+                  icon: <Sparkles className="value-icon-svg" />,
+                },
+                {
+                  name: "Innovation",
+                  icon: <Lightbulb className="value-icon-svg" />,
+                },
+                {
+                  name: "Community",
+                  icon: <Users className="value-icon-svg" />,
+                },
+                {
+                  name: "Accessibility",
+                  icon: <Globe className="value-icon-svg" />,
+                },
+                {
+                  name: "Growth Mindset",
+                  icon: <Sprout className="value-icon-svg" />,
+                },
               ].map((value, index) => (
                 <motion.div
                   key={index}
@@ -417,7 +500,7 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>Our Journey</SectionHeading>
+            <SectionHeading id="journey">Our Journey</SectionHeading>
 
             <div className="timeline-wrapper">
               <div className="timeline-progress-container">
@@ -495,7 +578,7 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>Events We've Organized</SectionHeading>
+            <SectionHeading id="events">Events We've Organized</SectionHeading>
 
             <motion.div className="events-grid" variants={containerVariants}>
               {events.map((event, index) => (
@@ -519,6 +602,7 @@ export default function AboutUs() {
                     </div>
                   </div>
                   <div className="event-info">
+                    <div className="event-icon-wrapper">{event.icon}</div>
                     <h3>{event.name}</h3>
                     <p>{event.description}</p>
                   </div>
@@ -537,7 +621,7 @@ export default function AboutUs() {
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading>Our Partners</SectionHeading>
+            <SectionHeading id="partners">Our Partners</SectionHeading>
 
             <motion.p className="connections-intro" variants={itemVariants}>
               We're proud to collaborate with leading tech companies and
@@ -649,6 +733,10 @@ export default function AboutUs() {
             background-repeat: no-repeat;
           }
 
+          .profile-left-alt {
+            background-image: url("https://media.istockphoto.com/id/1318858332/photo/headshot-portrait-of-smiling-female-employee-posing-in-office.jpg?s=612x612&w=0&k=20&c=Uf-dW98hzqwNCB2g4wmZ3OFnKJ8FZ6TU8PJm9a2_9uA=");
+          }
+
           /* Right section */
           .profile-right {
             width: 80%;
@@ -685,7 +773,7 @@ export default function AboutUs() {
             font-size: 1.6rem;
             line-height: 1.6;
             font-weight: 100;
-            margin-bottom: 13rem;
+            margin-bottom: 8rem;
           }
 
           /* Experience section title */
@@ -697,6 +785,16 @@ export default function AboutUs() {
           /* Experience list */
           .profile-experience-list {
             font-size: 1.1rem;
+            display: flex;
+            gap: 10px;
+          }
+
+          .company-tag {
+            background-color: #f5f5f5;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            color: #555;
           }
 
           /* Responsive styles */
@@ -783,11 +881,17 @@ export default function AboutUs() {
 
           /* Establishment Section */
           .establishment-section {
-            background-color: white;
+            background-image: url("https://media.istockphoto.com/id/1331350008/photo/business-team-working-on-a-laptop-computer.jpg?s=1024x1024&w=is&k=20&c=kiAEBApRWT_qgVrM0MHF3wMxh5H14vfsaDHg8354Y_Y=");
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            height: 100vh;
+            width: 100%;
           }
 
           .content-card {
             background: white;
+            margin-top: 140px;
             padding: 40px;
             border-radius: 16px;
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
@@ -834,6 +938,23 @@ export default function AboutUs() {
             color: rgba(255, 154, 112, 0.1);
           }
 
+          .feature-icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background-color: #ff9a70;
+            border-radius: 50%;
+            margin-bottom: 20px;
+          }
+
+          .feature-icon {
+            width: 24px;
+            height: 24px;
+            color: white;
+          }
+
           /* Right Class Section */
           .right-class-section {
             background-color: white;
@@ -853,9 +974,21 @@ export default function AboutUs() {
             position: relative;
           }
 
-          .tip-icon {
-            font-size: 2rem;
+          .tip-icon-wrapper {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 50px;
+            height: 50px;
+            background-color: #ff9a70;
+            border-radius: 50%;
             margin-bottom: 20px;
+          }
+
+          .tip-icon {
+            width: 24px;
+            height: 24px;
+            color: white;
           }
 
           /* Vision & Values Section */
@@ -883,7 +1016,15 @@ export default function AboutUs() {
           }
 
           .value-icon {
-            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+          }
+
+          .value-icon-svg {
+            width: 20px;
+            height: 20px;
+            color: white;
           }
 
           /* Timeline Section - Enhanced */
@@ -1035,6 +1176,21 @@ export default function AboutUs() {
 
           .event-info {
             padding: 30px;
+            position: relative;
+          }
+
+          .event-icon-wrapper {
+            position: absolute;
+            top: -25px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: #ff9a70;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(255, 154, 112, 0.3);
           }
 
           /* Connections Section */
