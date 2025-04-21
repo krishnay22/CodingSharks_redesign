@@ -152,9 +152,9 @@ const RecruitmentStoriesCarousel = () => {
   const styles = {
     outerContainer: {
       position: "relative",
-      maxWidth: "1100px",
+      maxWidth: isMobile ? "90%" : "1100px", // Reduced width for mobile
       margin: "0 auto",
-      padding: isMobile ? "0 30px" : "0 60px", // Reduced padding for mobile
+      padding: isMobile ? "0 30px" : "0 60px",
       height: isMobile ? "auto" : "500px",
     },
     slideWindow: {
@@ -237,12 +237,12 @@ const RecruitmentStoriesCarousel = () => {
       position: "absolute",
     },
     leftButton: {
-      left: "0",
-      transform: "translateX(-50%)",
+      left: isMobile ? "10px" : "0",
+      transform: isMobile ? "none" : "translateX(-50%)",
     },
     rightButton: {
-      right: "0",
-      transform: "translateX(50%)",
+      right: isMobile ? "10px" : "0",
+      transform: isMobile ? "none" : "translateX(50%)",
     },
     indicators: {
       display: "flex",

@@ -73,6 +73,17 @@ const EnquirySection = () => {
     }
   }, []);
 
+  // Building image component to be reused
+  const BuildingImage = () => (
+    <div className="building-image mb-4">
+      <img
+        src="https://cdn.shopify.com/s/files/1/0070/5901/3716/files/ubiqum-coding-bootcamp.jpg?v=1686797831"
+        alt="Building with MOCKUP sign"
+        className="img-fluid rounded shadow-lg"
+      />
+    </div>
+  );
+
   return (
     <Container fluid>
       <div className="enquiry-section p-3 p-md-4 my-2 my-md-3">
@@ -90,6 +101,12 @@ const EnquirySection = () => {
             >
               Learn from coders, not tutors.
             </p>
+
+            {/* Mobile image - shown only on xs and sm screens */}
+            <div className="d-block d-md-none">
+              <BuildingImage />
+            </div>
+
             <div className="mb-4">
               <Form>
                 <Row>
@@ -119,14 +136,10 @@ const EnquirySection = () => {
               </Form>
             </div>
           </Col>
-          <Col lg={6}>
-            <div className="building-image">
-              <img
-                src="https://cdn.shopify.com/s/files/1/0070/5901/3716/files/ubiqum-coding-bootcamp.jpg?v=1686797831"
-                alt="Building with MOCKUP sign"
-                className="img-fluid rounded shadow-lg"
-              />
-            </div>
+
+          {/* Desktop image - shown only on md screens and up */}
+          <Col lg={6} className="d-none d-md-block">
+            <BuildingImage />
           </Col>
         </Row>
       </div>
@@ -179,9 +192,6 @@ const EnquirySection = () => {
           border: 1px solid;
           border-radius: 10px;
         }
-        /* Button spacing - works across all screen sizes */
-        .button-wrapper {
-        }
         /* Remove focus effect */
         .form-control:focus,
         .input-group:focus-within .form-control,
@@ -203,9 +213,6 @@ const EnquirySection = () => {
           .form-control {
             padding: 0.5rem 0.8rem;
             font-size: 0.9rem;
-          }
-          /* Slightly increase spacing on mobile */
-          .button-wrapper {
           }
         }
 
