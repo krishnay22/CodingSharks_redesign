@@ -61,22 +61,10 @@ const Footer = () => {
             <h3>FOR THE PUBLIC</h3>
             <ul className="footer-links">
               <li>
-                <a href="#visit-us">Visit Us</a>
+                <a href="#visit-us">Students Work</a>
               </li>
               <li>
-                <a href="#guided-tours">Guided Tours</a>
-              </li>
-              <li>
-                <a href="#archives-libraries">Archives, Libraries & Treasury</a>
-              </li>
-              <li>
-                <a href="#venue-hire">Venue Hire and Events</a>
-              </li>
-              <li>
-                <a href="#sports-centre">Winchester College Sports Centre</a>
-              </li>
-              <li>
-                <a href="#jane-austen">Jane Austen & 8 College Street</a>
+                <a href="#guided-tours">About Us </a>
               </li>
             </ul>
           </div>

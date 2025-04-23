@@ -21,9 +21,9 @@ function Homenav() {
             <Nav.Link as={NavLink} to="/" exact activeClassName="active">
               Home
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/dashboard" activeClassName="active">
+            {/* <Nav.Link as={NavLink} to="/dashboard" activeClassName="active">
               Dashboard
-            </Nav.Link>
+            </Nav.Link> */}
             <Nav.Link as={NavLink} to="/courses" activeClassName="active">
               Courses
             </Nav.Link>

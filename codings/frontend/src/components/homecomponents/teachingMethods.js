@@ -1,6 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 
-const UseCases = () => {
+const TeachingMethods = () => {
   const containerRef = useRef(null);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -55,10 +55,10 @@ const UseCases = () => {
     const style = document.createElement("style");
     // Add CSS rules to hide scrollbar
     style.textContent = `
-      .use-cases-container::-webkit-scrollbar {
+      .teaching-methods-container::-webkit-scrollbar {
         display: none;
       }
-      .use-cases-container {
+      .teaching-methods-container {
         -ms-overflow-style: none;
         scrollbar-width: none;
       }
@@ -73,10 +73,10 @@ const UseCases = () => {
   }, []);
 
   // Function to handle card hover
-  const [presentationHover, setPresentationHover] = useState(false);
-  const [blogHover, setBlogHover] = useState(false);
-  const [socialHover, setSocialHover] = useState(false);
-  const [docsHover, setDocsHover] = useState(false);
+  const [practicalHover, setPracticalHover] = useState(false);
+  const [mentorshipHover, setMentorshipHover] = useState(false);
+  const [projectHover, setProjectHover] = useState(false);
+  const [assessmentHover, setAssessmentHover] = useState(false);
 
   // Responsive styles object
   const styles = {
@@ -104,7 +104,7 @@ const UseCases = () => {
       justifyContent: "center",
     },
     leftTitle: {
-      fontSize: isMobile ? "2.5rem" : "4rem",
+      fontSize: isMobile ? "1.5rem" : "3rem",
       color: "#333",
       marginBottom: "20px",
       fontWeight: "600",
@@ -162,28 +162,28 @@ const UseCases = () => {
       alignItems: "center",
       justifyContent: "center",
     },
-    presentationCard: {
+    practicalCard: {
       backgroundColor: "#FFF8ED",
     },
-    presentationCategory: {
+    practicalCategory: {
       color: "#FF9500",
     },
-    blogCard: {
+    mentorshipCard: {
       backgroundColor: "#F8F0FF",
     },
-    blogCategory: {
+    mentorshipCategory: {
       color: "#A259FF",
     },
-    socialCard: {
+    projectCard: {
       backgroundColor: "#F0FFE9",
     },
-    socialCategory: {
+    projectCategory: {
       color: "#64D836",
     },
-    docsCard: {
+    assessmentCard: {
       backgroundColor: "#E9F6FF",
     },
-    docsCategory: {
+    assessmentCategory: {
       color: "#36A2D8",
     },
   };
@@ -192,13 +192,14 @@ const UseCases = () => {
     <div
       style={styles.container}
       ref={containerRef}
-      className="use-cases-container"
+      className="teaching-methods-container"
     >
       <div style={styles.leftContent}>
-        <h1 style={styles.leftTitle}>Use cases</h1>
+        <h1 style={styles.leftTitle}>Our Teaching Methods</h1>
         <p style={styles.leftDescription}>
-          Captivate your audience with auto-generated infographics, diagrams,
-          flowcharts, and more.
+          Experience accelerated growth through our hands-on learning approach
+          and personalized one-on-one mentorship programs designed for your
+          success.
         </p>
       </div>
 
@@ -206,74 +207,67 @@ const UseCases = () => {
         <div
           style={{
             ...styles.card,
-            ...styles.presentationCard,
-            ...(presentationHover ? styles.cardHover : {}),
+            ...styles.practicalCard,
+            ...(practicalHover ? styles.cardHover : {}),
           }}
-          onMouseEnter={() => setPresentationHover(true)}
-          onMouseLeave={() => setPresentationHover(false)}
+          onMouseEnter={() => setPracticalHover(true)}
+          onMouseLeave={() => setPracticalHover(false)}
         >
-          <span style={{ ...styles.category, ...styles.presentationCategory }}>
-            Presentations
+          <span style={{ ...styles.category, ...styles.practicalCategory }}>
+            Hands-on Learning
           </span>
-          <h2 style={styles.cardTitle}>Make impactful slides</h2>
-          <div style={styles.icons}>
-            <div style={styles.icon}>📄</div>
-            <div style={styles.icon}>🎯</div>
-            <div style={styles.icon}>📊</div>
-          </div>
+          <h2 style={styles.cardTitle}>Learn by doing, not just listening</h2>
         </div>
 
         <div
           style={{
             ...styles.card,
-            ...styles.blogCard,
-            ...(blogHover ? styles.cardHover : {}),
+            ...styles.mentorshipCard,
+            ...(mentorshipHover ? styles.cardHover : {}),
           }}
-          onMouseEnter={() => setBlogHover(true)}
-          onMouseLeave={() => setBlogHover(false)}
+          onMouseEnter={() => setMentorshipHover(true)}
+          onMouseLeave={() => setMentorshipHover(false)}
         >
-          <span style={{ ...styles.category, ...styles.blogCategory }}>
-            Blog
+          <span style={{ ...styles.category, ...styles.mentorshipCategory }}>
+            One-on-One Mentorship
           </span>
-          <h2 style={styles.cardTitle}>Leave an impression</h2>
-          <div style={styles.icons}>
-            <div style={styles.icon}>⏺️</div>
-            <div style={styles.icon}>🔖</div>
-          </div>
+          <h2 style={styles.cardTitle}>Personalized guidance from experts</h2>
         </div>
 
         <div
           style={{
             ...styles.card,
-            ...styles.socialCard,
-            ...(socialHover ? styles.cardHover : {}),
+            ...styles.projectCard,
+            ...(projectHover ? styles.cardHover : {}),
           }}
-          onMouseEnter={() => setSocialHover(true)}
-          onMouseLeave={() => setSocialHover(false)}
+          onMouseEnter={() => setProjectHover(true)}
+          onMouseLeave={() => setProjectHover(false)}
         >
-          <span style={{ ...styles.category, ...styles.socialCategory }}>
-            Social Media
+          <span style={{ ...styles.category, ...styles.projectCategory }}>
+            Real-world Projects
           </span>
-          <h2 style={styles.cardTitle}>Engage your audience</h2>
+          <h2 style={styles.cardTitle}>Build your portfolio while learning</h2>
         </div>
 
         <div
           style={{
             ...styles.card,
-            ...styles.docsCard,
-            ...(docsHover ? styles.cardHover : {}),
+            ...styles.assessmentCard,
+            ...(assessmentHover ? styles.cardHover : {}),
           }}
-          onMouseEnter={() => setDocsHover(true)}
-          onMouseLeave={() => setDocsHover(false)}
+          onMouseEnter={() => setAssessmentHover(true)}
+          onMouseLeave={() => setAssessmentHover(false)}
         >
-          <span style={{ ...styles.category, ...styles.docsCategory }}>
-            Docs
+          <span style={{ ...styles.category, ...styles.assessmentCategory }}>
+            Continuous Assessment
           </span>
-          <h2 style={styles.cardTitle}>Write easy to read docs</h2>
+          <h2 style={styles.cardTitle}>
+            Track progress with personal feedback
+          </h2>
         </div>
       </div>
     </div>
   );
 };
 
-export default UseCases;
+export default TeachingMethods;

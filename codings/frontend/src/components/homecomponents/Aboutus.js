@@ -3,6 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { Row, Col, Button } from "react-bootstrap";
 import { useScrollAnimation } from "./fadeuptext";
 import useRepeatScrollTextSplitting from "./hooks/textsplitting";
+import CustomButton from "./Landingbutoon";
 
 const CommunitySection = () => {
   const [imageVisible, setImageVisible] = useState(false);
@@ -37,9 +38,7 @@ const CommunitySection = () => {
           <div className="mb-4">
             <h6 className="text-muted">About us</h6>
             <div ref={headingContainerRef}>
-              <h2 className="display-4 fw-bold">
-                A Community of Faith, Learning and Life
-              </h2>
+              <h2>Transforming Education Through Hands-on Expertise</h2>
             </div>
           </div>
         </Col>
@@ -63,16 +62,20 @@ const CommunitySection = () => {
       <Row className="mt-4">
         <Col md={{ span: 6, offset: 6 }}>
           <p ref={textRef} className="custom-paragraph">
-            At Marcellin College, we understand that a successful school must
-            adapt and change, constantly evolve and 'dare to create something
-            new'. Our innovative approach to education is informed by
-            evidence-based learning and teaching that sits within our Catholic
-            and Marist framework.
+            At our coaching institute, we believe in the power of practical
+            learning and personalized attention. Our approach combines hands-on
+            experiences with dedicated one-on-one mentorship to ensure every
+            student masters both theoretical concepts and their real-world
+            applications. We continuously adapt our teaching methods based on
+            industry trends and student feedback to create the most effective
+            learning environment possible.
           </p>
-          <div className="mt-4 text-left">
-            <Button variant="outline-secondary" size="lg" className="px-5">
-              Learn More
-            </Button>
+          <div style={{ width: "300px" }}>
+            <CustomButton
+              text="learn More"
+              accentColor="#FF9A70"
+              primaryColor="#ffffff"
+            />
           </div>
         </Col>
       </Row>
