@@ -1,8 +1,35 @@
 import { Container, Nav, Navbar } from "react-bootstrap";
-import { NavLink } from "react-router-dom";
+import { NavLink, Link } from "react-router-dom";
 import CustomButton from "./homecomponents/Landingbutoon";
+import { useState, useEffect } from "react";
+import UserMenu from "./UserMenu";
 
 function Homenav() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [userName, setUserName] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false);
+
+  useEffect(() => {
+    // Check if user is logged in based on the actual localStorage structure
+    const checkLoginStatus = () => {
+      const username = localStorage.getItem("username");
+      const token = localStorage.getItem("token");
+      const adminStatus = localStorage.getItem("isAdmin");
+
+      if (username && token) {
+        setIsLoggedIn(true);
+        setUserName(username);
+
+        // Set admin status if available
+        if (adminStatus === "true") {
+          setIsAdmin(true);
+        }
+      }
+    };
+
+    checkLoginStatus();
+  }, []);
+
   return (
     <>
       <Navbar className="homenav" expand="lg">
@@ -11,7 +38,8 @@ function Homenav() {
           <img
             src="https://www.thecodingsharks.in/image/Coding-Sharks-Logo.png"
             style={{ width: "115px", height: "auto" }}
-          ></img>
+            alt="Coding Sharks Logo"
+          />
         </Navbar.Brand>
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
@@ -21,9 +49,16 @@ function Homenav() {
             <Nav.Link as={NavLink} to="/" exact activeClassName="active">
               Home
             </Nav.Link>
-            {/* <Nav.Link as={NavLink} to="/dashboard" activeClassName="active">
-              Dashboard
-            </Nav.Link> */}
+            {isLoggedIn && (
+              <Nav.Link as={NavLink} to="/dashboard" activeClassName="active">
+                Dashboard
+              </Nav.Link>
+            )}
+            {isAdmin && (
+              <Nav.Link as={NavLink} to="/AdminLayout" activeClassName="active">
+                Admin Panel
+              </Nav.Link>
+            )}
             <Nav.Link as={NavLink} to="/courses" activeClassName="active">
               Courses
             </Nav.Link>
@@ -41,11 +76,17 @@ function Homenav() {
 
           {/* Keep login button on the far right */}
           <Nav className="ms-auto">
-            <CustomButton
-              text="Login"
-              accentColor="#FF9A70"
-              primaryColor="#ffffff"
-            />
+            {isLoggedIn ? (
+              <UserMenu userName={userName} />
+            ) : (
+              <Link to="/LoginPage" style={{ textDecoration: "none" }}>
+                <CustomButton
+                  text="Login"
+                  accentColor="#FF9A70"
+                  primaryColor="#ffffff"
+                />
+              </Link>
+            )}
           </Nav>
         </Navbar.Collapse>
       </Navbar>
