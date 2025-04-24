@@ -81,6 +81,7 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<CreateUserPage />} />
+        <Route path="Dailyquestions" element={<Dailyquestions />} />
       </Route>
 
       {/* User Dashboard Routes - Protected (any logged in user) */}

@@ -44,27 +44,28 @@ const SideNavforadmin = () => {
                 {isOpen && <span className="nav-text">Home</span>}
               </NavLink>
             </li>
+
             <li className="nav-item">
               <NavLink
-                to="/dashboard"
-                className={({ isActive }) =>
-                  isActive ? "nav-link active" : "nav-link"
-                }
-                end
-              >
-                <FaTachometerAlt className="nav-icon" />
-                {isOpen && <span className="nav-text">Dashboard</span>}
-              </NavLink>
-            </li>
-            <li className="nav-item">
-              <NavLink
-                to="/CreateUserPage"
+                to="/AdminLayout/CreateUserPage"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
               >
                 <FaUser className="nav-icon" />
                 {isOpen && <span className="nav-text">CreateUserPage</span>}
+              </NavLink>
+            </li>
+
+            <li className="nav-item"> 
+              <NavLink
+                to="/AdminLayout/Dailyquestions"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                <FaUser className="nav-icon" />
+                {isOpen && <span className="nav-text">Dailyquestions</span>}
               </NavLink>
             </li>
           </ul>

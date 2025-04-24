@@ -491,84 +491,48 @@ export default function AboutUs() {
           </div>
         </motion.section>
 
-        {/* History Timeline Section - Enhanced */}
+        {/* History Timeline Section */}
         <motion.section
-          className="timeline-section"
+          className="history-section"
           initial="hidden"
           whileInView="visible"
           viewport={{ once: true, margin: "-100px" }}
           variants={sectionVariants}
         >
           <div className="section-container">
-            <SectionHeading id="journey">Our Journey</SectionHeading>
+            <SectionHeading id="history">Our Journey</SectionHeading>
 
-            <div className="timeline-wrapper">
-              <div className="timeline-progress-container">
+            <motion.div
+              className="timeline-container"
+              variants={containerVariants}
+            >
+              <div className="timeline-line">
                 <motion.div
-                  className="timeline-progress"
-                  animate={{
-                    height: `${
-                      ((activeTimelineIndex + 1) / timelineItems.length) * 100
-                    }%`,
-                  }}
-                  transition={{ duration: 0.5 }}
-                />
+                  className="timeline-line-progress"
+                  initial={{ height: 0 }}
+                  animate={{ height: "100%" }}
+                  transition={{ duration: 3, ease: "linear" }}
+                ></motion.div>
               </div>
 
-              <div className="timeline-items">
-                {timelineItems.map((item, index) => (
-                  <motion.div
-                    key={index}
-                    className={`timeline-item ${
-                      activeTimelineIndex === index ? "active" : ""
-                    }`}
-                    initial={{ opacity: 0.6, x: 0 }}
-                    animate={{
-                      opacity: activeTimelineIndex === index ? 1 : 0.6,
-                      x: activeTimelineIndex === index ? 0 : 0,
-                      scale: activeTimelineIndex === index ? 1 : 0.98,
-                    }}
-                    transition={{ duration: 0.5 }}
-                    onClick={() => setActiveTimelineIndex(index)}
-                  >
-                    <div className="timeline-marker">
-                      <motion.div
-                        className="timeline-dot"
-                        animate={{
-                          scale: activeTimelineIndex === index ? 1.5 : 1,
-                          backgroundColor:
-                            activeTimelineIndex === index
-                              ? "#ff7a45"
-                              : "#FF9A70",
-                        }}
-                        transition={{ duration: 0.3 }}
-                      />
-                      {index < timelineItems.length - 1 && (
-                        <div className="timeline-line-segment" />
-                      )}
-                    </div>
-
-                    <motion.div
-                      className="timeline-content"
-                      animate={{
-                        boxShadow:
-                          activeTimelineIndex === index
-                            ? "0 15px 30px rgba(0, 0, 0, 0.1)"
-                            : "0 5px 15px rgba(0, 0, 0, 0.05)",
-                        y: activeTimelineIndex === index ? -5 : 0,
-                      }}
-                      transition={{ duration: 0.3 }}
-                    >
-                      <div className="timeline-year">{item.year}</div>
-                      <p>{item.event}</p>
-                    </motion.div>
-                  </motion.div>
-                ))}
-              </div>
-            </div>
+              {timelineItems.map((item, index) => (
+                <motion.div
+                  key={index}
+                  className={`timeline-item ${
+                    activeTimelineIndex === index ? "active" : ""
+                  }`}
+                  variants={itemVariants}
+                >
+                  <div className="timeline-dot"></div>
+                  <div className="timeline-content">
+                    <h3>{item.year}</h3>
+                    <p>{item.event}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
           </div>
         </motion.section>
-
         {/* Events Section */}
         <motion.section
           className="events-section"
@@ -1028,97 +992,100 @@ export default function AboutUs() {
           }
 
           /* Timeline Section - Enhanced */
-          .timeline-section {
+          /* Timeline Section - Fixed */
+          .history-section {
             background-color: white;
-            padding-bottom: 150px;
+            padding: 100px 20px;
           }
 
-          .timeline-wrapper {
+          .timeline-container {
             position: relative;
-            max-width: 800px;
-            margin: 80px auto 0;
-            padding-left: 50px;
+            max-width: 1000px;
+            margin: 60px auto 0;
+            padding: 20px 0;
           }
 
-          .timeline-progress-container {
+          .timeline-line {
             position: absolute;
             top: 0;
-            left: 20px;
-            width: 4px;
-            height: 100%;
-            background: #f0f0f0;
-            border-radius: 2px;
+            bottom: 0;
+            left: 50%;
+            width: 3px;
+            background: rgba(255, 154, 112, 0.3);
+            transform: translateX(-50%);
             overflow: hidden;
           }
 
-          .timeline-progress {
+          .timeline-line-progress {
             position: absolute;
             bottom: 0;
             left: 0;
             width: 100%;
             background: #ff9a70;
-            border-radius: 2px;
-          }
-
-          .timeline-items {
-            position: relative;
           }
 
           .timeline-item {
             position: relative;
-            margin-bottom: 60px;
-            cursor: pointer;
+            margin-bottom: 50px;
+            opacity: 0.7;
+            transition: all 0.5s ease;
           }
 
-          .timeline-item:last-child {
-            margin-bottom: 0;
-          }
-
-          .timeline-marker {
-            position: absolute;
-            left: -50px;
-            top: 15px;
-            height: 100%;
+          .timeline-item.active {
+            opacity: 1;
           }
 
           .timeline-dot {
-            width: 24px;
-            height: 24px;
+            position: absolute;
+            left: 50%;
+            width: 20px;
+            height: 20px;
             background: #ff9a70;
             border-radius: 50%;
-            border: 4px solid white;
-            box-shadow: 0 0 0 4px rgba(255, 154, 112, 0.2);
+            transform: translateX(-50%);
             z-index: 2;
+            transition: transform 0.3s ease, background-color 0.3s ease;
           }
 
-          .timeline-line-segment {
-            position: absolute;
-            top: 24px;
-            left: 12px;
-            width: 4px;
-            height: calc(100% + 36px);
-            background: transparent;
-            transform: translateX(-50%);
+          .timeline-item.active .timeline-dot {
+            transform: translateX(-50%) scale(1.3);
+            background: #ff7a45;
+            box-shadow: 0 0 15px rgba(255, 122, 69, 0.5);
           }
 
           .timeline-content {
+            width: 45%;
+            padding: 20px;
             background: white;
-            padding: 30px;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            transition: transform 0.3s ease;
           }
 
-          .timeline-year {
-            display: inline-block;
-            background: #ff9a70;
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-weight: 600;
-            margin-bottom: 15px;
-            font-size: 1.1rem;
+          .timeline-item:nth-child(odd) .timeline-content {
+            margin-left: auto;
           }
 
+          .timeline-item.active .timeline-content {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+          }
+
+          /* Responsive timeline for mobile */
+          @media (max-width: 768px) {
+            .timeline-line {
+              left: 30px;
+            }
+
+            .timeline-dot {
+              left: 30px;
+            }
+
+            .timeline-content {
+              width: calc(100% - 60px);
+              margin-left: 60px !important;
+            }
+          }
           /* Events Section */
           .events-section {
             background-color: #f9f9f9;
