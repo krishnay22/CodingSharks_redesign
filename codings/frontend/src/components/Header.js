@@ -12,8 +12,9 @@ const Header = () => {
         .header {
           display: flex;
           justify-content: flex-end;
+
           align-items: center;
-          padding: 0.65rem 1rem;
+          padding: 0.3rem;
           background: #fff;
           border-bottom: 2px solid #ff996e; /* Updated border color */
           position: relative;

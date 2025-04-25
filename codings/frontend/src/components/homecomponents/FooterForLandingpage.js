@@ -93,7 +93,9 @@ const Footer = () => {
           <div className="policies">
             <a href="#cookie-policy">COOKIE POLICY</a>
             <a href="#privacy-policy">PRIVACY POLICY</a>
-            <a href="#by-thursday">BY KRISHNA YADAV</a>
+            <a href="https://www.linkedin.com/in/krishna-yadav-0585682a6/">
+              BY KRISHNA YADAV
+            </a>
           </div>
         </div>
       </div>

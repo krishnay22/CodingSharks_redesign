@@ -7,6 +7,8 @@ const cors = require("cors");
 const authRoutes = require("./routes/auth");
 const protectedRoutes = require("./routes/protected");
 const adminRoutes = require("./routes/admin");
+const courseRoutes = require("./routes/courseRoutes");
+const questionRoutes = require("./routes/questionRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;

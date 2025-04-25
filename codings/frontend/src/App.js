@@ -8,7 +8,7 @@ const App = () => {
   return (
     <Router>
       <AuthProvider>
-        <AppRoutes />
+        <AppRoutes />x
       </AuthProvider>
     </Router>
   );
