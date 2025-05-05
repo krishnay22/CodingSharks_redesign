@@ -2,7 +2,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import LogoSlider from "../../components/homecomponents/logoslider";
 import EnquirySection from "../../components/homecomponents/Enquire";
 import CommunitySection from "../../components/homecomponents/Aboutus";
-import ReviewSlider from "../../components/homecomponents/ReviewSlider";
+import GoogleReviewsSlider from "../../components/homecomponents/GoogleReviews";
 import RecruitmentStories from "../../components/homecomponents/Slider";
 import UseCases from "../../components/homecomponents/teachingMethods";
 import CourseCarousel from "../../components/CourseCarousel";
@@ -25,7 +25,7 @@ const Home = () => {
       </div>
 
       <div className="my-32">
-        <ReviewSlider />
+        <GoogleReviewsSlider />
       </div>
     </div>
   );

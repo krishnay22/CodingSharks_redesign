@@ -8,14 +8,18 @@ const NewComponent = () => {
   return (
     <div
       style={{
+        display: "flex",
+        flexDirection: "column",
+        fontFamily: "Arial, sans-serif",
+        maxWidth: "1200px",
+        margin: "0 auto",
         padding: "clamp(10px, 2vw, 20px)",
-        borderRadius: "10px",
-        position: "relative",
-        minHeight: "clamp(400px, 100vh, 650px)",
-        overflow: "hidden",
+        borderRadius: "20px",
+        minHeight: "clamp(400px, 80vh, 650px)",
         background: "#F8F8F8",
         width: "100%",
         boxSizing: "border-box",
+        overflow: "hidden",
       }}
     >
       <div className="container">

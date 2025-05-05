@@ -26,3 +26,6 @@ app.use("/api", adminRoutes); // Make sure adminRoutes is a router
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+app.use("/api/courses", courseRoutes);
+app.use("/api/questions", questionRoutes);

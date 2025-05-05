@@ -4,11 +4,11 @@ import {
   FaHome,
   FaUser,
   FaClipboardList,
-  FaArchive,
-  FaTachometerAlt,
   FaMedal,
   FaProjectDiagram,
 } from "react-icons/fa";
+import { FaTimeline } from "react-icons/fa6";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
 
 const SideNav = () => {
   return (
@@ -44,7 +44,7 @@ const SideNav = () => {
                 }
                 end
               >
-                <FaTachometerAlt className="nav-icon" />
+                <TbLayoutDashboardFilled className="nav-icon" />
                 <span className="nav-text">Dashboard</span>
               </NavLink>
             </li>
@@ -70,17 +70,7 @@ const SideNav = () => {
                 <span className="nav-text">Daily Questions</span>
               </NavLink>
             </li>
-            <li className="nav-item">
-              <NavLink
-                to="/archive"
-                className={({ isActive }) =>
-                  isActive ? "nav-link active" : "nav-link"
-                }
-              >
-                <FaArchive className="nav-icon" />
-                <span className="nav-text">Archive</span>
-              </NavLink>
-            </li>
+
             <li className="nav-item">
               <NavLink
                 to="/dashboard/CourseTimeline"
@@ -88,7 +78,7 @@ const SideNav = () => {
                   isActive ? "nav-link active" : "nav-link"
                 }
               >
-                <FaTachometerAlt className="nav-icon" />
+                <FaTimeline className="nav-icon" />
                 <span className="nav-text">Course Timeline</span>
               </NavLink>
             </li>

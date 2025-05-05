@@ -159,6 +159,7 @@ export default function LoginPage() {
 
       // Redirect to home page
       navigate("/");
+      window.location.reload();
 
       console.log("Login successful!", data);
     } catch (error) {

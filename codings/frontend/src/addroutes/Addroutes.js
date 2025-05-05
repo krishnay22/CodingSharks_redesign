@@ -16,7 +16,6 @@ import Profile from "../pages/user/Profil";
 import StudentWorkPage from "../components/StudentsWork";
 import LoginPage from "../components/Loginpage";
 import AdminLayout from "../layouts/AdminLayout";
-import BlackDiv2 from "../pages/admin/Admin";
 import CreateUserPage from "../components/CreateUser";
 
 // Protected route components
@@ -96,6 +95,7 @@ const AppRoutes = () => {
         <Route index element={<UserDashboard />} />
         <Route path="CourseTimeline" element={<CourseTimeline />} />
         <Route path="LeagueBoard" element={<LeagueBoard />} />
+
         <Route path="Dailyquestions" element={<Dailyquestions />} />
         <Route path="Profile" element={<Profile />} />
         <Route path="Projects" element={<StudentWorkPage />} />

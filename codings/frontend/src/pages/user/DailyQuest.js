@@ -1,14 +1,14 @@
-import { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
+import { useState, useEffect } from "react";
+import { motion } from "framer-motion";
 
 export default function QuestionTimer() {
-  const [time, setTime] = useState('0:00');
+  const [time, setTime] = useState("0:00");
   const [progress, setProgress] = useState(0);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTime(prevTime => {
-        const [minutes, seconds] = prevTime.split(':').map(Number);
+      setTime((prevTime) => {
+        const [minutes, seconds] = prevTime.split(":").map(Number);
         let newSeconds = seconds + 1;
         let newMinutes = minutes;
 
@@ -19,14 +19,14 @@ export default function QuestionTimer() {
 
         if (newMinutes >= 10) {
           clearInterval(timer);
-          return '10:00';
+          return "10:00";
         }
 
         const totalSeconds = newMinutes * 60 + newSeconds;
         const maxSeconds = 10 * 60;
         setProgress((totalSeconds / maxSeconds) * 100);
 
-        return `${newMinutes}:${newSeconds.toString().padStart(2, '0')}`;
+        return `${newMinutes}:${newSeconds.toString().padStart(2, "0")}`;
       });
     }, 1000);
 
@@ -39,74 +39,73 @@ export default function QuestionTimer() {
 
   const styles = {
     container: {
-      display: 'flex',
-      flexDirection: 'column',
-      fontFamily: 'Arial, sans-serif',
-      maxWidth: '1200px',
-      margin: '0 auto',
-      padding: 'clamp(10px, 2vw, 20px)',
-      borderRadius: '20px',
-      minHeight: 'clamp(400px, 80vh, 650px)',
-      background: '#F8F8F8',
-      width: '100%',
-      boxSizing: 'border-box',
-      overflow: 'hidden',
+      display: "flex",
+      flexDirection: "column",
+      maxWidth: "1200px",
+      margin: "0 auto",
+      padding: "clamp(10px, 2vw, 20px)",
+      borderRadius: "20px",
+      minHeight: "clamp(400px, 80vh, 650px)",
+      background: "#F8F8F8",
+      width: "100%",
+      boxSizing: "border-box",
+      overflow: "hidden",
     },
     questionBox: {
-      padding: '20px',
-      border: '1px solid #ccc',
-      borderRadius: '25px',
-      marginBottom: '20px',
-      color: '#555',
-      fontSize: '25px',
-      lineHeight: '1.5',
-      backgroundColor: '#ffffff',
+      padding: "20px",
+      border: "1px solid #ccc",
+      borderRadius: "25px",
+      marginBottom: "20px",
+      color: "#555",
+      fontSize: "25px",
+      lineHeight: "1.5",
+      backgroundColor: "#ffffff",
     },
     timerContainer: {
-      display: 'flex',
-      flexDirection: 'column',
-      alignItems: 'center',
-      justifyContent: 'center',
-      padding: '20px 0',
+      display: "flex",
+      flexDirection: "column",
+      alignItems: "center",
+      justifyContent: "center",
+      padding: "20px 0",
     },
     timer: {
-      fontSize: '120px',
-      fontWeight: '300',
-      color: '#ff9d76',
-      margin: '20px 0',
+      fontSize: "120px",
+      fontWeight: "300",
+      color: "#ff9d76",
+      margin: "20px 0",
     },
     progressBarContainer: {
-      width: '100%',
-      maxWidth: '400px',
-      position: 'relative',
-      marginTop: '10px',
+      width: "100%",
+      maxWidth: "400px",
+      position: "relative",
+      marginTop: "10px",
     },
     progressBar: {
-      height: '4px',
-      width: '100%',
-      background: '#e0e0e0',
+      height: "4px",
+      width: "100%",
+      background: "#e0e0e0",
     },
     progress: {
-      position: 'absolute',
+      position: "absolute",
       top: 0,
       left: 0,
-      height: '4px',
+      height: "4px",
       width: `${progress}%`,
-      background: '#ff9d76',
-      transition: 'width 1s linear',
+      background: "#ff9d76",
+      transition: "width 1s linear",
     },
     button: {
-      marginTop: '30px',
-      padding: '12px 30px',
-      border: '1px solid #ccc',
-      borderRadius: '50px',
-      background: 'white',
-      fontSize: '18px',
-      color: '#555',
-      cursor: 'pointer',
-      alignSelf: 'center',
-      boxShadow: '0px 8px 15px rgba(0, 0, 0, 0.1)',
-      transition: 'all 0.3s ease',
+      marginTop: "30px",
+      padding: "12px 30px",
+      border: "1px solid #ccc",
+      borderRadius: "50px",
+      background: "white",
+      fontSize: "18px",
+      color: "#555",
+      cursor: "pointer",
+      alignSelf: "center",
+      boxShadow: "0px 8px 15px rgba(0, 0, 0, 0.1)",
+      transition: "all 0.3s ease",
     },
   };
 
@@ -114,14 +113,14 @@ export default function QuestionTimer() {
     <div style={styles.container}>
       <div style={styles.questionBox}>
         <p>
-          Write a JavaScript function named <strong>sum</strong> that takes two parameters and returns their sum. Then, call the function with the numbers 5 and 7 and log the result to the console.
+          Write a JavaScript function named <strong>sum</strong> that takes two
+          parameters and returns their sum. Then, call the function with the
+          numbers 5 and 7 and log the result to the console.
         </p>
       </div>
 
       <div style={styles.timerContainer}>
-        <div style={styles.timer}>
-          {time}
-        </div>
+        <div style={styles.timer}>{time}</div>
 
         <div style={styles.progressBarContainer}>
           <div style={styles.progressBar}></div>
@@ -130,9 +129,13 @@ export default function QuestionTimer() {
 
         <motion.button
           style={styles.button}
-          whileHover={{ scale: 1.1, backgroundColor: '#ff9d76', color: 'white' }}
+          whileHover={{
+            scale: 1.1,
+            backgroundColor: "#ff9d76",
+            color: "white",
+          }}
           whileTap={{ scale: 0.9, rotate: 5 }}
-          transition={{ type: 'spring', stiffness: 300, damping: 10 }}
+          transition={{ type: "spring", stiffness: 300, damping: 10 }}
           onClick={handleSubmit}
         >
           send answer

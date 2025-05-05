@@ -5,18 +5,21 @@ const ProfilePage = () => {
   const styles = {
     container: {
       display: "flex",
-      justifyContent: "center",
-      alignItems: "center",
-      minHeight: "100vh",
+      flexDirection: "column",
+      fontFamily: "Arial, sans-serif",
+      maxWidth: "1200px",
+      margin: "0 auto",
+      padding: "clamp(10px, 2vw, 20px)",
+      borderRadius: "20px",
+      minHeight: "clamp(400px, 80vh, 650px)",
       background: "#F8F8F8",
-      fontFamily: "'Poppins', sans-serif",
-      padding: "40px",
+      width: "100%",
       boxSizing: "border-box",
+      overflow: "hidden",
     },
     card: {
       backgroundColor: "#fff",
       borderRadius: "20px",
-      boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
       maxWidth: "1200px",
       width: "100%",
       display: "grid",
@@ -231,9 +234,18 @@ const ProfilePage = () => {
 
       // Apply styles based on current window width
       if (windowWidth <= 576) {
-        resultStyles = { ...resultStyles, ...mediaQueryBreakpoints[992], ...mediaQueryBreakpoints[768], ...mediaQueryBreakpoints[576] };
+        resultStyles = {
+          ...resultStyles,
+          ...mediaQueryBreakpoints[992],
+          ...mediaQueryBreakpoints[768],
+          ...mediaQueryBreakpoints[576],
+        };
       } else if (windowWidth <= 768) {
-        resultStyles = { ...resultStyles, ...mediaQueryBreakpoints[992], ...mediaQueryBreakpoints[768] };
+        resultStyles = {
+          ...resultStyles,
+          ...mediaQueryBreakpoints[992],
+          ...mediaQueryBreakpoints[768],
+        };
       } else if (windowWidth <= 992) {
         resultStyles = { ...resultStyles, ...mediaQueryBreakpoints[992] };
       }
@@ -274,10 +286,18 @@ const ProfilePage = () => {
           {/* Personal Info */}
           <div>
             <h2 style={responsiveStyles.sectionTitle}>Personal Info</h2>
-            <p style={responsiveStyles.infoItem}><strong>Email:</strong> {studentInfo.email}</p>
-            <p style={responsiveStyles.infoItem}><strong>Location:</strong> {studentInfo.location}</p>
-            <p style={responsiveStyles.infoItem}><strong>Joined:</strong> {studentInfo.joinDate}</p>
-            <p style={responsiveStyles.infoItem}><strong>Phone no.</strong> {studentInfo.phoneno}</p>
+            <p style={responsiveStyles.infoItem}>
+              <strong>Email:</strong> {studentInfo.email}
+            </p>
+            <p style={responsiveStyles.infoItem}>
+              <strong>Location:</strong> {studentInfo.location}
+            </p>
+            <p style={responsiveStyles.infoItem}>
+              <strong>Joined:</strong> {studentInfo.joinDate}
+            </p>
+            <p style={responsiveStyles.infoItem}>
+              <strong>Phone no.</strong> {studentInfo.phoneno}
+            </p>
           </div>
 
           {/* Course Progress */}
@@ -285,9 +305,13 @@ const ProfilePage = () => {
             <h2 style={responsiveStyles.sectionTitle}>Course Progress</h2>
             {courses.map((item, index) => (
               <div key={index}>
-                <p style={responsiveStyles.courseText}>{`${item.course} (${item.progress}%)`}</p>
+                <p
+                  style={responsiveStyles.courseText}
+                >{`${item.course} (${item.progress}%)`}</p>
                 <div style={responsiveStyles.progressBarContainer}>
-                  <div style={responsiveStyles.progressBar(item.progress)}></div>
+                  <div
+                    style={responsiveStyles.progressBar(item.progress)}
+                  ></div>
                 </div>
               </div>
             ))}
