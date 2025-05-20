@@ -5,53 +5,32 @@ export default function StudentWorkPage() {
   const projects = [
     {
       id: 1,
-      title: "Portfolio Website",
+      title: "Aerpace",
       description:
-        "A personal portfolio website showcasing my skills and projects. Built with React and custom animations.",
+        "Experience travel that will take your breath away. A fully autonomous, integrated and frictionless transport system that is closer to you than ever.",
       image:
-        "https://mir-s3-cdn-cf.behance.net/projects/404/4f56ea188636359.Y3JvcCwxNjEyLDEyNjAsMCww.png",
+        "https://sattaexpress.co.in/wp-content/uploads/2024/04/image-2-23-1024x576-1.jpg",
       date: "March 15, 2023",
-      url: "https://media.licdn.com/dms/image/v2/D4D22AQFnGP0qILKGWQ/feedshare-shrink_800/feedshare-shrink_800/0/1713691873187?e=2147483647&v=beta&t=0UiBnm0U8CwZZVZ9YIeKdocVq8ciPRomT036gIykQa4",
+      url: "https://www.aerpace.com/",
     },
     {
       id: 2,
-      title: "E-commerce Platform",
+      title: "Tennisshop E-commerce Platform",
       description:
-        "A fully functional e-commerce platform with product listings, cart functionality, and checkout process.",
+        "Shop all of them at a single place on www.tennisshop.ae. Dig in for the best tennis products in our online as well as offline stores.",
       image:
-        "https://mir-s3-cdn-cf.behance.net/projects/404/e7a7ba212082353.Y3JvcCwyNTMwLDE5NzksNDMsMA.jpg",
+        "https://about.me/cdn-cgi/image/q=80,dpr=1,f=auto,fit=cover,w=1200,h=630,gravity=auto/https://assets.about.me/background/users/t/e/n/tennisshopuae_1674907087_228.jpg",
       date: "June 22, 2023",
-      url: "https://example.com/ecommerce",
+      url: "https://www.tennisshop.ae/",
     },
     {
       id: 3,
-      title: "Weather Application",
-      description:
-        "A weather application that provides real-time weather updates based on location. Includes 5-day forecast.",
+      title: "Movies-review",
+      description: "A site to check reviews of the latest movies.",
       image:
-        "https://mir-s3-cdn-cf.behance.net/projects/404/a09357217932295.Y3JvcCw4MDgsNjMyLDAsMA.png",
+        "https://s.tmimgcdn.com/scr/800x500/358900/movies-movie-review-film-wordpress-theme_358953-original.jpg",
       date: "September 10, 2023",
-      url: "https://example.com/weather",
-    },
-    {
-      id: 4,
-      title: "Task Management System",
-      description:
-        "A comprehensive task management system with features like task creation, assignment, and progress tracking.",
-      image:
-        "https://mir-s3-cdn-cf.behance.net/projects/404/30794f214336445.Y3JvcCwxMjEyLDk0OCwwLDA.png",
-      date: "December 5, 2023",
-      url: "https://example.com/tasks",
-    },
-    {
-      id: 5,
-      title: "Social Media Dashboard",
-      description:
-        "A dashboard that aggregates and displays social media metrics and analytics from multiple platforms.",
-      image:
-        "https://mir-s3-cdn-cf.behance.net/projects/404/30794f214336445.Y3JvcCwxMjEyLDk0OCwwLDA.png",
-      date: "February 18, 2024",
-      url: "https://example.com/dashboard",
+      url: "https://movies-review-eosin.vercel.app/",
     },
   ];
 

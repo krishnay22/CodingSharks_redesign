@@ -3,6 +3,7 @@ import { NavLink, Link } from "react-router-dom";
 import CustomButton from "./homecomponents/Landingbutoon";
 import { useState, useEffect } from "react";
 import UserMenu from "./UserMenu";
+import logo from "../images/images for project/Coding-Sharks-Logo.png";
 
 function Homenav() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -36,7 +37,7 @@ function Homenav() {
         {/* Move brand/logo to the far left */}
         <Navbar.Brand as={NavLink} to="/" className="brand-logo">
           <img
-            src="https://www.thecodingsharks.in/image/Coding-Sharks-Logo.png"
+            src={logo}
             style={{ width: "115px", height: "auto" }}
             alt="Coding Sharks Logo"
           />

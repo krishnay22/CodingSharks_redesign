@@ -17,6 +17,8 @@ import StudentWorkPage from "../components/StudentsWork";
 import LoginPage from "../components/Loginpage";
 import AdminLayout from "../layouts/AdminLayout";
 import CreateUserPage from "../components/CreateUser";
+import StudentWorkUploadForm from "../pages/admin/StudentWorkSumbit";
+import DailyquestionUpload from "../pages/admin/DailyquestionUpload";
 
 // Protected route components
 const ProtectedRoute = ({ children }) => {
@@ -81,6 +83,11 @@ const AppRoutes = () => {
       >
         <Route index element={<CreateUserPage />} />
         <Route path="Dailyquestions" element={<Dailyquestions />} />
+        <Route
+          path="StudentWorkUploadForm"
+          element={<StudentWorkUploadForm />}
+        />
+        <Route path="DailyquestionUpload" element={<DailyquestionUpload />} />
       </Route>
 
       {/* User Dashboard Routes - Protected (any logged in user) */}

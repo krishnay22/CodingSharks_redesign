@@ -14,25 +14,25 @@ const RecruitmentStoriesCarousel = () => {
       id: 1,
       image:
         "https://media.istockphoto.com/id/1389017464/photo/man-wearing-button-down-shirt-and-eyeglasses-poses-for-photo.jpg?s=612x612&w=0&k=20&c=_vWOPqcocxJzG_Fpfd7zAPpDQr6EjRFF62VRfdj19TY=",
-      title: "James' Tech Journey",
+      title: "Neeraj (Amadeus)",
       content:
-        "After years in traditional corporate roles, James found his perfect match through our specialized recruitment process. Now a Senior Developer at TechInnovate, he led a key product feature that increased customer satisfaction by 27%.",
+        "As a recent BCA graduate, Neeraj was unsure where to begin. Thanks to Coding Sharks' intensive placement training, he landed a role at Amadeus as a Junior Developer right after college.",
     },
     {
       id: 2,
       image:
-        "https://images.squarespace-cdn.com/content/v1/592738c58419c2fe84fbdb81/1513536870219-95REEICPQ2RYHOPD7NC4/Louis_web_0031.jpg?format=1000w",
-      title: "Sarah's Leadership Success",
+        "https://img.freepik.com/premium-photo/cute-boy-wearing-pink-hoodie-looking-camera_786444-280.jpg?ga=GA1.1.546181405.1738839454&semt=ais_hybrid&w=740",
+      title: "Mayur (Thoughtwin)",
       content:
-        "Sarah was seeking a challenging role that would use her strategic skills. We placed her as a Product Manager at InnovateTech, where she now leads a team of 15 and has overseen a 40% increase in product adoption.",
+        "Mayur joined Coding Sharks during his final semester. The mentorship and mock interviews gave him the edge to crack Thoughtwin’s placement drive as a Software Trainee.",
     },
     {
       id: 3,
       image:
-        "https://media.istockphoto.com/id/1279504799/photo/businesswomans-portrait.jpg?s=612x612&w=0&k=20&c=I-54ajKgmxkY8s5-myHZDv_pcSCveaoopf1DH3arv0k=",
-      title: "Michael's Career Transformation",
+        "https://img.freepik.com/free-photo/front-view-smiley-man-with-headphones_23-2149915902.jpg?ga=GA1.1.546181405.1738839454&semt=ais_hybrid&w=740", // Optional: replace this image with a male photo if needed
+      title: "Vijay (Mindruby)",
       content:
-        "After 12 years in finance, Michael wanted a change. Our team helped him transition to a FinTech startup where his industry knowledge proved invaluable. Six months in, he's already been promoted to Head of Strategy.",
+        "Vijay always dreamed of working in tech but lacked direction. Coding Sharks helped him build real-world projects and ace technical interviews. He’s now a fresher engineer at Mindruby.",
     },
   ];
 

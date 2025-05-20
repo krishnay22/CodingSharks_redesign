@@ -1,33 +1,22 @@
-import React, { useState } from "react";
+import React from "react";
 import { NavLink } from "react-router-dom";
 import {
   FaHome,
   FaUser,
   FaClipboardList,
-  FaArchive,
-  FaTachometerAlt,
   FaMedal,
   FaProjectDiagram,
-  FaChevronLeft,
-  FaChevronRight,
 } from "react-icons/fa";
+import { FaTimeline } from "react-icons/fa6";
+import { TbLayoutDashboardFilled } from "react-icons/tb";
+import logo from "../images/images for project/Coding-Sharks-Logo.png";
 
-const SideNavforadmin = () => {
-  const [isOpen, setIsOpen] = useState(true);
-
-  const toggleSidebar = () => {
-    setIsOpen(!isOpen);
-  };
-
+const SideNav = () => {
   return (
-    <div className="sidenavforadmin-container">
-      <div className={`sidebar ${isOpen ? "open" : "closed"}`}>
+    <div className="sidenav-container">
+      <div className="sidebar">
         <div className="logo">
-          <img
-            src="https://www.thecodingsharks.in/image/Coding-Sharks-Logo.png"
-            alt="Coding Sharks Logo"
-            className="logo-img"
-          />
+          <img src={logo} alt="Coding Sharks Logo" className="logo-img" />
         </div>
 
         <nav>
@@ -41,56 +30,91 @@ const SideNavforadmin = () => {
                 end
               >
                 <FaHome className="nav-icon" />
-                {isOpen && <span className="nav-text">Home</span>}
+                <span className="nav-text">Home</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/dashboard"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+                end
+              >
+                <TbLayoutDashboardFilled className="nav-icon" />
+                <span className="nav-text">Dashboard</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/dashboard/Profile"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                <FaUser className="nav-icon" />
+                <span className="nav-text">Students Profile</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/AdminLayout/DailyquestionUpload"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                <FaClipboardList className="nav-icon" />
+                <span className="nav-text">Daily Questions upload</span>
               </NavLink>
             </li>
 
             <li className="nav-item">
               <NavLink
-                to="/AdminLayout/CreateUserPage"
+                to="/dashboard/CourseTimeline"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
               >
-                <FaUser className="nav-icon" />
-                {isOpen && <span className="nav-text">CreateUserPage</span>}
+                <FaTimeline className="nav-icon" />
+                <span className="nav-text">Course Timeline</span>
               </NavLink>
             </li>
-
-            <li className="nav-item"> 
+            <li className="nav-item">
               <NavLink
-                to="/AdminLayout/Dailyquestions"
+                to="/dashboard/LeagueBoard"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
               >
-                <FaUser className="nav-icon" />
-                {isOpen && <span className="nav-text">Dailyquestions</span>}
+                <FaMedal className="nav-icon" />
+                <span className="nav-text">League Board</span>
+              </NavLink>
+            </li>
+            <li className="nav-item">
+              <NavLink
+                to="/AdminLayout/StudentWorkUploadForm"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                <FaProjectDiagram className="nav-icon" />
+                <span className="nav-text">Upload StudentWork</span>
               </NavLink>
             </li>
           </ul>
         </nav>
-
-        {/* Arrow toggle button on the right side */}
-        <button
-          className="toggle-button"
-          onClick={toggleSidebar}
-          aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          {isOpen ? <FaChevronLeft /> : <FaChevronRight />}
-        </button>
       </div>
 
       {/* Styles */}
       <style jsx>{`
-        .sidenavforadmin-container {
+        .sidenav-container {
           position: relative;
           height: 100%;
         }
 
         /* Sidebar styles */
         .sidebar {
-          width: ${isOpen ? "250px" : "70px"};
+          width: 230px;
           height: 100vh;
           background-color: #fff;
           color: #333;
@@ -99,7 +123,6 @@ const SideNavforadmin = () => {
           left: 0;
           box-shadow: 0 0 15px rgba(0, 0, 0, 0.05);
           border-right: 1px solid #eee;
-          transition: width 0.3s ease;
           display: flex;
           flex-direction: column;
           overflow-y: auto;
@@ -113,8 +136,8 @@ const SideNavforadmin = () => {
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 20px 0;
-          border-bottom: 2px solid #ff6600;
+          padding: 14px 0;
+          border-bottom: 2px solid #ff996e; /* Updated border color */
           overflow: hidden; /* Prevent logo overflow */
         }
 
@@ -122,32 +145,7 @@ const SideNavforadmin = () => {
           width: auto;
           height: 40px;
           max-width: 80%;
-        }
-
-        /* Toggle button */
-        .toggle-button {
-          position: absolute;
-          top: 50%;
-          right: -12px;
-          transform: translateY(-50%);
-          width: 24px;
-          height: 24px;
-          background-color: #ff6600;
-          color: white;
-          border: none;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
-          z-index: 1000; /* Even higher z-index to ensure button stays on top */
-        }
-
-        .toggle-button:hover {
-          background-color: #e65c00;
-          transform: translateY(-50%) scale(1.1);
+          opacity: 0.9;
         }
 
         /* Navigation */
@@ -155,7 +153,7 @@ const SideNavforadmin = () => {
           flex: 1;
           overflow-y: auto;
           overflow-x: hidden; /* Prevent horizontal scrollbar */
-          padding: 10px 0;
+          padding: 2px 0;
         }
 
         .nav-list {
@@ -177,55 +175,50 @@ const SideNavforadmin = () => {
           align-items: center;
           padding: 12px 15px;
           text-decoration: none;
-          color: #555;
+          color: #777;
           border-radius: 8px;
           transition: all 0.2s ease;
           overflow: hidden; /* Prevent text overflow */
         }
 
         .nav-icon {
-          font-size: 20px;
-          min-width: 25px;
+          font-size: 16px;
+          min-width: 20px;
           flex-shrink: 0;
+          opacity: 0.75;
         }
 
         .nav-text {
           margin-left: 12px;
-          font-size: 16px;
+          font-size: 14px;
+          font-weight: 400;
           white-space: nowrap;
           overflow: hidden;
           text-overflow: ellipsis;
+          letter-spacing: 0.2px;
         }
 
         .nav-link:hover {
-          background-color: #fff0e8;
+          background-color: #f9f9f9;
           color: #ff6600;
           transform: translateX(3px);
         }
 
         .nav-link.active {
-          background-color: #ff6600;
-          color: white;
+          background-color: #fff0e8;
+          color: #ff6600;
+          font-weight: 500;
           transform: none;
+        }
+
+        .nav-link.active .nav-icon {
+          opacity: 1;
         }
 
         /* Responsive styles */
         @media (max-width: 768px) {
           .sidebar {
-            width: ${isOpen ? "250px" : "0"};
-          }
-
-          .sidebar.closed {
-            width: 0;
-            padding: 0;
-          }
-
-          .sidebar.open {
-            width: 250px;
-          }
-
-          .toggle-button {
-            right: ${isOpen ? "-12px" : "12px"};
+            width: 220px;
           }
         }
       `}</style>
@@ -233,4 +226,4 @@ const SideNavforadmin = () => {
   );
 };
 
-export default SideNavforadmin;
+export default SideNav;

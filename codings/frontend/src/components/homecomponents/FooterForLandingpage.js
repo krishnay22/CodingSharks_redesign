@@ -1,4 +1,5 @@
 import React from "react";
+import logo from "../../images/images for project/Coding-Sharks-Logo.png";
 
 const Footer = () => {
   return (
@@ -6,7 +7,7 @@ const Footer = () => {
       <div className="footer-content">
         <div className="footer-section">
           <img
-            src="https://www.thecodingsharks.in/image/Coding-Sharks-Logo.png"
+            src={logo}
             alt="Logo"
             style={{
               width: "200px",

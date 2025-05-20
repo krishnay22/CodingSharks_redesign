@@ -16,6 +16,8 @@ import {
   Code,
   Presentation,
 } from "lucide-react";
+import PSirimage from "../../images/images for project/pradeepsir.jpg";
+import Asirimage from "../../images/images for project/adarshsir.jpg";
 
 export default function AboutUs() {
   // State for active sections
@@ -215,7 +217,10 @@ export default function AboutUs() {
       {/* Original Profile Card Section */}
       <div className="profile-card">
         {/* Left section with teal background */}
-        <div className="profile-left">
+        <div
+          className="profile-left"
+          style={{ backgroundImage: `url(${PSirimage})` }}
+        >
           {/* Placeholder for profile image */}
         </div>
 
@@ -227,15 +232,15 @@ export default function AboutUs() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="profile-name">Alex Morgan</h1>
+          <h1 className="profile-name">Pradeep Patidar</h1>
           <h2 className="profile-title">
-            Lead Instructor & Full-Stack Developer
+            NodeJS | ExpressJs | MongoDB | MySql |
           </h2>
 
           <div className="profile-divider"></div>
 
           <p className="profile-bio">
-            10+ years of experience specializing in React, Node.js, and cloud
+            20+ years of experience specializing in React, Node.js, and cloud
             architecture. Passionate about mentoring the next generation of
             developers.
           </p>
@@ -243,9 +248,13 @@ export default function AboutUs() {
           <div>
             <h3 className="profile-experience-title">Previously worked at</h3>
             <p className="profile-experience-list">
-              <span className="company-tag">Google</span>
-              <span className="company-tag">Microsoft</span>
-              <span className="company-tag">Amazon</span>
+              <span className="company-tag">
+                Apoliums infotech india private limited
+              </span>
+              <span className="company-tag">
+                FXBytes Technologies Pvt. Ltd.
+              </span>
+              <span className="company-tag">Joister</span>
             </p>
           </div>
         </motion.div>
@@ -261,29 +270,35 @@ export default function AboutUs() {
           viewport={{ once: true }}
           transition={{ duration: 0.8 }}
         >
-          <h1 className="profile-name">Sarah Chen</h1>
-          <h2 className="profile-title">Curriculum Director & UX Specialist</h2>
+          <h1 className="profile-name">Adarsh Kewat</h1>
+          <h2 className="profile-title">
+            Curriculum Director & Front End developer
+          </h2>
 
           <div className="profile-divider"></div>
 
           <p className="profile-bio">
-            Award-winning educator with a background in cognitive science and UX
-            design. Focused on creating intuitive learning experiences that
-            bridge theory and practice.
+            My journey as a software developer started with a strong foundation
+            in programming languages such as JavaScript. Over the years, I have
+            honed my skills in FullStack development, with over 5+ years of
+            experience.
           </p>
 
           <div>
             <h3 className="profile-experience-title">Previously worked at</h3>
             <p className="profile-experience-list">
-              <span className="company-tag">Apple</span>
-              <span className="company-tag">Stanford</span>
-              <span className="company-tag">Airbnb</span>
+              <span className="company-tag">Aventior</span>
+              <span className="company-tag">Apexon</span>
+              <span className="company-tag">Pfizer</span>
             </p>
           </div>
         </motion.div>
 
         {/* Left section with teal background - now on right */}
-        <div className="profile-left profile-left-alt">
+        <div
+          className="profile-left profile-left-alt"
+          style={{ backgroundImage: `url(${Asirimage})` }}
+        >
           {/* Placeholder for profile image */}
         </div>
       </div>
@@ -691,14 +706,12 @@ export default function AboutUs() {
             display: flex;
             align-items: center;
             justify-content: center;
-            background-image: url("https://media.istockphoto.com/id/1288039261/photo/portrait-of-a-smiling-middle-aged-man-of-indian-origin.jpg?s=1024x1024&w=is&k=20&c=d5zStFdzfq2iVZt2cXJZttDYZ0i32g400peD-pr3K0g=");
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
           }
 
           .profile-left-alt {
-            background-image: url("https://media.istockphoto.com/id/1318858332/photo/headshot-portrait-of-smiling-female-employee-posing-in-office.jpg?s=612x612&w=0&k=20&c=Uf-dW98hzqwNCB2g4wmZ3OFnKJ8FZ6TU8PJm9a2_9uA=");
           }
 
           /* Right section */

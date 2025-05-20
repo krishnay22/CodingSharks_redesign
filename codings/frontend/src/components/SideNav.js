@@ -9,17 +9,14 @@ import {
 } from "react-icons/fa";
 import { FaTimeline } from "react-icons/fa6";
 import { TbLayoutDashboardFilled } from "react-icons/tb";
+import logo from "../images/images for project/Coding-Sharks-Logo.png";
 
 const SideNav = () => {
   return (
     <div className="sidenav-container">
       <div className="sidebar">
         <div className="logo">
-          <img
-            src="https://www.thecodingsharks.in/image/Coding-Sharks-Logo.png"
-            alt="Coding Sharks Logo"
-            className="logo-img"
-          />
+          <img src={logo} alt="Coding Sharks Logo" className="logo-img" />
         </div>
 
         <nav>

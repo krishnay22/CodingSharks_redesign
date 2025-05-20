@@ -1,16 +1,14 @@
 import React, { useEffect } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { useInView } from "react-intersection-observer";
+import apexonLogo from "../../images/images for project/Apexon_Logo.jpg";
+import cLogo from "../../images/images for project/c-logo.png";
+import d1 from "../../images/images for project/d1.jpg";
+import image from "../../images/images for project/image.png";
+import mrLogo from "../../images/images for project/mr-logo.png";
+import orange from "../../images/images for project/orange.png";
 
-// Array of logo images (replace with actual paths)
-const logos = [
-  "https://upload.wikimedia.org/wikipedia/commons/2/2f/Google_2015_logo.svg",
-  "https://upload.wikimedia.org/wikipedia/commons/4/44/Microsoft_logo.svg",
-  "https://upload.wikimedia.org/wikipedia/commons/a/a9/Amazon_logo.svg",
-  "https://upload.wikimedia.org/wikipedia/commons/f/fa/Apple_logo_black.svg",
-  "https://upload.wikimedia.org/wikipedia/commons/0/05/Facebook_Logo_%282019%29.png",
-  "https://upload.wikimedia.org/wikipedia/commons/b/bd/Tesla_Motors.svg",
-];
+const logos = [apexonLogo, mrLogo, orange, d1, cLogo, image];
 
 function LogoDisplay() {
   const controls = useAnimation();

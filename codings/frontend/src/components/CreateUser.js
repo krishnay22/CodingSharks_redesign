@@ -1,11 +1,21 @@
 // CreateUserPage.jsx
-import React, { useState } from "react";
-import { LockIcon, UserIcon, ShieldIcon } from "lucide-react";
+import React, { useState, useRef } from "react";
+import {
+  LockIcon,
+  UserIcon,
+  MapPinIcon,
+  PhoneIcon,
+  CalendarIcon,
+  MailIcon,
+  BookOpenIcon,
+  ImageIcon,
+} from "lucide-react";
 
 const styles = {
   container: {
     display: "flex",
     alignItems: "center",
+    borderRadius: "20px",
     justifyContent: "center",
     minHeight: "100vh",
     background: "linear-gradient(135deg, #f5f7fa 0%, #e4e8eb 100%)",
@@ -15,7 +25,7 @@ const styles = {
   },
   card: {
     width: "100%",
-    maxWidth: "400px",
+    maxWidth: "500px",
     background: "white",
     borderRadius: "16px",
     boxShadow: "0 10px 25px rgba(0, 0, 0, 0.05)",
@@ -121,29 +131,117 @@ const styles = {
     fontSize: "16px",
     color: "#666",
   },
+  twoColumns: {
+    display: "flex",
+    gap: "16px",
+  },
+  halfWidth: {
+    flex: "1",
+  },
+  photoUploadContainer: {
+    position: "relative",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    border: "2px dashed #e1e1e1",
+    borderRadius: "8px",
+    padding: "20px",
+    marginBottom: "24px",
+    backgroundColor: "#f9f9f9",
+    cursor: "pointer",
+    transition: "all 0.3s ease",
+  },
+  photoUploadActive: {
+    borderColor: "#FF9A70",
+    backgroundColor: "rgba(255, 154, 112, 0.05)",
+  },
+  photoPreview: {
+    width: "100px",
+    height: "100px",
+    borderRadius: "50%",
+    objectFit: "cover",
+    marginBottom: "10px",
+  },
+  photoUploadText: {
+    color: "#666",
+    fontSize: "14px",
+    textAlign: "center",
+  },
+  photoInput: {
+    opacity: 0,
+    position: "absolute",
+    top: 0,
+    left: 0,
+    width: "100%",
+    height: "100%",
+    cursor: "pointer",
+  },
 };
 
 export default function CreateUserPage() {
-  const [username, setUsername] = useState("");
-  const [password, setPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [formData, setFormData] = useState({
+    username: "",
+    email: "",
+    password: "",
+    confirmPassword: "",
+    phone: "",
+    location: "",
+    joinedDate: new Date().toISOString().split("T")[0], // Default to today
+    course: "",
+    isAdmin: false,
+  });
+
+  const [photoFile, setPhotoFile] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
+  const fileInputRef = useRef(null);
+
+  const handleInputChange = (e) => {
+    const { name, value, type, checked } = e.target;
+    setFormData({
+      ...formData,
+      [name]: type === "checkbox" ? checked : value,
+    });
+  };
+
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setPhotoFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handlePhotoUploadClick = () => {
+    fileInputRef.current.click();
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (password !== confirmPassword) {
+    if (formData.password !== formData.confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
 
     try {
+      // Create form data for file upload
+      const submitData = new FormData();
+      Object.keys(formData).forEach((key) => {
+        submitData.append(key, formData[key]);
+      });
+
+      if (photoFile) {
+        submitData.append("photo", photoFile);
+      }
+
       const response = await fetch("http://localhost:5000/api/create-user", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ username, password, isAdmin }),
+        body: submitData, // Don't set Content-Type header when using FormData
       });
 
       const data = await response.json();
@@ -161,6 +259,42 @@ export default function CreateUserPage() {
     }
   };
 
+  const renderInputField = (name, label, icon, type = "text") => {
+    const value = formData[name];
+    const Icon = icon;
+
+    return (
+      <div style={styles.inputGroup}>
+        <div
+          style={{
+            ...styles.formInput,
+            ...(value ? styles.formInputActive : {}),
+          }}
+        >
+          <Icon style={styles.inputIcon} />
+          <input
+            id={name}
+            name={name}
+            type={type}
+            value={value}
+            onChange={handleInputChange}
+            style={styles.input}
+            required
+          />
+          <label
+            htmlFor={name}
+            style={{
+              ...styles.label,
+              ...(value ? styles.labelActive : {}),
+            }}
+          >
+            {label}
+          </label>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div style={styles.container}>
       <div style={styles.card}>
@@ -172,96 +306,98 @@ export default function CreateUserPage() {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <div style={styles.inputGroup}>
-            <div
-              style={{
-                ...styles.formInput,
-                ...(username ? styles.formInputActive : {}),
-              }}
-            >
-              <UserIcon style={styles.inputIcon} />
-              <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                style={styles.input}
-                required
+          {/* Photo upload section */}
+          <div
+            style={{
+              ...styles.photoUploadContainer,
+              ...(photoPreview ? styles.photoUploadActive : {}),
+            }}
+            onClick={handlePhotoUploadClick}
+          >
+            {photoPreview ? (
+              <img
+                src={photoPreview}
+                alt="Profile preview"
+                style={styles.photoPreview}
               />
-              <label
-                htmlFor="username"
-                style={{
-                  ...styles.label,
-                  ...(username ? styles.labelActive : {}),
-                }}
-              >
-                Username
-              </label>
+            ) : (
+              <ImageIcon size={48} color="#999" />
+            )}
+            <p style={styles.photoUploadText}>
+              {photoPreview ? "Change photo" : "Upload profile photo"}
+            </p>
+            <input
+              type="file"
+              ref={fileInputRef}
+              accept="image/*"
+              onChange={handlePhotoChange}
+              style={styles.photoInput}
+            />
+          </div>
+
+          {/* Basic user information */}
+          <div style={styles.twoColumns}>
+            <div style={styles.halfWidth}>
+              {renderInputField("username", "Username", UserIcon)}
+            </div>
+            <div style={styles.halfWidth}>
+              {renderInputField("email", "Email", MailIcon, "email")}
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <div
-              style={{
-                ...styles.formInput,
-                ...(password ? styles.formInputActive : {}),
-              }}
-            >
-              <LockIcon style={styles.inputIcon} />
-              <input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                style={styles.input}
-                required
-              />
-              <label
-                htmlFor="password"
-                style={{
-                  ...styles.label,
-                  ...(password ? styles.labelActive : {}),
-                }}
-              >
-                Create Password
-              </label>
+          {/* Password fields */}
+          <div style={styles.twoColumns}>
+            <div style={styles.halfWidth}>
+              {renderInputField(
+                "password",
+                "Create Password",
+                LockIcon,
+                "password"
+              )}
+            </div>
+            <div style={styles.halfWidth}>
+              {renderInputField(
+                "confirmPassword",
+                "Confirm Password",
+                LockIcon,
+                "password"
+              )}
             </div>
           </div>
 
-          <div style={styles.inputGroup}>
-            <div
-              style={{
-                ...styles.formInput,
-                ...(confirmPassword ? styles.formInputActive : {}),
-              }}
-            >
-              <LockIcon style={styles.inputIcon} />
-              <input
-                id="confirmPassword"
-                type="password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                style={styles.input}
-                required
-              />
-              <label
-                htmlFor="confirmPassword"
-                style={{
-                  ...styles.label,
-                  ...(confirmPassword ? styles.labelActive : {}),
-                }}
-              >
-                Confirm Password
-              </label>
+          {/* Contact information */}
+          <div style={styles.twoColumns}>
+            <div style={styles.halfWidth}>
+              {renderInputField("phone", "Phone Number", PhoneIcon, "tel")}
+            </div>
+            <div style={styles.halfWidth}>
+              {renderInputField("location", "Location", MapPinIcon)}
             </div>
           </div>
 
+          {/* Additional information */}
+          <div style={styles.twoColumns}>
+            <div style={styles.halfWidth}>
+              {renderInputField(
+                "joinedDate",
+                "Joined Date",
+                CalendarIcon,
+                "date"
+              )}
+            </div>
+            <div style={styles.halfWidth}>
+              {renderInputField("course", "Course", BookOpenIcon)}
+            </div>
+          </div>
+
+          {/* Admin checkbox */}
           <div style={styles.checkboxContainer}>
             <input
               id="isAdmin"
+              name="isAdmin"
               type="checkbox"
-              checked={isAdmin}
-              onChange={(e) => setIsAdmin(e.target.checked)}
+              checked={formData.isAdmin}
+              onChange={handleInputChange}
               style={styles.checkbox}
             />
             <label htmlFor="isAdmin" style={styles.checkboxLabel}>
