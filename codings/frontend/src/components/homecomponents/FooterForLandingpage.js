@@ -85,16 +85,13 @@ const Footer = () => {
             </a>
             <a
               href="/https://www.instagram.com/thecodingsharks_official/profilecard/?igsh=b2pqaDJkbGJ0M2Q2"
-              target="_blank"
-              rel="noopener noreferrer"
+              
               aria-label="Instagram"
             >
               <i className="social-icon instagram"></i>
             </a>
             <a
               href="/https://www.linkedin.com/company/codingsharks/"
-              target="_blank"
-              rel="noopener noreferrer"
               aria-label="LinkedIn"
             >
               <i className="social-icon linkedin"></i>
