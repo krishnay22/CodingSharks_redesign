@@ -19,6 +19,7 @@ import AdminLayout from "../layouts/AdminLayout";
 import CreateUserPage from "../components/CreateUser";
 import StudentWorkUploadForm from "../pages/admin/StudentWorkSumbit";
 import DailyquestionUpload from "../pages/admin/DailyquestionUpload";
+import CourseGroup from "../pages/admin/CourseGroup";
 
 // Protected route components
 const ProtectedRoute = ({ children }) => {
@@ -88,6 +89,7 @@ const AppRoutes = () => {
           element={<StudentWorkUploadForm />}
         />
         <Route path="DailyquestionUpload" element={<DailyquestionUpload />} />
+        <Route path="CourseGroup" element={<CourseGroup />} />
       </Route>
 
       {/* User Dashboard Routes - Protected (any logged in user) */}

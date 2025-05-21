@@ -110,18 +110,6 @@ const EnquirySection = () => {
             <div className="mb-4">
               <Form>
                 <Row>
-                  <Col xs={12} md={9} className="mb-3">
-                    <div className="input-group">
-                      <span className="input-group-text bg-white border-end-0">
-                        +91
-                      </span>
-                      <Form.Control
-                        type="text"
-                        placeholder="Enter your mobile number"
-                        className="border-start-0"
-                      />
-                    </div>
-                  </Col>
                   <Col xs={12} md={9}>
                     <div className="button-wrapper">
                       <CustomButton
@@ -129,6 +117,12 @@ const EnquirySection = () => {
                         accentColor="#212529"
                         primaryColor="#ffffff"
                         className="w-100 py-2 py-md-3"
+                        onClick={() =>
+                          window.open(
+                            "https://docs.google.com/forms/d/e/1FAIpQLSe4XUthAQ980TWIxlUT_P5HATpNpWxkCbEPE6XxSFk0jMannA/viewform",
+                            "_blank"
+                          )
+                        }
                       />
                     </div>
                   </Col>

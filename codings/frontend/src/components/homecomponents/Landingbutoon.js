@@ -2,6 +2,7 @@ import React, { useRef, useEffect } from "react";
 
 const CustomButton = ({
   text,
+  onClick,
   icon,
   accentColor,
   primaryColor,
@@ -38,6 +39,7 @@ const CustomButton = ({
         className={`custom-button ${isNavButton ? "c-btn" : ""}`}
         ref={buttonRef}
         onMouseMove={handleMouseMove}
+        onClick={onClick}
         style={buttonStyle}
       >
         <div className="circle" ref={circleRef}></div>
