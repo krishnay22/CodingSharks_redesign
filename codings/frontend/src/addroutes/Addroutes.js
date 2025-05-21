@@ -83,6 +83,8 @@ const AppRoutes = () => {
         }
       >
         <Route index element={<CreateUserPage />} />
+        <Route path="CreateUserPage" element={<CreateUserPage />} />
+
         <Route path="Dailyquestions" element={<Dailyquestions />} />
         <Route
           path="StudentWorkUploadForm"

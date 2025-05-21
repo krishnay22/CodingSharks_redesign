@@ -33,21 +33,21 @@ const SideNav = () => {
                 <span className="nav-text">Home</span>
               </NavLink>
             </li>
+
             <li className="nav-item">
               <NavLink
-                to="/dashboard"
+                to="/AdminLayout/CreateUserPage"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
-                end
               >
-                <TbLayoutDashboardFilled className="nav-icon" />
-                <span className="nav-text">Dashboard</span>
+                <FaUser className="nav-icon" />
+                <span className="nav-text">Create user</span>
               </NavLink>
             </li>
             <li className="nav-item">
               <NavLink
-                to="/dashboard/Profile"
+                to="/"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
