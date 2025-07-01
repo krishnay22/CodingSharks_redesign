@@ -186,7 +186,7 @@ export default function CreateUserPage() {
     password: "",
     confirmPassword: "",
     phone: "",
-    location: "",
+    Address: "",
     joinedDate: new Date().toISOString().split("T")[0], // Default to today
     course: "",
     isAdmin: false,
@@ -371,7 +371,7 @@ export default function CreateUserPage() {
               {renderInputField("phone", "Phone Number", PhoneIcon, "tel")}
             </div>
             <div style={styles.halfWidth}>
-              {renderInputField("location", "Location", MapPinIcon)}
+              {renderInputField("Address", "Address", MapPinIcon)}
             </div>
           </div>
 

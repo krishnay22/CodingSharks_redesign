@@ -9,9 +9,19 @@ const pool = mysql.createPool({
   database: process.env.DB_DATABASE,
   waitForConnections: true,
   connectionLimit: 10,
-  queueLimit: 0
+  queueLimit: 0,
 });
 
 console.log("MySQL pool created");
+
+pool
+  .getConnection()
+  .then((connection) => {
+    console.log("Successfully connected to the database.");
+    connection.release();
+  })
+  .catch((err) => {
+    console.error("Database connection failed:", err.message);
+  });
 
 module.exports = pool;
