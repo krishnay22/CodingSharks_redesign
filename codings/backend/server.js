@@ -29,3 +29,6 @@ app.listen(PORT, () => {
 
 app.use("/api/courses", courseRoutes);
 app.use("/api/questions", questionRoutes);
+
+// Add this to your main server file (app.js or server.js)
+app.use("/uploads", express.static("uploads"));
