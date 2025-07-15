@@ -4,7 +4,7 @@ import { useInView } from "react-intersection-observer";
 import apexonLogo from "../../images/images for project/Apexon_Logo.jpg";
 import cLogo from "../../images/images for project/c-logo.png";
 import d1 from "../../images/images for project/d1.jpg";
-import image from "../../images/images for project/image.png";
+import image from "../../images/images for project/image.jpg";
 import mrLogo from "../../images/images for project/mr-logo.png";
 import orange from "../../images/images for project/orange.png";
 
@@ -54,12 +54,12 @@ function LogoDisplay() {
       <style jsx>{`
         .logo-display-container {
           text-align: center;
-          margin: 60px 0;
+          margin: 30px 0;
           display: flex;
           flex-direction: column;
           align-items: center;
           width: 100%;
-          padding: 0 20px;
+          padding: 0 15px;
           box-sizing: border-box;
         }
 
@@ -67,14 +67,14 @@ function LogoDisplay() {
         .title-container {
           width: 100%;
           text-align: left;
-          padding-left: 3%;
-          margin-bottom: 40px;
+          padding-left: 2%;
+          margin-bottom: 20px;
         }
 
         .logo-display-title {
-          font-size: 65px;
+          font-size: 40px;
           font-weight: 100;
-          margin-bottom: 30px;
+          margin-bottom: 20px;
           line-height: 1.2;
         }
 
@@ -92,7 +92,6 @@ function LogoDisplay() {
           display: flex;
           justify-content: center;
           align-items: center;
-          padding: 15px;
           transition: transform 0.3s ease;
         }
 
@@ -101,7 +100,7 @@ function LogoDisplay() {
         }
 
         .logo-img {
-          height: 73px;
+          height: 55px;
           width: auto;
           max-width: 100%;
           object-fit: contain;
@@ -110,7 +109,7 @@ function LogoDisplay() {
         /* Large Devices (laptops/desktops) */
         @media (max-width: 1200px) {
           .logo-display-title {
-            font-size: 55px;
+            font-size: 35px;
           }
 
           .logo-grid {

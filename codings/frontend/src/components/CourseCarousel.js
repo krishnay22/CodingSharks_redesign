@@ -172,7 +172,7 @@ const CourseCarousel = () => {
         ? "42px"
         : "50px",
       fontWeight: "lighter",
-      paddingLeft: "20px",
+      paddingLeft: "36px",
       paddingBottom: "20px",
       paddingTop: "20px",
       textAlign: screenSize.isSmallMobile ? "center" : "left",

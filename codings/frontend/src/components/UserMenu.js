@@ -1,24 +1,29 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../context/AuthContext"; // Import useAuth hook
 
-function UserMenu({ userName, isAdmin }) {
+function UserMenu() {
+  const { user, logout } = useAuth(); // Use the useAuth hook to get user and logout function
+
+  // If user is not logged in, don't render the menu
+  if (!user) {
+    return null;
+  }
+
   const handleLogout = () => {
-    // Clear all user-related data from localStorage
-    localStorage.removeItem("username");
-    localStorage.removeItem("token");
-    localStorage.removeItem("isAdmin");
-
-    // Refresh the page to update the UI state
-    window.location.reload();
+    logout(); // Call the logout function from AuthContext
+    // The AuthContext's logout function already handles clearing localStorage and navigating
+    // So, window.location.reload() is not strictly needed here, but can be kept if desired
   };
 
   return (
     <div className="user-menu">
       <div className="user-dropdown">
         <Link to="/profile" style={{ textDecoration: "none" }}>
-          <button className="menu-btn">{userName}</button>
+          <button className="menu-btn">{user.username}</button>{" "}
+          {/* Use user.username from context */}
         </Link>
-        {isAdmin && (
+        {user.isAdmin && ( // Use user.isAdmin from context
           <Link to="/AdminLayout" style={{ textDecoration: "none" }}>
             <button className="menu-btn admin-btn">Admin</button>
           </Link>

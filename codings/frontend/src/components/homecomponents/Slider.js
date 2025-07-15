@@ -155,7 +155,7 @@ const RecruitmentStoriesCarousel = () => {
       maxWidth: isMobile ? "90%" : "1100px", // Reduced width for mobile
       margin: "0 auto",
       padding: isMobile ? "0 30px" : "0 60px",
-      height: isMobile ? "auto" : "500px",
+      height: isMobile ? "auto" : "220px",
     },
     slideWindow: {
       width: "100%",
@@ -284,7 +284,7 @@ const RecruitmentStoriesCarousel = () => {
           transform: "translateY(200px)",
           transition: "transform 0.2s ease-out, opacity 0.8s ease-out",
           padding: isMobile ? "40px 20px 30px 20px" : "40px 20px 60px 50px",
-          fontSize: isMobile ? "32px" : "55px",
+          fontSize: isMobile ? "32px" : "50px",
           fontWeight: "lighter",
           textAlign: isMobile ? "center" : "left",
         }}

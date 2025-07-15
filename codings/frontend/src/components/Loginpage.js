@@ -1,6 +1,6 @@
 // src/components/LoginPage.jsx
 import React, { useState } from "react";
-import { LockIcon, UserIcon } from "lucide-react";
+import { LockIcon, MailIcon } from "lucide-react"; // Changed UserIcon to MailIcon
 import { useNavigate } from "react-router-dom";
 
 const styles = {
@@ -126,7 +126,7 @@ const styles = {
 };
 
 export default function LoginPage() {
-  const [username, setUsername] = useState("");
+  const [email, setEmail] = useState(""); // Corrected setter name to setEmail
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
@@ -143,7 +143,7 @@ export default function LoginPage() {
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ username, password }),
+        body: JSON.stringify({ email, password }),
       });
 
       const data = await response.json();
@@ -154,12 +154,12 @@ export default function LoginPage() {
 
       // Store token and user info in localStorage
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("isAdmin", data.isAdmin);
+      localStorage.setItem("username", data.user.username); // Correctly accessing from data.user
+      localStorage.setItem("isAdmin", data.user.isAdmin); // Correctly accessing from data.user
 
       // Redirect to home page
       navigate("/");
-      window.location.reload();
+      window.location.reload(); // Reload to ensure auth state is picked up by other components
 
       console.log("Login successful!", data);
     } catch (error) {
@@ -183,26 +183,26 @@ export default function LoginPage() {
             <div
               style={{
                 ...styles.formInput,
-                ...(username ? styles.formInputActive : {}),
+                ...(email ? styles.formInputActive : {}),
               }}
             >
-              <UserIcon style={styles.inputIcon} />
+              <MailIcon style={styles.inputIcon} /> {/* Changed to MailIcon */}
               <input
-                id="username"
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
+                id="email"
+                type="email" // Changed type to "email" for better validation
+                value={email}
+                onChange={(e) => setEmail(e.target.value)} // Corrected setter to setEmail
                 style={styles.input}
                 required
               />
               <label
-                htmlFor="username"
+                htmlFor="email"
                 style={{
                   ...styles.label,
-                  ...(username ? styles.labelActive : {}),
+                  ...(email ? styles.labelActive : {}),
                 }}
               >
-                Username
+                Email {/* Corrected label text to "Email" */}
               </label>
             </div>
           </div>

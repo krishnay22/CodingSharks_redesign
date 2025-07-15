@@ -11,7 +11,6 @@ function Homenav() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    // Check if user is logged in based on the actual localStorage structure
     const checkLoginStatus = () => {
       const username = localStorage.getItem("username");
       const token = localStorage.getItem("token");
@@ -21,7 +20,6 @@ function Homenav() {
         setIsLoggedIn(true);
         setUserName(username);
 
-        // Set admin status if available
         if (adminStatus === "true") {
           setIsAdmin(true);
         }
@@ -34,7 +32,6 @@ function Homenav() {
   return (
     <>
       <Navbar className="homenav" expand="lg">
-        {/* Move brand/logo to the far left */}
         <Navbar.Brand as={NavLink} to="/" className="brand-logo">
           <img
             src={logo}
@@ -45,37 +42,55 @@ function Homenav() {
 
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
-          {/* Align navigation links to center-left */}
           <Nav className="nav-links">
-            <Nav.Link as={NavLink} to="/" exact activeClassName="active">
+            <Nav.Link
+              as={NavLink}
+              to="/"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Home
             </Nav.Link>
             {isLoggedIn && (
-              <Nav.Link as={NavLink} to="/dashboard" activeClassName="active">
+              <Nav.Link
+                as={NavLink}
+                to="/dashboard"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Dashboard
               </Nav.Link>
             )}
             {isAdmin && (
-              <Nav.Link as={NavLink} to="/AdminLayout" activeClassName="active">
+              <Nav.Link
+                as={NavLink}
+                to="/AdminLayout"
+                className={({ isActive }) => (isActive ? "active" : "")}
+              >
                 Admin Panel
               </Nav.Link>
             )}
-            <Nav.Link as={NavLink} to="/courses" activeClassName="active">
+            <Nav.Link
+              as={NavLink}
+              to="/courses"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               Courses
             </Nav.Link>
             <Nav.Link
               as={NavLink}
               to="/StudentWorkPage"
-              activeClassName="active"
+              className={({ isActive }) => (isActive ? "active" : "")}
             >
               Students Work
             </Nav.Link>
-            <Nav.Link as={NavLink} to="/AboutUsPage" activeClassName="active">
+            <Nav.Link
+              as={NavLink}
+              to="/AboutUsPage"
+              className={({ isActive }) => (isActive ? "active" : "")}
+            >
               About us
             </Nav.Link>
           </Nav>
 
-          {/* Keep login button on the far right */}
           <Nav className="ms-auto">
             {isLoggedIn ? (
               <UserMenu userName={userName} />
@@ -93,11 +108,10 @@ function Homenav() {
       </Navbar>
       <div className="nav-underline"></div>
 
-      {/* CSS Styles */}
       <style>
         {`
           .homenav {
-            background-color: #ffffff !important; /* White background */
+            background-color: #ffffff !important;
             padding: 5px 20px !important;
             font-size: 18px;
           }
@@ -122,16 +136,16 @@ function Homenav() {
           .nav-links a {
             text-decoration: none;
             font-size: 18px;
-            color: lightgray !important; /* Default inactive color */
+            color: lightgray !important;
             transition: color 0.3s ease-in-out;
           }
 
           .nav-links a.active {
-            color:rgb(0, 0, 0) !important; /* Active link color */
+            color: rgb(0, 0, 0) !important;
           }
 
           .nav-links a:hover {
-            color: #ff9a70 !important; /* Hover effect */
+            color: #ff9a70 !important;
           }
 
           .login-btn {

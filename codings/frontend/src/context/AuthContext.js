@@ -32,7 +32,11 @@ export const AuthProvider = ({ children }) => {
       if (!res.ok) return logout();
 
       const data = await res.json();
-      setUser({ id: data.id, username: data.username, isAdmin: data.isAdmin });
+      setUser({
+        id: data.id,
+        username: data.user.username,
+        isAdmin: data.user.isAdmin,
+      });
     } catch (err) {
       console.error("Token check failed", err);
       logout();
@@ -54,10 +58,10 @@ export const AuthProvider = ({ children }) => {
       if (!res.ok) throw new Error(data.message || "Login failed");
 
       localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
-      localStorage.setItem("isAdmin", data.isAdmin);
+      localStorage.setItem("username", data.user.username);
+      localStorage.setItem("isAdmin", data.user.isAdmin);
 
-      setUser({ username: data.username, isAdmin: data.isAdmin });
+      setUser({ username: data.user.username, isAdmin: data.user.isAdmin });
       return true;
     } catch (err) {
       console.error("Login error:", err);
