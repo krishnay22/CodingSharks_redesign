@@ -31,9 +31,11 @@ const userSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
-    course: {
-      type: String,
-      trim: true,
+    // Removed 'course' string, now using 'course_id' for reference
+    course_id: {
+      type: mongoose.Schema.Types.ObjectId, // Reference to the Course model
+      ref: "Course", // The name of the model it refers to
+      default: null, // Optional: User might not be enrolled in a course initially
     },
     isAdmin: {
       type: Boolean,

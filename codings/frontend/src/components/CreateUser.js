@@ -1,5 +1,4 @@
-// CreateUserPage.jsx
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   LockIcon,
   UserIcon,
@@ -79,6 +78,16 @@ const styles = {
     fontSize: "16px",
     outline: "none",
   },
+  select: {
+    width: "100%",
+    padding: "16px 16px 16px 50px",
+    border: "none",
+    background: "transparent",
+    fontSize: "16px",
+    outline: "none",
+    appearance: "none", // Remove default select arrow
+    cursor: "pointer",
+  },
   label: {
     position: "absolute",
     left: "50px",
@@ -106,6 +115,11 @@ const styles = {
     fontWeight: 600,
     cursor: "pointer",
     marginTop: "10px",
+    transition: "background 0.3s ease",
+  },
+  submitButtonDisabled: {
+    background: "#ccc",
+    cursor: "not-allowed",
   },
   footer: {
     textAlign: "center",
@@ -126,10 +140,12 @@ const styles = {
     width: "20px",
     height: "20px",
     accentColor: "#FF9A70",
+    cursor: "pointer",
   },
   checkboxLabel: {
     fontSize: "16px",
     color: "#666",
+    cursor: "pointer",
   },
   twoColumns: {
     display: "flex",
@@ -177,6 +193,23 @@ const styles = {
     height: "100%",
     cursor: "pointer",
   },
+  messageBox: {
+    padding: "12px",
+    borderRadius: "8px",
+    marginBottom: "20px",
+    textAlign: "center",
+    fontWeight: "bold",
+  },
+  successMessage: {
+    backgroundColor: "#d4edda",
+    color: "#155724",
+    border: "1px solid #c3e6cb",
+  },
+  errorMessage: {
+    backgroundColor: "#f8d7da",
+    color: "#721c24",
+    border: "1px solid #f5c6cb",
+  },
 };
 
 export default function CreateUserPage() {
@@ -188,13 +221,41 @@ export default function CreateUserPage() {
     phone: "",
     Address: "",
     joinedDate: new Date().toISOString().split("T")[0], // Default to today
-    course: "",
-    isAdmin: false,
+    isAdmin: false, // isAdmin toggle
   });
 
   const [photoFile, setPhotoFile] = useState(null);
   const [photoPreview, setPhotoPreview] = useState(null);
   const fileInputRef = useRef(null);
+
+  const [availableCourses, setAvailableCourses] = useState([]); // State for fetched courses
+  const [selectedCourseId, setSelectedCourseId] = useState(""); // State for selected course ID
+  const [loadingCourses, setLoadingCourses] = useState(true);
+  const [coursesError, setCoursesError] = useState(null);
+  const [formMessage, setFormMessage] = useState({ type: "", text: "" }); // For success/error messages
+  const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Fetch all available courses when the component mounts
+  useEffect(() => {
+    const fetchAllCourses = async () => {
+      try {
+        setLoadingCourses(true);
+        const response = await fetch("http://localhost:5000/api/courses"); // Your GET /api/courses endpoint
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setAvailableCourses(data.courses);
+      } catch (err) {
+        console.error("Error fetching courses:", err);
+        setCoursesError("Failed to load course options.");
+      } finally {
+        setLoadingCourses(false);
+      }
+    };
+
+    fetchAllCourses();
+  }, []); // Empty dependency array means this runs once on mount
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -222,9 +283,18 @@ export default function CreateUserPage() {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setFormMessage({ type: "", text: "" }); // Clear previous messages
+    setIsSubmitting(true);
 
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      setFormMessage({ type: "error", text: "Passwords do not match!" });
+      setIsSubmitting(false);
+      return;
+    }
+
+    if (!selectedCourseId) {
+      setFormMessage({ type: "error", text: "Please select a course." });
+      setIsSubmitting(false);
       return;
     }
 
@@ -234,6 +304,7 @@ export default function CreateUserPage() {
       Object.keys(formData).forEach((key) => {
         submitData.append(key, formData[key]);
       });
+      submitData.append("course_id", selectedCourseId); // Append the selected course ID
 
       if (photoFile) {
         submitData.append("photo", photoFile);
@@ -248,14 +319,35 @@ export default function CreateUserPage() {
 
       if (response.ok) {
         console.log("User created:", data);
-        alert("User created successfully!");
-        // Redirect or update UI accordingly
+        setFormMessage({ type: "success", text: "User created successfully!" });
+        // Optionally, reset form fields here
+        setFormData({
+          username: "",
+          email: "",
+          password: "",
+          confirmPassword: "",
+          phone: "",
+          Address: "",
+          joinedDate: new Date().toISOString().split("T")[0],
+          isAdmin: false,
+        });
+        setSelectedCourseId("");
+        setPhotoFile(null);
+        setPhotoPreview(null);
       } else {
-        alert(data.message || "Failed to create user");
+        setFormMessage({
+          type: "error",
+          text: data.message || "Failed to create user",
+        });
       }
     } catch (error) {
       console.error("Error creating user:", error);
-      alert("Something went wrong. Please try again.");
+      setFormMessage({
+        type: "error",
+        text: "Something went wrong. Please try again.",
+      });
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -304,6 +396,18 @@ export default function CreateUserPage() {
             Enter details to create a new user account
           </p>
         </div>
+
+        {formMessage.text && (
+          <div
+            style={
+              formMessage.type === "success"
+                ? { ...styles.messageBox, ...styles.successMessage }
+                : { ...styles.messageBox, ...styles.errorMessage }
+            }
+          >
+            {formMessage.text}
+          </div>
+        )}
 
         <form onSubmit={handleSubmit}>
           {/* Photo upload section */}
@@ -386,7 +490,63 @@ export default function CreateUserPage() {
               )}
             </div>
             <div style={styles.halfWidth}>
-              {renderInputField("course", "Course", BookOpenIcon)}
+              {/* Course Selection Dropdown */}
+              <div style={styles.inputGroup}>
+                <div
+                  style={{
+                    ...styles.formInput,
+                    ...(selectedCourseId ? styles.formInputActive : {}),
+                  }}
+                >
+                  <BookOpenIcon style={styles.inputIcon} />
+                  {loadingCourses ? (
+                    <p
+                      style={{
+                        ...styles.input,
+                        paddingLeft: "50px",
+                        color: "#999",
+                      }}
+                    >
+                      Loading courses...
+                    </p>
+                  ) : coursesError ? (
+                    <p
+                      style={{
+                        ...styles.input,
+                        paddingLeft: "50px",
+                        color: "red",
+                      }}
+                    >
+                      {coursesError}
+                    </p>
+                  ) : (
+                    <select
+                      id="course-select"
+                      name="course_id" // Use course_id for backend
+                      value={selectedCourseId}
+                      onChange={(e) => setSelectedCourseId(e.target.value)}
+                      style={styles.select}
+                      required
+                    >
+                      <option value="">-- Select Course --</option>
+                      {availableCourses.map((course) => (
+                        <option key={course._id} value={course._id}>
+                          {course.course_name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                  <label
+                    htmlFor="course-select"
+                    style={{
+                      ...styles.label,
+                      ...(selectedCourseId || loadingCourses || coursesError
+                        ? styles.labelActive
+                        : {}),
+                    }}
+                  ></label>
+                </div>
+              </div>
             </div>
           </div>
 
@@ -405,8 +565,17 @@ export default function CreateUserPage() {
             </label>
           </div>
 
-          <button type="submit" style={styles.submitButton}>
-            Create User
+          <button
+            type="submit"
+            style={{
+              ...styles.submitButton,
+              ...(isSubmitting || loadingCourses
+                ? styles.submitButtonDisabled
+                : {}),
+            }}
+            disabled={isSubmitting || loadingCourses}
+          >
+            {isSubmitting ? "Creating User..." : "Create User"}
           </button>
         </form>
 
