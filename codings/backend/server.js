@@ -6,8 +6,9 @@ require("dotenv").config();
 
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
-const courseRoutes = require("./routes/courseRoutes"); // NEW
-const questionRoutes = require("./routes/questionRoutes"); // NEW
+const courseRoutes = require("./routes/courseRoutes");
+const questionRoutes = require("./routes/questionRoutes");
+const dailyQuestionRoutes = require("./routes/dailyQuestionRoutes"); // NEW IMPORT
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -28,8 +29,9 @@ app.use("/uploads", express.static(uploadsDir));
 
 // API Routes
 app.use("/api", authRoutes);
-app.use("/api", courseRoutes); // NEW
-app.use("/api", questionRoutes); // NEW
+app.use("/api", courseRoutes);
+app.use("/api", questionRoutes);
+app.use("/api", dailyQuestionRoutes); // NEW USAGE
 
 // Start the server
 app.listen(PORT, () => {

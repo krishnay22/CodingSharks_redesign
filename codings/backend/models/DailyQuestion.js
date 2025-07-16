@@ -1,3 +1,4 @@
+// models/DailyQuestion.js
 const mongoose = require("mongoose");
 
 const dailyQuestionSchema = new mongoose.Schema(
@@ -8,22 +9,23 @@ const dailyQuestionSchema = new mongoose.Schema(
       trim: true,
     },
     duration: {
-      type: Number, // Duration in minutes (e.g., 60 for 1 hour)
-      default: 0, // 0 means no specific time limit
+      // in minutes
+      type: Number,
+      required: true,
+      min: 0,
     },
     is_active: {
       type: Boolean,
-      default: false, // Only one question should be active at a time
+      default: false,
     },
-    // You could add fields like `correct_answer` if it's a fixed answer question
-    // correct_answer: {
-    //   type: String,
-    //   trim: true,
-    //   default: null
-    // },
+    // NEW FIELD: Timestamp when the question became active
+    startTime: {
+      type: Date,
+      default: null, // It will be set when the admin posts it
+    },
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt
+    timestamps: true,
   }
 );
 

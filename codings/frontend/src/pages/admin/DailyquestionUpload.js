@@ -1,105 +1,247 @@
-import { useState } from "react";
+import React, { useState, useEffect } from "react";
 
 export default function DailyquestionUpload() {
   const [activeTab, setActiveTab] = useState("questions");
-  const [questions, setQuestions] = useState([
-    {
-      id: 1,
-      text: "Write a JavaScript function named sum that takes two parameters and returns their sum. Then, call the function with the numbers 5 and 7 and log the result to the console.",
-      difficulty: "Easy",
-      timeLimit: 10,
-    },
-    {
-      id: 2,
-      text: "Create a React component that displays a counter and has buttons to increment and decrement the count.",
-      difficulty: "Medium",
-      timeLimit: 15,
-    },
-  ]);
-  const [submissions, setSubmissions] = useState([
-    {
-      id: 1,
-      studentId: "S001",
-      studentName: "Alex Johnson",
-      questionId: 1,
-      answer:
-        "function sum(a, b) {\n  return a + b;\n}\n\nconsole.log(sum(5, 7));",
-      timeTaken: "4:23",
-      status: "pending",
-    },
-    {
-      id: 2,
-      studentId: "S002",
-      studentName: "Taylor Smith",
-      questionId: 1,
-      answer:
-        "function sum(num1, num2) {\n  return num1 + num2;\n}\n\nconst result = sum(5, 7);\nconsole.log(result);",
-      timeTaken: "6:45",
-      status: "pending",
-    },
-    {
-      id: 3,
-      studentId: "S003",
-      studentName: "Jamie Williams",
-      questionId: 2,
-      answer:
-        "import React, { useState } from 'react';\n\nfunction Counter() {\n  const [count, setCount] = useState(0);\n  \n  return (\n    <div>\n      <h2>Count: {count}</h2>\n      <button onClick={() => setCount(count + 1)}>Increment</button>\n      <button onClick={() => setCount(count - 1)}>Decrement</button>\n    </div>\n  );\n}\n\nexport default Counter;",
-      timeTaken: "10:12",
-      status: "pending",
-    },
-  ]);
+
+  // State for questions fetched from backend
+  const [questions, setQuestions] = useState([]);
+  const [loadingQuestions, setLoadingQuestions] = useState(true);
+  const [questionsError, setQuestionsError] = useState(null);
+
+  // State for submissions fetched from backend
+  const [submissions, setSubmissions] = useState([]);
+  const [loadingSubmissions, setLoadingSubmissions] = useState(true);
+  const [submissionsError, setSubmissionsError] = useState(null);
+
   const [newQuestion, setNewQuestion] = useState({
-    text: "",
-    difficulty: "Easy",
-    timeLimit: 10,
+    question_text: "", // Matches backend field name
+    duration: 10, // Matches backend field name
   });
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // State for the actual JWT token
+  const [authToken, setAuthToken] = useState(null);
+  // State to check if the current user is an admin (based on localStorage 'isAdmin' flag)
+  const [isAdminUser, setIsAdminUser] = useState(false);
+
+  // Base URL for your backend API
+  const API_BASE_URL = "http://localhost:5000/api";
+
+  // --- Fetch Auth Token and Admin Status from localStorage on component mount ---
+  useEffect(() => {
+    const token = localStorage.getItem("token"); // Corrected: fetching from "token"
+    const adminStatus = localStorage.getItem("isAdmin"); // Corrected: fetching from "isAdmin"
+
+    // Check if both token exists and isAdmin is "true" (as localStorage stores strings)
+    if (token && adminStatus === "true") {
+      setAuthToken(token);
+      setIsAdminUser(true);
+    } else {
+      // Handle cases where token is missing or user is not an admin
+      console.warn(
+        "User is not an admin or JWT token not found in localStorage. Some features may be restricted."
+      );
+      // Optionally:
+      // if (!token) {
+      //   // Redirect to login page if no token
+      //   // history.push('/login'); // If you use React Router
+      // } else if (adminStatus !== "true") {
+      //   // Show a message or redirect if logged in but not an admin
+      // }
+    }
+  }, []); // Runs once on component mount
+
+  // --- Fetch Questions ---
+  const fetchQuestions = async () => {
+    // Only attempt to fetch if authToken is available and user is an admin
+    if (!authToken || !isAdminUser) {
+      setLoadingQuestions(false); // Stop loading if conditions aren't met
+      return;
+    }
+
+    setLoadingQuestions(true);
+    setQuestionsError(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/daily-questions`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`, // Use the fetched token
+        },
+      });
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch questions");
+      }
+      const data = await response.json();
+      setQuestions(data.questions);
+    } catch (error) {
+      console.error("Error fetching questions:", error);
+      setQuestionsError(error.message);
+    } finally {
+      setLoadingQuestions(false);
+    }
+  };
+
+  // --- Fetch Submissions ---
+  const fetchSubmissions = async () => {
+    // Only attempt to fetch if authToken is available and user is an admin
+    if (!authToken || !isAdminUser) {
+      setLoadingSubmissions(false); // Stop loading if conditions aren't met
+      return;
+    }
+
+    setLoadingSubmissions(true);
+    setSubmissionsError(null);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/daily-questions/submissions`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`, // Use the fetched token
+          },
+        }
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to fetch submissions");
+      }
+      const data = await response.json();
+      setSubmissions(data.submissions);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      setSubmissionsError(error.message);
+    } finally {
+      setLoadingSubmissions(false);
+    }
+  };
+
+  // UseEffect to fetch data when authToken becomes available or isAdminUser status changes
+  useEffect(() => {
+    if (authToken && isAdminUser) {
+      // Only fetch if both token and admin status are confirmed
+      fetchQuestions();
+      fetchSubmissions();
+    }
+  }, [authToken, isAdminUser]); // Depend on authToken and isAdminUser
+
   // Filter submissions based on search term
   const filteredSubmissions = submissions.filter(
     (submission) =>
-      submission.studentName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      submission.studentId.toLowerCase().includes(searchTerm.toLowerCase())
+      submission.user_id?.username
+        .toLowerCase()
+        .includes(searchTerm.toLowerCase()) ||
+      submission.user_id?._id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const handleQuestionSubmit = (e) => {
+  // --- Handle New Question Submission ---
+  const handleQuestionSubmit = async (e) => {
     e.preventDefault();
-    const newId =
-      questions.length > 0 ? Math.max(...questions.map((q) => q.id)) + 1 : 1;
+    if (!authToken || !isAdminUser) {
+      alert("Unauthorized: Please log in as an admin to add questions.");
+      return;
+    }
+    try {
+      const response = await fetch(`${API_BASE_URL}/daily-questions`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`, // Use the JWT
+        },
+        body: JSON.stringify(newQuestion),
+      });
 
-    setQuestions([
-      ...questions,
-      {
-        id: newId,
-        ...newQuestion,
-      },
-    ]);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to add question");
+      }
 
-    setNewQuestion({
-      text: "",
-      difficulty: "Easy",
-      timeLimit: 10,
-    });
+      alert("Question added successfully!");
+      setNewQuestion({ question_text: "", duration: 10 });
+      fetchQuestions(); // Refresh the list of questions
+    } catch (error) {
+      console.error("Error adding question:", error);
+      alert(`Error adding question: ${error.message}`);
+    }
   };
 
-  const handleMarkSubmission = (submissionId, status) => {
-    setSubmissions(
-      submissions.map((sub) =>
-        sub.id === submissionId ? { ...sub, status } : sub
+  // --- Handle Marking Submission (Correct/Incorrect) ---
+  const handleMarkSubmission = async (submissionId, isCorrect) => {
+    if (!authToken || !isAdminUser) {
+      alert("Unauthorized: Please log in as an admin to mark submissions.");
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/daily-questions/submissions/${submissionId}`,
+        {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`, // Use the JWT
+          },
+          body: JSON.stringify({ is_correct: isCorrect }), // Send boolean
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          errorData.message || "Failed to update submission status"
+        );
+      }
+
+      alert("Submission status updated!");
+      setSelectedSubmission(null); // Close modal
+      fetchSubmissions(); // Refresh submissions list
+    } catch (error) {
+      console.error("Error marking submission:", error);
+      alert(`Error marking submission: ${error.message}`);
+    }
+  };
+
+  // --- Handle Deleting Question ---
+  const deleteQuestion = async (questionId) => {
+    if (!authToken || !isAdminUser) {
+      alert("Unauthorized: Please log in as an admin to delete questions.");
+      return;
+    }
+    if (
+      !window.confirm(
+        "Are you sure you want to delete this question and all its submissions?"
       )
-    );
-    setSelectedSubmission(null);
-  };
+    ) {
+      return;
+    }
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/daily-questions/${questionId}`,
+        {
+          method: "DELETE",
+          headers: {
+            Authorization: `Bearer ${authToken}`, // Use the JWT
+          },
+        }
+      );
 
-  const deleteQuestion = (questionId) => {
-    setQuestions(questions.filter((q) => q.id !== questionId));
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.message || "Failed to delete question");
+      }
+
+      alert("Question deleted successfully!");
+      fetchQuestions(); // Refresh questions list
+      fetchSubmissions(); // Also refresh submissions as some might have been deleted
+    } catch (error) {
+      console.error("Error deleting question:", error);
+      alert(`Error deleting question: ${error.message}`);
+    }
   };
 
   const styles = {
     container: {
       maxWidth: "1200px",
       margin: "0 auto",
+      padding: "20px",
     },
     header: {
       display: "flex",
@@ -296,20 +438,24 @@ export default function DailyquestionUpload() {
     },
   };
 
-  const difficultyColors = {
-    Easy: { bg: "#d1fae5", text: "#065f46" },
-    Medium: { bg: "#fef3c7", text: "#92400e" },
-    Hard: { bg: "#fee2e2", text: "#b91c1c" },
+  const getStatusStyles = (isCorrect) => {
+    if (isCorrect === true) {
+      return styles.statusCorrect;
+    } else if (isCorrect === false) {
+      return styles.statusIncorrect;
+    } else {
+      // Default for null/undefined or initial state
+      return styles.statusPending;
+    }
   };
 
-  const getStatusStyles = (status) => {
-    switch (status) {
-      case "correct":
-        return styles.statusCorrect;
-      case "incorrect":
-        return styles.statusIncorrect;
-      default:
-        return styles.statusPending;
+  const getStatusText = (isCorrect) => {
+    if (isCorrect === true) {
+      return "Correct";
+    } else if (isCorrect === false) {
+      return "Incorrect";
+    } else {
+      return "Pending";
     }
   };
 
@@ -342,92 +488,93 @@ export default function DailyquestionUpload() {
         <>
           <div style={styles.card}>
             <h2>Add New Question</h2>
-            <form onSubmit={handleQuestionSubmit}>
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Question Text</label>
-                <textarea
-                  style={styles.textarea}
-                  value={newQuestion.text}
-                  onChange={(e) =>
-                    setNewQuestion({ ...newQuestion, text: e.target.value })
-                  }
-                  required
-                  placeholder="Enter question text here..."
-                />
-              </div>
+            {isAdminUser ? ( // Only show form if isAdminUser is true
+              <form onSubmit={handleQuestionSubmit}>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Question Text</label>
+                  <textarea
+                    style={styles.textarea}
+                    value={newQuestion.question_text}
+                    onChange={(e) =>
+                      setNewQuestion({
+                        ...newQuestion,
+                        question_text: e.target.value,
+                      })
+                    }
+                    required
+                    placeholder="Enter question text here..."
+                  />
+                </div>
 
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Difficulty</label>
-                <select
-                  style={styles.select}
-                  value={newQuestion.difficulty}
-                  onChange={(e) =>
-                    setNewQuestion({
-                      ...newQuestion,
-                      difficulty: e.target.value,
-                    })
-                  }
-                >
-                  <option value="Easy">Easy</option>
-                  <option value="Medium">Medium</option>
-                  <option value="Hard">Hard</option>
-                </select>
-              </div>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Duration (minutes)</label>
+                  <input
+                    type="number"
+                    style={styles.input}
+                    value={newQuestion.duration}
+                    onChange={(e) =>
+                      setNewQuestion({
+                        ...newQuestion,
+                        duration: parseInt(e.target.value),
+                      })
+                    }
+                    min="0"
+                    required
+                  />
+                </div>
 
-              <div style={styles.formGroup}>
-                <label style={styles.label}>Time Limit (minutes)</label>
-                <input
-                  type="number"
-                  style={styles.input}
-                  value={newQuestion.timeLimit}
-                  onChange={(e) =>
-                    setNewQuestion({
-                      ...newQuestion,
-                      timeLimit: parseInt(e.target.value),
-                    })
-                  }
-                  min="1"
-                  max="60"
-                  required
-                />
-              </div>
-
-              <button type="submit" style={styles.button}>
-                Add Question
-              </button>
-            </form>
+                <button type="submit" style={styles.button}>
+                  Add Question
+                </button>
+              </form>
+            ) : (
+              <p style={{ color: "red" }}>
+                Please log in as an admin to add questions.
+              </p>
+            )}
           </div>
 
           <div style={styles.card}>
             <h2>Question Bank</h2>
-            {questions.map((question) => (
-              <div key={question.id} style={styles.questionCard}>
-                <div style={styles.questionText}>
-                  <p>{question.text}</p>
-                  <div style={styles.questionMeta}>
-                    <span
-                      style={{
-                        ...styles.badge,
-                        backgroundColor:
-                          difficultyColors[question.difficulty].bg,
-                        color: difficultyColors[question.difficulty].text,
-                      }}
-                    >
-                      {question.difficulty}
-                    </span>
-                    <span>{question.timeLimit} min</span>
+            {loadingQuestions ? (
+              <p>Loading questions...</p>
+            ) : questionsError ? (
+              <p style={{ color: "red" }}>Error: {questionsError}</p>
+            ) : questions.length === 0 ? (
+              <p>No questions found. Add a new question above!</p>
+            ) : (
+              questions.map((question) => (
+                <div key={question._id} style={styles.questionCard}>
+                  <div style={styles.questionText}>
+                    <p>{question.question_text}</p>
+                    <div style={styles.questionMeta}>
+                      <span>{question.duration} min</span>
+                      {question.is_active && (
+                        <span
+                          style={{
+                            ...styles.badge,
+                            backgroundColor: "#dbeafe",
+                            color: "#1e40af",
+                          }}
+                        >
+                          Active
+                        </span>
+                      )}
+                    </div>
+                  </div>
+                  <div>
+                    {isAdminUser && ( // Only show delete button if isAdminUser is true
+                      <button
+                        style={styles.cancelButton}
+                        onClick={() => deleteQuestion(question._id)}
+                      >
+                        Delete
+                      </button>
+                    )}
                   </div>
                 </div>
-                <div>
-                  <button
-                    style={styles.cancelButton}
-                    onClick={() => deleteQuestion(question.id)}
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </>
       )}
@@ -446,52 +593,55 @@ export default function DailyquestionUpload() {
 
           <div style={styles.card}>
             <h2>Student Submissions</h2>
-            {filteredSubmissions.map((submission) => (
-              <div
-                key={submission.id}
-                style={{
-                  ...styles.submissionItem,
-                  borderLeft: `4px solid ${
-                    submission.status === "correct"
-                      ? "#10b981"
-                      : submission.status === "incorrect"
-                      ? "#ef4444"
-                      : "#9ca3af"
-                  }`,
-                }}
-                onClick={() => setSelectedSubmission(submission)}
-              >
-                <div style={styles.submissionHeader}>
-                  <div style={styles.studentInfo}>
-                    {submission.studentName} ({submission.studentId})
+            {loadingSubmissions ? (
+              <p>Loading submissions...</p>
+            ) : submissionsError ? (
+              <p style={{ color: "red" }}>Error: {submissionsError}</p>
+            ) : filteredSubmissions.length === 0 ? (
+              <p>No submissions found.</p>
+            ) : (
+              filteredSubmissions.map((submission) => (
+                <div
+                  key={submission._id}
+                  style={{
+                    ...styles.submissionItem,
+                    borderLeft: `4px solid ${
+                      getStatusStyles(submission.is_correct).backgroundColor
+                    }`,
+                  }}
+                  onClick={() => setSelectedSubmission(submission)}
+                >
+                  <div style={styles.submissionHeader}>
+                    <div style={styles.studentInfo}>
+                      {submission.user_id?.username || "N/A"} (ID:{" "}
+                      {submission.user_id?._id || "N/A"})
+                    </div>
+                    <div>
+                      <span
+                        style={{
+                          ...styles.badge,
+                          ...getStatusStyles(submission.is_correct),
+                        }}
+                      >
+                        {getStatusText(submission.is_correct)}
+                      </span>
+                    </div>
                   </div>
                   <div>
-                    <span
-                      style={{
-                        ...styles.badge,
-                        ...getStatusStyles(submission.status),
-                      }}
-                    >
-                      {submission.status === "correct"
-                        ? "Correct"
-                        : submission.status === "incorrect"
-                        ? "Incorrect"
-                        : "Pending"}
-                    </span>
+                    <strong>Question:</strong>{" "}
+                    {submission.daily_question_id?.question_text?.substring(
+                      0,
+                      50
+                    ) || "N/A"}
+                    ...
+                  </div>
+                  <div>
+                    <strong>Submitted At:</strong>{" "}
+                    {new Date(submission.createdAt).toLocaleString()}
                   </div>
                 </div>
-                <div>
-                  <strong>Question:</strong>{" "}
-                  {questions
-                    .find((q) => q.id === submission.questionId)
-                    ?.text.substring(0, 50)}
-                  ...
-                </div>
-                <div>
-                  <strong>Time Taken:</strong> {submission.timeTaken}
-                </div>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </>
       )}
@@ -512,49 +662,56 @@ export default function DailyquestionUpload() {
             <div>
               <h3>Student Information</h3>
               <p>
-                <strong>Name:</strong> {selectedSubmission.studentName}
+                <strong>Name:</strong>{" "}
+                {selectedSubmission.user_id?.username || "N/A"}
               </p>
               <p>
-                <strong>ID:</strong> {selectedSubmission.studentId}
+                <strong>ID:</strong> {selectedSubmission.user_id?._id || "N/A"}
               </p>
               <p>
-                <strong>Time Taken:</strong> {selectedSubmission.timeTaken}
+                <strong>Email:</strong>{" "}
+                {selectedSubmission.user_id?.email || "N/A"}
+              </p>
+              <p>
+                <strong>Submitted At:</strong>{" "}
+                {new Date(selectedSubmission.createdAt).toLocaleString()}
               </p>
             </div>
 
             <div>
               <h3>Question</h3>
               <p>
-                {
-                  questions.find((q) => q.id === selectedSubmission.questionId)
-                    ?.text
-                }
+                {selectedSubmission.daily_question_id?.question_text || "N/A"}
               </p>
             </div>
 
             <div>
               <h3>Student's Answer</h3>
-              <div style={styles.codeDisplay}>{selectedSubmission.answer}</div>
+              <div style={styles.codeDisplay}>
+                {selectedSubmission.answer_text}
+              </div>
             </div>
 
-            <div style={styles.buttonGroup}>
-              <button
-                style={styles.cancelButton}
-                onClick={() =>
-                  handleMarkSubmission(selectedSubmission.id, "incorrect")
-                }
-              >
-                Mark as Incorrect
-              </button>
-              <button
-                style={styles.button}
-                onClick={() =>
-                  handleMarkSubmission(selectedSubmission.id, "correct")
-                }
-              >
-                Mark as Correct
-              </button>
-            </div>
+            {isAdminUser && ( // Only show mark buttons if isAdminUser is true
+              <div style={styles.buttonGroup}>
+                <button
+                  style={styles.cancelButton}
+                  onClick={() =>
+                    handleMarkSubmission(selectedSubmission._id, false)
+                  }
+                >
+                  Mark as Incorrect
+                </button>
+                <button
+                  style={styles.button}
+                  onClick={() =>
+                    handleMarkSubmission(selectedSubmission._id, true)
+                  }
+                >
+                  Mark as Correct
+                </button>
+              </div>
+            )}
           </div>
         </div>
       )}
