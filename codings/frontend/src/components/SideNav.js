@@ -101,6 +101,17 @@ const SideNav = () => {
                 <span className="nav-text">Projects</span>
               </NavLink>
             </li>
+            <li className="nav-item">
+              <NavLink
+                to="/dashboard/StudentWorkUploadForm"
+                className={({ isActive }) =>
+                  isActive ? "nav-link active" : "nav-link"
+                }
+              >
+                <FaProjectDiagram className="nav-icon" />
+                <span className="nav-text">Upload StudentWork</span>
+              </NavLink>
+            </li>
           </ul>
         </nav>
       </div>

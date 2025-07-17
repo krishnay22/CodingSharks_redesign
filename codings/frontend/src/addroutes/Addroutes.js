@@ -17,7 +17,7 @@ import StudentWorkPage from "../components/StudentsWork";
 import LoginPage from "../components/Loginpage";
 import AdminLayout from "../layouts/AdminLayout";
 import CreateUserPage from "../components/CreateUser";
-import StudentWorkUploadForm from "../pages/admin/StudentWorkSumbit";
+import StudentWorkUploadForm from "../pages/user/StudentWorkSumbit";
 import DailyquestionUpload from "../pages/admin/DailyquestionUpload";
 import CourseGroup from "../pages/admin/CourseGroup";
 
@@ -86,10 +86,7 @@ const AppRoutes = () => {
         <Route path="CreateUserPage" element={<CreateUserPage />} />
 
         <Route path="Dailyquestions" element={<Dailyquestions />} />
-        <Route
-          path="StudentWorkUploadForm"
-          element={<StudentWorkUploadForm />}
-        />
+
         <Route path="DailyquestionUpload" element={<DailyquestionUpload />} />
         <Route path="CourseGroup" element={<CourseGroup />} />
       </Route>
@@ -110,6 +107,10 @@ const AppRoutes = () => {
         <Route path="Dailyquestions" element={<Dailyquestions />} />
         <Route path="Profile" element={<Profile />} />
         <Route path="Projects" element={<StudentWorkPage />} />
+        <Route
+          path="StudentWorkUploadForm"
+          element={<StudentWorkUploadForm />}
+        />
       </Route>
 
       {/* Catch-all route for undefined routes */}

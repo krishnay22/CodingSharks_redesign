@@ -9,6 +9,7 @@ const authRoutes = require("./routes/authRoutes");
 const courseRoutes = require("./routes/courseRoutes");
 const questionRoutes = require("./routes/questionRoutes");
 const dailyQuestionRoutes = require("./routes/dailyQuestionRoutes"); // NEW IMPORT
+const studentWorkRoutes = require("./routes/studentWorkRoutes");
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -32,6 +33,9 @@ app.use("/api", authRoutes);
 app.use("/api", courseRoutes);
 app.use("/api", questionRoutes);
 app.use("/api", dailyQuestionRoutes); // NEW USAGE
+
+// --- Use the student work routes ---
+app.use("/api/student-work", studentWorkRoutes); // This is the endpoint for submitting
 
 // Start the server
 app.listen(PORT, () => {

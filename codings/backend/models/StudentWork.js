@@ -1,3 +1,4 @@
+// your-existing-backend/models/StudentWork.js
 const mongoose = require("mongoose");
 
 const studentWorkSchema = mongoose.Schema(
@@ -11,10 +12,10 @@ const studentWorkSchema = mongoose.Schema(
       type: String,
       required: [true, "Please add a description"],
     },
-    studentName: {
-      type: String,
-      required: [true, "Please add a student name"],
-      trim: true,
+    user: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User", // Reference to your User model
+      required: [true, "Please associate this work with a user"],
     },
     date: {
       type: Date,
@@ -22,22 +23,18 @@ const studentWorkSchema = mongoose.Schema(
     },
     url: {
       type: String,
-      required: false, // URL might be optional
+      required: false,
       trim: true,
     },
+    // imageUrl will now store the path to the locally saved image
     imageUrl: {
-      // This will store the URL of the image uploaded to Cloudinary
-      type: String,
-      required: false, // Image might be optional
-    },
-    cloudinaryId: {
-      // To easily delete images from Cloudinary if needed
       type: String,
       required: false,
     },
+    // REMOVED: cloudinaryId
   },
   {
-    timestamps: true, // Adds createdAt and updatedAt fields
+    timestamps: true,
   }
 );
 

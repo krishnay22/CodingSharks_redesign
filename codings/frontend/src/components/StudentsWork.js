@@ -1,68 +1,102 @@
-"use client";
+"use client"; // Keep this if you're using Next.js App Router and need client-side rendering
+
+import { useState, useEffect } from "react"; // Import useState and useEffect
 
 export default function StudentWorkPage() {
-  // Sample project data
-  const projects = [
-    {
-      id: 1,
-      title: "Aerpace",
-      description:
-        "Experience travel that will take your breath away. A fully autonomous, integrated and frictionless transport system that is closer to you than ever.",
-      image:
-        "https://sattaexpress.co.in/wp-content/uploads/2024/04/image-2-23-1024x576-1.jpg",
-      date: "March 15, 2023",
-      url: "https://www.aerpace.com/",
-    },
-    {
-      id: 2,
-      title: "Tennisshop E-commerce Platform",
-      description:
-        "Shop all of them at a single place on www.tennisshop.ae. Dig in for the best tennis products in our online as well as offline stores.",
-      image:
-        "https://about.me/cdn-cgi/image/q=80,dpr=1,f=auto,fit=cover,w=1200,h=630,gravity=auto/https://assets.about.me/background/users/t/e/n/tennisshopuae_1674907087_228.jpg",
-      date: "June 22, 2023",
-      url: "https://www.tennisshop.ae/",
-    },
-    {
-      id: 3,
-      title: "Movies-review",
-      description: "A site to check reviews of the latest movies.",
-      image:
-        "https://s.tmimgcdn.com/scr/800x500/358900/movies-movie-review-film-wordpress-theme_358953-original.jpg",
-      date: "September 10, 2023",
-      url: "https://movies-review-eosin.vercel.app/",
-    },
-  ];
+  const [studentWorks, setStudentWorks] = useState([]); // State to store fetched student works
+  const [loading, setLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
+
+  useEffect(() => {
+    const fetchStudentWorks = async () => {
+      try {
+        setLoading(true); // Start loading
+        setError(null); // Clear previous errors
+
+        const response = await fetch("http://localhost:5000/api/student-work"); // Your API endpoint
+        if (!response.ok) {
+          const errorData = await response.json();
+          throw new Error(errorData.message || "Failed to fetch student work.");
+        }
+
+        const data = await response.json();
+        setStudentWorks(data.works); // Set the fetched works to state
+      } catch (err) {
+        console.error("Error fetching student work:", err);
+        setError(err.message || "An unexpected error occurred.");
+      } finally {
+        setLoading(false); // End loading
+      }
+    };
+
+    fetchStudentWorks(); // Call the fetch function when component mounts
+  }, []); // Empty dependency array ensures this runs only once on mount
+
+  // Function to format date (optional, but good for display)
+  const formatDate = (dateString) => {
+    if (!dateString) return "N/A";
+    const options = { year: "numeric", month: "long", day: "numeric" };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
 
   return (
     <div className="student-work-container">
       <h1>What Our Students Have Created:</h1>
-      <div className="projects-container">
-        {projects.map((project) => (
-          <div className="project-card" key={project.id}>
-            <div className="project-image">
-              <img
-                src={project.image || "/placeholder.svg"}
-                alt={project.title}
-              />
-            </div>
-            <div className="project-details">
-              <h2>{project.title}</h2>
-              <p className="project-description">{project.description}</p>
-              <p className="project-date">Created on: {project.date}</p>
-              <a
-                href={project.url}
-                className="view-site-btn"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                View Site
-              </a>
-            </div>
-          </div>
-        ))}
-      </div>
 
+      {loading && <p className="loading-message">Loading student works...</p>}
+      {error && <p className="error-message">Error: {error}</p>}
+      {!loading && studentWorks.length === 0 && !error && (
+        <p className="no-works-message">No student works available yet.</p>
+      )}
+
+      {!loading && studentWorks.length > 0 && (
+        <div className="projects-container">
+          {studentWorks.map((project) => (
+            <div className="project-card" key={project._id}>
+              {" "}
+              {/* Use _id from MongoDB */}
+              <div className="project-image">
+                <img
+                  // Construct the full image URL.
+                  // Assumes your backend serves static files from '/uploads'
+                  // and your backend is at http://localhost:5000
+                  src={
+                    project.imageUrl
+                      ? `http://localhost:5000${project.imageUrl}`
+                      : "/placeholder.svg"
+                  }
+                  alt={project.title}
+                />
+              </div>
+              <div className="project-details">
+                <h2>{project.title}</h2>
+                {/* Display student's username if available */}
+                {project.user && project.user.username && (
+                  <p className="student-name">
+                    By: {project.user.username} ({project.user.email})
+                  </p>
+                )}
+                <p className="project-description">{project.description}</p>
+                <p className="project-date">
+                  Created on: {formatDate(project.date)}
+                </p>
+                {project.url && ( // Only show button if URL exists
+                  <a
+                    href={project.url}
+                    className="view-site-btn"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    View Site
+                  </a>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Styles remain the same, adding some for loading/error messages */}
       <style jsx>{`
         .student-work-container {
           max-width: 1200px;
@@ -76,6 +110,19 @@ export default function StudentWorkPage() {
           margin-bottom: 30px;
           font-size: 2.5rem;
           font-weight: 100;
+        }
+
+        .loading-message,
+        .error-message,
+        .no-works-message {
+          text-align: center;
+          font-size: 1.2rem;
+          color: #555;
+          margin-top: 50px;
+        }
+
+        .error-message {
+          color: red;
         }
 
         .projects-container {
@@ -120,7 +167,7 @@ export default function StudentWorkPage() {
         }
 
         .project-details {
-          height: 30%; /* Maintaining 30% for details section */
+          height: 35%; /* Maintaining 30% for details section */
           padding: 15px;
           display: flex;
           flex-direction: column;
@@ -131,6 +178,12 @@ export default function StudentWorkPage() {
           margin-bottom: 8px;
           color: #333;
           font-size: 1.6rem;
+        }
+
+        .student-name {
+          color: #888; /* Style for student name */
+          font-size: 0.9rem;
+          margin-bottom: 5px;
         }
 
         .project-description {

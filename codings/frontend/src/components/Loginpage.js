@@ -156,6 +156,7 @@ export default function LoginPage() {
       localStorage.setItem("token", data.token);
       localStorage.setItem("username", data.user.username); // Correctly accessing from data.user
       localStorage.setItem("isAdmin", data.user.isAdmin); // Correctly accessing from data.user
+      localStorage.setItem("userId", data.user._id); // <--- ADD THIS LINE
 
       // Redirect to home page
       navigate("/");
