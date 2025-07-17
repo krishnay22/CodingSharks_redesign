@@ -5,7 +5,75 @@ const DailyQuestionSubmission = require("../models/DailyQuestionSubmission");
 const { protect } = require("../middleware/authMiddleware"); // Import protect middleware
 
 // In routes/dailyQuestionRoutes.js, add this route:
+// --- Helper function for admin check (assuming protect middleware adds req.user) ---
+const checkAdmin = (req, res, next) => {
+  if (!req.user || !req.user.isAdmin) {
+    return res.status(403).json({ message: "Not authorized as an admin" });
+  }
+  next();
+};
 
+// @desc    Mark a daily question submission as correct and assign points
+// @route   POST /api/daily-questions/submissions/:id/grade
+// @access  Admin
+router.post(
+  "/daily-questions/submissions/:id/grade",
+  protect,
+  checkAdmin,
+  async (req, res) => {
+    const { id } = req.params; // Submission ID
+    const { is_correct, points_awarded } = req.body; // Expecting boolean for is_correct and number for points_awarded
+
+    // Basic validation for input
+    if (
+      typeof is_correct !== "boolean" ||
+      typeof points_awarded !== "number" ||
+      points_awarded < 0
+    ) {
+      return res
+        .status(400)
+        .json({
+          message:
+            "Invalid input: is_correct must be a boolean, points_awarded must be a non-negative number.",
+        });
+    }
+
+    try {
+      const submission = await DailyQuestionSubmission.findById(id);
+
+      if (!submission) {
+        return res
+          .status(404)
+          .json({ message: "Daily question submission not found" });
+      }
+
+      // Update the submission
+      submission.is_correct = is_correct;
+      submission.points_awarded = is_correct ? points_awarded : 0; // Only award points if marked correct
+
+      await submission.save();
+
+      // The functionality to update the user's total points has been removed as per your request.
+      // If you need to manage user points, you would do it outside of this grading route,
+      // or re-implement it based on different logic.
+
+      res.status(200).json({
+        message: "Submission updated successfully",
+        submission: submission,
+        // userUpdated and userNewTotalPoints removed as user points are no longer updated here
+      });
+    } catch (error) {
+      console.error("Error grading daily question submission:", error);
+      // Handle Mongoose validation errors or other server errors
+      if (error.name === "ValidationError") {
+        return res
+          .status(400)
+          .json({ message: error.message, errors: error.errors });
+      }
+      res.status(500).json({ message: "Server error", error: error.message });
+    }
+  }
+);
 // GET /api/daily-questions/submissions - Get ALL submissions (Admin only)
 router.get("/daily-questions/submissions", protect, async (req, res) => {
   try {

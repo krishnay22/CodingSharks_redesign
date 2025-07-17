@@ -21,6 +21,11 @@ const dailyQuestionSubmissionSchema = new mongoose.Schema(
       type: Boolean,
       default: false, // Admins can mark this after review
     },
+    points_awarded: {
+      type: Number,
+      default: 0, // Default to 0 points. Set upon marking as correct.
+      min: 0, // Points should not be negative
+    },
     // submitted_at is handled by timestamps: true (createdAt)
   },
   {

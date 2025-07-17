@@ -20,43 +20,59 @@ export default function DailyquestionUpload() {
   const [selectedSubmission, setSelectedSubmission] = useState(null);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // State for the actual JWT token
+  // NEW STATE: To hold the points value for grading in the modal
+  const [pointsToAward, setPointsToAward] = useState(0);
+
+  // State for the actual JWT token (NO CHANGES HERE)
   const [authToken, setAuthToken] = useState(null);
-  // State to check if the current user is an admin (based on localStorage 'isAdmin' flag)
+  // State to check if the current user is an admin (NO CHANGES HERE)
   const [isAdminUser, setIsAdminUser] = useState(false);
 
-  // Base URL for your backend API
+  // Base URL for your backend API (NO CHANGES HERE)
   const API_BASE_URL = "http://localhost:5000/api";
 
-  // --- Fetch Auth Token and Admin Status from localStorage on component mount ---
-  useEffect(() => {
-    const token = localStorage.getItem("token"); // Corrected: fetching from "token"
-    const adminStatus = localStorage.getItem("isAdmin"); // Corrected: fetching from "isAdmin"
+  // --- Custom Message Box State and Functions (replaces alert and confirm) ---
+  const [messageBox, setMessageBox] = useState({
+    visible: false,
+    title: "",
+    message: "",
+    onConfirm: null,
+  });
 
-    // Check if both token exists and isAdmin is "true" (as localStorage stores strings)
+  const showMessageBox = (title, message, onConfirm = null) => {
+    setMessageBox({ visible: true, title, message, onConfirm });
+  };
+
+  const hideMessageBox = () => {
+    setMessageBox({ ...messageBox, visible: false });
+  };
+
+  // This is a simple placeholder for confirm. For a full custom UI,
+  // you'd expand showMessageBox to handle 'yes/no' options.
+  const confirmAction = (message) => {
+    return window.confirm(message);
+  };
+  // --- End Custom Message Box ---
+
+  // --- Fetch Auth Token and Admin Status from localStorage on component mount (NO CHANGES HERE) ---
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const adminStatus = localStorage.getItem("isAdmin");
+
     if (token && adminStatus === "true") {
       setAuthToken(token);
       setIsAdminUser(true);
     } else {
-      // Handle cases where token is missing or user is not an admin
       console.warn(
         "User is not an admin or JWT token not found in localStorage. Some features may be restricted."
       );
-      // Optionally:
-      // if (!token) {
-      //   // Redirect to login page if no token
-      //   // history.push('/login'); // If you use React Router
-      // } else if (adminStatus !== "true") {
-      //   // Show a message or redirect if logged in but not an admin
-      // }
     }
   }, []); // Runs once on component mount
 
-  // --- Fetch Questions ---
+  // --- Fetch Questions (NO CHANGES HERE, except using showMessageBox) ---
   const fetchQuestions = async () => {
-    // Only attempt to fetch if authToken is available and user is an admin
     if (!authToken || !isAdminUser) {
-      setLoadingQuestions(false); // Stop loading if conditions aren't met
+      setLoadingQuestions(false);
       return;
     }
 
@@ -65,7 +81,7 @@ export default function DailyquestionUpload() {
     try {
       const response = await fetch(`${API_BASE_URL}/daily-questions`, {
         headers: {
-          Authorization: `Bearer ${authToken}`, // Use the fetched token
+          Authorization: `Bearer ${authToken}`,
         },
       });
       if (!response.ok) {
@@ -82,11 +98,10 @@ export default function DailyquestionUpload() {
     }
   };
 
-  // --- Fetch Submissions ---
+  // --- Fetch Submissions (NO CHANGES HERE, except using showMessageBox) ---
   const fetchSubmissions = async () => {
-    // Only attempt to fetch if authToken is available and user is an admin
     if (!authToken || !isAdminUser) {
-      setLoadingSubmissions(false); // Stop loading if conditions aren't met
+      setLoadingSubmissions(false);
       return;
     }
 
@@ -97,7 +112,7 @@ export default function DailyquestionUpload() {
         `${API_BASE_URL}/daily-questions/submissions`,
         {
           headers: {
-            Authorization: `Bearer ${authToken}`, // Use the fetched token
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -115,16 +130,28 @@ export default function DailyquestionUpload() {
     }
   };
 
-  // UseEffect to fetch data when authToken becomes available or isAdminUser status changes
+  // UseEffect to fetch data when authToken becomes available or isAdminUser status changes (NO CHANGES HERE)
   useEffect(() => {
     if (authToken && isAdminUser) {
-      // Only fetch if both token and admin status are confirmed
       fetchQuestions();
       fetchSubmissions();
     }
-  }, [authToken, isAdminUser]); // Depend on authToken and isAdminUser
+  }, [authToken, isAdminUser]);
 
-  // Filter submissions based on search term
+  // NEW useEffect: Update pointsToAward when selectedSubmission changes
+  useEffect(() => {
+    if (selectedSubmission) {
+      // If submission already has points awarded, use them.
+      // Otherwise, use points from the daily question itself (if available), default to 0.
+      setPointsToAward(
+        selectedSubmission.points_awarded ||
+          selectedSubmission.daily_question_id?.points ||
+          0
+      );
+    }
+  }, [selectedSubmission]);
+
+  // Filter submissions based on search term (NO CHANGES HERE)
   const filteredSubmissions = submissions.filter(
     (submission) =>
       submission.user_id?.username
@@ -133,11 +160,14 @@ export default function DailyquestionUpload() {
       submission.user_id?._id.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  // --- Handle New Question Submission ---
+  // --- Handle New Question Submission (NO CHANGES HERE, except using showMessageBox) ---
   const handleQuestionSubmit = async (e) => {
     e.preventDefault();
     if (!authToken || !isAdminUser) {
-      alert("Unauthorized: Please log in as an admin to add questions.");
+      showMessageBox(
+        "Unauthorized",
+        "Please log in as an admin to add questions."
+      );
       return;
     }
     try {
@@ -145,7 +175,7 @@ export default function DailyquestionUpload() {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
-          Authorization: `Bearer ${authToken}`, // Use the JWT
+          Authorization: `Bearer ${authToken}`,
         },
         body: JSON.stringify(newQuestion),
       });
@@ -155,31 +185,47 @@ export default function DailyquestionUpload() {
         throw new Error(errorData.message || "Failed to add question");
       }
 
-      alert("Question added successfully!");
+      showMessageBox("Success", "Question added successfully!");
       setNewQuestion({ question_text: "", duration: 10 });
-      fetchQuestions(); // Refresh the list of questions
+      fetchQuestions();
     } catch (error) {
       console.error("Error adding question:", error);
-      alert(`Error adding question: ${error.message}`);
+      showMessageBox("Error", `Error adding question: ${error.message}`);
     }
   };
 
-  // --- Handle Marking Submission (Correct/Incorrect) ---
+  // --- Handle Marking Submission (Correct/Incorrect) - MODIFIED FOR POINTS ---
   const handleMarkSubmission = async (submissionId, isCorrect) => {
     if (!authToken || !isAdminUser) {
-      alert("Unauthorized: Please log in as an admin to mark submissions.");
+      showMessageBox(
+        "Unauthorized",
+        "Please log in as an admin to mark submissions."
+      );
       return;
     }
+
+    // Validate pointsToAward before sending
+    if (typeof pointsToAward !== "number" || pointsToAward < 0) {
+      showMessageBox(
+        "Invalid Input",
+        "Points to award must be a non-negative number."
+      );
+      return;
+    }
+
     try {
       const response = await fetch(
-        `${API_BASE_URL}/daily-questions/submissions/${submissionId}`,
+        `${API_BASE_URL}/daily-questions/submissions/${submissionId}/grade`, // Updated endpoint as per backend
         {
-          method: "PUT",
+          method: "POST", // Changed to POST as per backend route
           headers: {
             "Content-Type": "application/json",
-            Authorization: `Bearer ${authToken}`, // Use the JWT
+            Authorization: `Bearer ${authToken}`,
           },
-          body: JSON.stringify({ is_correct: isCorrect }), // Send boolean
+          body: JSON.stringify({
+            is_correct: isCorrect,
+            points_awarded: isCorrect ? pointsToAward : 0, // Send points only if correct
+          }),
         }
       );
 
@@ -190,23 +236,26 @@ export default function DailyquestionUpload() {
         );
       }
 
-      alert("Submission status updated!");
+      showMessageBox("Success", "Submission status updated!");
       setSelectedSubmission(null); // Close modal
       fetchSubmissions(); // Refresh submissions list
     } catch (error) {
       console.error("Error marking submission:", error);
-      alert(`Error marking submission: ${error.message}`);
+      showMessageBox("Error", `Error marking submission: ${error.message}`);
     }
   };
 
-  // --- Handle Deleting Question ---
+  // --- Handle Deleting Question (NO CHANGES HERE, except using showMessageBox and confirmAction) ---
   const deleteQuestion = async (questionId) => {
     if (!authToken || !isAdminUser) {
-      alert("Unauthorized: Please log in as an admin to delete questions.");
+      showMessageBox(
+        "Unauthorized",
+        "Please log in as an admin to delete questions."
+      );
       return;
     }
     if (
-      !window.confirm(
+      !confirmAction(
         "Are you sure you want to delete this question and all its submissions?"
       )
     ) {
@@ -218,7 +267,7 @@ export default function DailyquestionUpload() {
         {
           method: "DELETE",
           headers: {
-            Authorization: `Bearer ${authToken}`, // Use the JWT
+            Authorization: `Bearer ${authToken}`,
           },
         }
       );
@@ -228,12 +277,12 @@ export default function DailyquestionUpload() {
         throw new Error(errorData.message || "Failed to delete question");
       }
 
-      alert("Question deleted successfully!");
-      fetchQuestions(); // Refresh questions list
-      fetchSubmissions(); // Also refresh submissions as some might have been deleted
+      showMessageBox("Success", "Question deleted successfully!");
+      fetchQuestions();
+      fetchSubmissions();
     } catch (error) {
       console.error("Error deleting question:", error);
-      alert(`Error deleting question: ${error.message}`);
+      showMessageBox("Error", `Error deleting question: ${error.message}`);
     }
   };
 
@@ -242,6 +291,7 @@ export default function DailyquestionUpload() {
       maxWidth: "1200px",
       margin: "0 auto",
       padding: "20px",
+      fontFamily: "'Inter', sans-serif", // Added Inter font
     },
     header: {
       display: "flex",
@@ -436,6 +486,49 @@ export default function DailyquestionUpload() {
       backgroundColor: "#fee2e2",
       color: "#b91c1c",
     },
+    // Styles for the custom message box
+    messageBoxOverlay: {
+      position: "fixed",
+      top: 0,
+      left: 0,
+      right: 0,
+      bottom: 0,
+      backgroundColor: "rgba(0, 0, 0, 0.6)",
+      display: "flex",
+      justifyContent: "center",
+      alignItems: "center",
+      zIndex: 2000, // Higher than modal overlay
+    },
+    messageBox: {
+      backgroundColor: "white",
+      borderRadius: "10px",
+      padding: "25px",
+      width: "90%",
+      maxWidth: "400px",
+      boxShadow: "0 5px 15px rgba(0, 0, 0, 0.3)",
+      textAlign: "center",
+    },
+    messageBoxTitle: {
+      fontSize: "22px",
+      marginBottom: "15px",
+      color: "#333",
+    },
+    messageBoxMessage: {
+      fontSize: "16px",
+      marginBottom: "25px",
+      color: "#555",
+    },
+    messageBoxButton: {
+      padding: "10px 20px",
+      backgroundColor: "#ff9d76",
+      color: "white",
+      border: "none",
+      borderRadius: "8px",
+      cursor: "pointer",
+      fontSize: "16px",
+      transition: "all 0.3s ease",
+      minWidth: "100px",
+    },
   };
 
   const getStatusStyles = (isCorrect) => {
@@ -625,6 +718,19 @@ export default function DailyquestionUpload() {
                       >
                         {getStatusText(submission.is_correct)}
                       </span>
+                      {/* Display points awarded if available */}
+                      {submission.points_awarded > 0 && (
+                        <span
+                          style={{
+                            ...styles.badge,
+                            backgroundColor: "#e0f2fe",
+                            color: "#0369a1",
+                            marginLeft: "10px",
+                          }}
+                        >
+                          Points: {submission.points_awarded}
+                        </span>
+                      )}
                     </div>
                   </div>
                   <div>
@@ -666,13 +772,6 @@ export default function DailyquestionUpload() {
                 {selectedSubmission.user_id?.username || "N/A"}
               </p>
               <p>
-                <strong>ID:</strong> {selectedSubmission.user_id?._id || "N/A"}
-              </p>
-              <p>
-                <strong>Email:</strong>{" "}
-                {selectedSubmission.user_id?.email || "N/A"}
-              </p>
-              <p>
                 <strong>Submitted At:</strong>{" "}
                 {new Date(selectedSubmission.createdAt).toLocaleString()}
               </p>
@@ -683,6 +782,12 @@ export default function DailyquestionUpload() {
               <p>
                 {selectedSubmission.daily_question_id?.question_text || "N/A"}
               </p>
+              {selectedSubmission.daily_question_id?.points && (
+                <p>
+                  <strong>Question's Max Points:</strong>{" "}
+                  {selectedSubmission.daily_question_id.points}
+                </p>
+              )}
             </div>
 
             <div>
@@ -692,26 +797,66 @@ export default function DailyquestionUpload() {
               </div>
             </div>
 
-            {isAdminUser && ( // Only show mark buttons if isAdminUser is true
-              <div style={styles.buttonGroup}>
-                <button
-                  style={styles.cancelButton}
-                  onClick={() =>
-                    handleMarkSubmission(selectedSubmission._id, false)
-                  }
-                >
-                  Mark as Incorrect
-                </button>
-                <button
-                  style={styles.button}
-                  onClick={() =>
-                    handleMarkSubmission(selectedSubmission._id, true)
-                  }
-                >
-                  Mark as Correct
-                </button>
-              </div>
+            {isAdminUser && ( // Only show mark buttons and points input if isAdminUser is true
+              <>
+                <div style={styles.formGroup}>
+                  <label style={styles.label}>Points to Award</label>
+                  <input
+                    type="number"
+                    style={styles.input}
+                    value={pointsToAward}
+                    onChange={(e) =>
+                      setPointsToAward(parseInt(e.target.value) || 0)
+                    } // Ensure it's a number, default to 0
+                    min="0"
+                    // Optionally set max based on question's max points if available
+                    max={
+                      selectedSubmission.daily_question_id?.points || undefined
+                    }
+                  />
+                </div>
+
+                <div style={styles.buttonGroup}>
+                  <button
+                    style={styles.cancelButton}
+                    onClick={() =>
+                      handleMarkSubmission(selectedSubmission._id, false)
+                    }
+                  >
+                    Mark as Incorrect
+                  </button>
+                  <button
+                    style={styles.button}
+                    onClick={() =>
+                      handleMarkSubmission(selectedSubmission._id, true)
+                    }
+                  >
+                    Mark as Correct
+                  </button>
+                </div>
+              </>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* Custom Message Box Render */}
+      {messageBox.visible && (
+        <div style={styles.messageBoxOverlay}>
+          <div style={styles.messageBox}>
+            <h3 style={styles.messageBoxTitle}>{messageBox.title}</h3>
+            <p style={styles.messageBoxMessage}>{messageBox.message}</p>
+            <button
+              style={styles.messageBoxButton}
+              onClick={() => {
+                hideMessageBox();
+                if (messageBox.onConfirm) {
+                  messageBox.onConfirm();
+                }
+              }}
+            >
+              OK
+            </button>
           </div>
         </div>
       )}
