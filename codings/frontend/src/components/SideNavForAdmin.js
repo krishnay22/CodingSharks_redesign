@@ -47,7 +47,7 @@ const SideNav = () => {
             </li>
             <li className="nav-item">
               <NavLink
-                to="/"
+                to="/AdminLayout/StudentCourseViewForAdmin"
                 className={({ isActive }) =>
                   isActive ? "nav-link active" : "nav-link"
                 }
@@ -67,7 +67,7 @@ const SideNav = () => {
                 <span className="nav-text">Daily Questions upload</span>
               </NavLink>
             </li>
-
+            {/* 
             <li className="nav-item">
               <NavLink
                 to="/AdminLayout/CourseGroup"
@@ -78,7 +78,7 @@ const SideNav = () => {
                 <FaTimeline className="nav-icon" />
                 <span className="nav-text">Course Timeline Update</span>
               </NavLink>
-            </li>
+            </li> */}
           </ul>
         </nav>
       </div>

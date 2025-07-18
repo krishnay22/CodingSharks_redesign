@@ -240,15 +240,39 @@ export default function CreateUserPage() {
     const fetchAllCourses = async () => {
       try {
         setLoadingCourses(true);
-        const response = await fetch("http://localhost:5000/api/courses"); // Your GET /api/courses endpoint
+        setCoursesError(null); // Clear any previous errors
+
+        // *************** IMPORTANT CHANGE HERE ***************
+        // Retrieve the token from localStorage (or wherever you store it)
+        const token = localStorage.getItem("token"); // Assuming you store your JWT here
+
+        if (!token) {
+          // If no token is found, we cannot make the authenticated request
+          throw new Error("Authentication token not found. Please log in.");
+        }
+
+        const response = await fetch("http://localhost:5000/api/courses", {
+          method: "GET", // Method for fetching data
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`, // <-- This is the key change!
+          },
+        });
+
         if (!response.ok) {
+          // Handle specific 401 error more gracefully
+          if (response.status === 401) {
+            throw new Error(
+              "Unauthorized access. Your session may have expired. Please log in again."
+            );
+          }
           throw new Error(`HTTP error! status: ${response.status}`);
         }
         const data = await response.json();
         setAvailableCourses(data.courses);
       } catch (err) {
         console.error("Error fetching courses:", err);
-        setCoursesError("Failed to load course options.");
+        setCoursesError(err.message || "Failed to load course options.");
       } finally {
         setLoadingCourses(false);
       }
@@ -299,6 +323,17 @@ export default function CreateUserPage() {
     }
 
     try {
+      const token = localStorage.getItem("token"); // Get token for user creation too
+
+      if (!token) {
+        setFormMessage({
+          type: "error",
+          text: "Authentication token missing for user creation. Please log in.",
+        });
+        setIsSubmitting(false);
+        return;
+      }
+
       // Create form data for file upload
       const submitData = new FormData();
       Object.keys(formData).forEach((key) => {
@@ -313,6 +348,9 @@ export default function CreateUserPage() {
       const response = await fetch("http://localhost:5000/api/create-user", {
         method: "POST",
         body: submitData, // Don't set Content-Type header when using FormData
+        headers: {
+          Authorization: `Bearer ${token}`, // <-- Also add token for user creation
+        },
       });
 
       const data = await response.json();
@@ -531,7 +569,7 @@ export default function CreateUserPage() {
                       <option value="">-- Select Course --</option>
                       {availableCourses.map((course) => (
                         <option key={course._id} value={course._id}>
-                          {course.course_name}
+                          {course.name}
                         </option>
                       ))}
                     </select>
@@ -544,7 +582,10 @@ export default function CreateUserPage() {
                         ? styles.labelActive
                         : {}),
                     }}
-                  ></label>
+                  >
+                    Select Course
+                    {/* Label is intentionally empty here as it's typically hidden by selected value */}
+                  </label>
                 </div>
               </div>
             </div>

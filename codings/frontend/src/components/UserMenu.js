@@ -23,11 +23,7 @@ function UserMenu() {
           <button className="menu-btn">{user.username}</button>{" "}
           {/* Use user.username from context */}
         </Link>
-        {user.isAdmin && ( // Use user.isAdmin from context
-          <Link to="/AdminLayout" style={{ textDecoration: "none" }}>
-            <button className="menu-btn admin-btn">Admin</button>
-          </Link>
-        )}
+
         <button className="menu-btn logout-btn" onClick={handleLogout}>
           Logout
         </button>

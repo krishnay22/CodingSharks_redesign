@@ -1,17 +1,217 @@
-import React from "react";
-import { FaUserGraduate } from "react-icons/fa";
+"use client";
+
+import React, { useState, useEffect, useCallback } from "react";
+import { FaUserGraduate } from "react-icons/fa"; // Assuming you have react-icons installed
+
+const API_BASE_URL = "http://localhost:5000/api"; // Your backend API base URL
 
 const ProfilePage = () => {
+  const [profileData, setProfileData] = useState(null);
+  const [courseProgressData, setCourseProgressData] = useState(null); // Will hold a single course's progress or null
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+  const [userId, setUserId] = useState(null);
+
+  // --- Authentication Check ---
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+
+    if (token && storedUserId) {
+      setAuthToken(token);
+      setUserId(storedUserId);
+    } else {
+      setError("You must be logged in to view your profile.");
+      setLoading(false);
+    }
+  }, []);
+
+  // --- Fetch User Profile and Associated Course Progress Data ---
+  const fetchProfileAndProgress = useCallback(async () => {
+    // Ensure userId is a valid non-empty string before proceeding
+    if (
+      !authToken ||
+      !userId ||
+      typeof userId !== "string" ||
+      userId.trim() === ""
+    ) {
+      console.warn("Skipping fetch: authToken or userId is missing/invalid.", {
+        authToken,
+        userId,
+      });
+      setLoading(false);
+      setError("Authentication token or User ID is missing. Please log in.");
+      return;
+    }
+
+    setLoading(true);
+    setError(null);
+    try {
+      // 1. Fetch User Profile Data from /api/users/:id
+      const userResponse = await fetch(`${API_BASE_URL}/users/${userId}`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!userResponse.ok) {
+        const errData = await userResponse.json();
+        throw new Error(errData.message || "Failed to fetch user profile.");
+      }
+      const userData = await userResponse.json();
+      const user = userData.user; // Get the user object from the response
+
+      // Map backend user data to frontend profileData state, aligning with your User model
+      setProfileData({
+        name: user.username || "N/A",
+        bio: "Student | Web Developer", // Static default as 'bio' is not in your User model
+        joinDate: user.joinedDate
+          ? new Date(user.joinedDate).toLocaleDateString()
+          : user.createdAt
+          ? new Date(user.createdAt).toLocaleDateString()
+          : "N/A",
+        phoneno: user.phone || "N/A", // Using 'phone' from your User model
+        email: user.email || "N/A",
+        location: user.address || "N/A", // Using 'address' from your User model
+      });
+
+      // 2. Fetch User's Course Progress for their assigned course_id
+      // The backend's /users/:id route should populate 'course_id' if it exists.
+      if (user.course_id) {
+        // user.course_id could be a populated object ({_id, name, ...}) or just the ID string if not populated
+        const courseIdToFetch = user.course_id._id || user.course_id;
+        const courseNameForDisplay = user.course_id.name || "Assigned Course"; // Use populated name, or fallback
+
+        const progressResponse = await fetch(
+          `${API_BASE_URL}/user-progress/${courseIdToFetch}`,
+          {
+            headers: {
+              Authorization: `Bearer ${authToken}`,
+            },
+          }
+        );
+
+        if (progressResponse.ok) {
+          const progressData = await progressResponse.json();
+          setCourseProgressData({
+            course: courseNameForDisplay,
+            progress: progressData.progress?.progress_percentage || 0,
+          });
+        } else {
+          // If no specific progress record found for this assigned course, treat as 0%
+          setCourseProgressData({
+            course: courseNameForDisplay,
+            progress: 0,
+          });
+          console.warn(
+            `No specific progress record found for assigned course ${courseIdToFetch}. Displaying 0% progress.`
+          );
+        }
+      } else {
+        // If user is not associated with any course_id in their User model
+        setCourseProgressData(null); // No course progress to display
+        console.log("User is not associated with any course_id.");
+      }
+    } catch (err) {
+      console.error("Error fetching data:", err);
+      setError(err.message);
+      setProfileData(null);
+      setCourseProgressData(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [authToken, userId]); // Re-run fetch when authToken or userId changes
+
+  // --- Effect to trigger initial data fetching ---
+  useEffect(() => {
+    if (authToken && userId) {
+      fetchProfileAndProgress();
+    }
+  }, [authToken, userId, fetchProfileAndProgress]); // Dependencies to re-run on auth state change
+
+  // Media query implementation for React inline styles (as provided)
+  const useResponsiveStyles = (styles) => {
+    const [windowWidth, setWindowWidth] = React.useState(
+      typeof window !== "undefined" ? window.innerWidth : 992
+    );
+
+    React.useEffect(() => {
+      if (typeof window === "undefined") return;
+
+      const handleResize = () => {
+        setWindowWidth(window.innerWidth);
+      };
+
+      window.addEventListener("resize", handleResize);
+      return () => window.removeEventListener("resize", handleResize);
+    }, []);
+
+    const applyResponsiveStyles = (styleObj) => {
+      if (typeof styleObj !== "object" || styleObj === null) return styleObj;
+
+      const baseStyles = {};
+      const mediaQueryBreakpoints = {
+        576: {},
+        768: {},
+        992: {},
+      };
+
+      // FIX: Iterate over styleObj, not the outer 'styles'
+      Object.entries(styleObj).forEach(([key, value]) => {
+        if (key.startsWith("@media")) {
+          const breakpointMatch = key.match(/\(max-width: (\d+)px\)/);
+          if (breakpointMatch && breakpointMatch[1]) {
+            const breakpoint = parseInt(breakpointMatch[1]);
+            if (breakpoint in mediaQueryBreakpoints) {
+              Object.assign(mediaQueryBreakpoints[breakpoint], value);
+            }
+          }
+        } else {
+          baseStyles[key] = value;
+        }
+      });
+
+      let resultStyles = { ...baseStyles };
+
+      if (windowWidth <= 576) {
+        resultStyles = {
+          ...resultStyles,
+          ...mediaQueryBreakpoints[992],
+          ...mediaQueryBreakpoints[768],
+          ...mediaQueryBreakpoints[576],
+        };
+      } else if (windowWidth <= 768) {
+        resultStyles = {
+          ...resultStyles,
+          ...mediaQueryBreakpoints[992],
+          ...mediaQueryBreakpoints[768],
+        };
+      } else if (windowWidth <= 992) {
+        resultStyles = { ...resultStyles, ...mediaQueryBreakpoints[992] };
+      }
+
+      return resultStyles;
+    };
+
+    const responsiveStyles = {};
+    Object.entries(styles).forEach(([key, value]) => {
+      if (typeof value === "function") {
+        responsiveStyles[key] = value;
+      } else {
+        responsiveStyles[key] = applyResponsiveStyles(value);
+      }
+    });
+
+    return responsiveStyles;
+  };
+
   const styles = {
     container: {
       display: "flex",
-      flexDirection: "column",
-      fontFamily: "Arial, sans-serif",
-      maxWidth: "1200px",
-      margin: "0 auto",
-      padding: "clamp(10px, 2vw, 20px)",
+
+      padding: "20px",
       borderRadius: "20px",
-      minHeight: "clamp(400px, 80vh, 650px)",
       background: "#F8F8F8",
       width: "100%",
       boxSizing: "border-box",
@@ -154,6 +354,7 @@ const ProfilePage = () => {
       },
     },
     avatar: {
+      // This style is for the <img> tag, but we're using FaUserGraduate
       width: "100px",
       height: "100px",
       borderRadius: "50%",
@@ -173,112 +374,70 @@ const ProfilePage = () => {
     },
   };
 
-  const studentInfo = {
-    name: "Monika Patidar",
-    bio: "Student | Web Developer",
-    joinDate: "January 15, 2023",
-    phoneno: "900768934",
-    email: "monika.patidar@example.com",
-    location: "Dewas, Madhya Pradesh",
-  };
-
-  const courses = [
-    { course: "HTML + CSS", progress: 90 },
-    { course: "JavaScript", progress: 70 },
-    { course: "ReactJS", progress: 50 },
-    { course: "NodeJS", progress: 30 },
-  ];
-
-  // Media query implementation for React inline styles
-  const useResponsiveStyles = (styles) => {
-    const [windowWidth, setWindowWidth] = React.useState(
-      typeof window !== "undefined" ? window.innerWidth : 992
-    );
-
-    React.useEffect(() => {
-      if (typeof window === "undefined") return;
-
-      const handleResize = () => {
-        setWindowWidth(window.innerWidth);
-      };
-
-      window.addEventListener("resize", handleResize);
-      return () => window.removeEventListener("resize", handleResize);
-    }, []);
-
-    const applyResponsiveStyles = (styleObj) => {
-      if (typeof styleObj !== "object" || styleObj === null) return styleObj;
-
-      const baseStyles = {};
-      const mediaQueryBreakpoints = {
-        576: {},
-        768: {},
-        992: {},
-      };
-
-      Object.entries(styleObj).forEach(([key, value]) => {
-        if (key.startsWith("@media")) {
-          const breakpointMatch = key.match(/\(max-width: (\d+)px\)/);
-          if (breakpointMatch && breakpointMatch[1]) {
-            const breakpoint = parseInt(breakpointMatch[1]);
-            if (breakpoint in mediaQueryBreakpoints) {
-              Object.assign(mediaQueryBreakpoints[breakpoint], value);
-            }
-          }
-        } else {
-          baseStyles[key] = value;
-        }
-      });
-
-      let resultStyles = { ...baseStyles };
-
-      // Apply styles based on current window width
-      if (windowWidth <= 576) {
-        resultStyles = {
-          ...resultStyles,
-          ...mediaQueryBreakpoints[992],
-          ...mediaQueryBreakpoints[768],
-          ...mediaQueryBreakpoints[576],
-        };
-      } else if (windowWidth <= 768) {
-        resultStyles = {
-          ...resultStyles,
-          ...mediaQueryBreakpoints[992],
-          ...mediaQueryBreakpoints[768],
-        };
-      } else if (windowWidth <= 992) {
-        resultStyles = { ...resultStyles, ...mediaQueryBreakpoints[992] };
-      }
-
-      return resultStyles;
-    };
-
-    const responsiveStyles = {};
-    Object.entries(styles).forEach(([key, value]) => {
-      if (typeof value === "function") {
-        responsiveStyles[key] = value;
-      } else {
-        responsiveStyles[key] = applyResponsiveStyles(value);
-      }
-    });
-
-    return responsiveStyles;
-  };
-
   const responsiveStyles = useResponsiveStyles(styles);
+
+  // Conditional rendering based on loading, error, and data presence
+  if (loading) {
+    return (
+      <div style={responsiveStyles.container}>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "50px",
+            fontSize: "20px",
+            color: "#666",
+          }}
+        >
+          Loading profile data...
+        </div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div style={responsiveStyles.container}>
+        <div
+          style={{
+            backgroundColor: "#fee2e2",
+            color: "#dc2626",
+            padding: "20px",
+            borderRadius: "10px",
+            textAlign: "center",
+          }}
+        >
+          Error: {error}
+        </div>
+      </div>
+    );
+  }
+
+  if (!profileData) {
+    return (
+      <div style={responsiveStyles.container}>
+        <div
+          style={{
+            textAlign: "center",
+            padding: "50px",
+            fontSize: "20px",
+            color: "#666",
+          }}
+        >
+          Please log in to view your profile.
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={responsiveStyles.container}>
       <div style={responsiveStyles.card}>
         {/* Left Section */}
         <div style={responsiveStyles.leftSection}>
-          <img
-            src="https://cdn-icons-png.flaticon.com/128/64/64572.png"
-            alt="Profile Avatar"
-            style={responsiveStyles.avatar}
-          />
-          <h1 style={responsiveStyles.name}>{studentInfo.name}</h1>
-          <p style={responsiveStyles.bio}>{studentInfo.bio}</p>
+          {/* Using FaUserGraduate for avatar as provided */}
+          <FaUserGraduate style={responsiveStyles.avatarIcon} />
+          <h1 style={responsiveStyles.name}>{profileData.name}</h1>
+          <p style={responsiveStyles.bio}>{profileData.bio}</p>
         </div>
 
         {/* Right Section */}
@@ -287,34 +446,40 @@ const ProfilePage = () => {
           <div>
             <h2 style={responsiveStyles.sectionTitle}>Personal Info</h2>
             <p style={responsiveStyles.infoItem}>
-              <strong>Email:</strong> {studentInfo.email}
+              <strong>Email:</strong> {profileData.email}
             </p>
             <p style={responsiveStyles.infoItem}>
-              <strong>Location:</strong> {studentInfo.location}
+              <strong>Location:</strong> {profileData.location}
             </p>
             <p style={responsiveStyles.infoItem}>
-              <strong>Joined:</strong> {studentInfo.joinDate}
+              <strong>Joined:</strong> {profileData.joinDate}
             </p>
             <p style={responsiveStyles.infoItem}>
-              <strong>Phone no.</strong> {studentInfo.phoneno}
+              <strong>Phone no.:</strong> {profileData.phoneno}
             </p>
           </div>
 
           {/* Course Progress */}
           <div>
             <h2 style={responsiveStyles.sectionTitle}>Course Progress</h2>
-            {courses.map((item, index) => (
-              <div key={index}>
-                <p
-                  style={responsiveStyles.courseText}
-                >{`${item.course} (${item.progress}%)`}</p>
+            {courseProgressData ? (
+              <div>
+                <p style={responsiveStyles.courseText}>{`${
+                  courseProgressData.course
+                } (${courseProgressData.progress.toFixed(0)}%)`}</p>
                 <div style={responsiveStyles.progressBarContainer}>
                   <div
-                    style={responsiveStyles.progressBar(item.progress)}
+                    style={responsiveStyles.progressBar(
+                      courseProgressData.progress
+                    )}
                   ></div>
                 </div>
               </div>
-            ))}
+            ) : (
+              <p style={responsiveStyles.infoItem}>
+                Not enrolled in a course or no progress found yet.
+              </p>
+            )}
           </div>
         </div>
       </div>

@@ -21,6 +21,8 @@ import StudentWorkUploadForm from "../pages/user/StudentWorkSumbit";
 import DailyquestionUpload from "../pages/admin/DailyquestionUpload";
 import CourseGroup from "../pages/admin/CourseGroup";
 
+import StudentCourseViewForAdmin from "../pages/admin/Allstudents";
+
 // Protected route components
 const ProtectedRoute = ({ children }) => {
   const { user } = useAuth();
@@ -89,6 +91,10 @@ const AppRoutes = () => {
 
         <Route path="DailyquestionUpload" element={<DailyquestionUpload />} />
         <Route path="CourseGroup" element={<CourseGroup />} />
+        <Route
+          path="StudentCourseViewForAdmin"
+          element={<StudentCourseViewForAdmin />}
+        />
       </Route>
 
       {/* User Dashboard Routes - Protected (any logged in user) */}
