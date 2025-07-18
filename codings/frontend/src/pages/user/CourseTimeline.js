@@ -1,725 +1,338 @@
-"use client";
+import React, { useState, useEffect, useCallback } from "react";
 
-import { useState, useEffect } from "react";
+const API_BASE_URL = "http://localhost:5000/api"; // Your backend API base URL
 
-const CourseTimeline = () => {
-  // State to track which topics are expanded
-  const [expandedTopics, setExpandedTopics] = useState({});
-  // State for question modal
-  const [isModalOpen, setIsModalOpen] = useState(false);
-  const [modalContent, setModalContent] = useState("");
-  const [modalTitle, setModalTitle] = useState("");
+const CourseProgressPage = () => {
+  const [courses, setCourses] = useState([]);
+  const [selectedCourseId, setSelectedCourseId] = useState("");
+  const [userProgress, setUserProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const [authToken, setAuthToken] = useState(null);
+  const [userId, setUserId] = useState(null);
+  const [message, setMessage] = useState(""); // For success/error messages
 
-  // Initial data structure with nested topics and subtopics
-  // Merged Front End and Back End topics directly under webDevelopment
-  const [topics, setTopics] = useState({
-    webDevelopment: {
-      name: "Web Development",
-      progress: 0,
-      topics: [
-        {
-          id: "html",
-          name: "HTML",
-          completed: false,
-          subtopics: [
-            {
-              id: "html-basics",
-              name: "HTML Basics",
-              completed: false,
-              questionsFile: "html-basics-questions.txt",
-            },
-            {
-              id: "html-forms",
-              name: "HTML Forms",
-              completed: false,
-              questionsFile: "html-forms-questions.txt",
-            },
-            {
-              id: "html-semantics",
-              name: "Semantic HTML",
-              completed: false,
-              questionsFile: "html-semantics-questions.txt",
-            },
-            {
-              id: "html-media",
-              name: "HTML Media",
-              completed: false,
-              questionsFile: "html-media-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "css",
-          name: "CSS",
-          completed: false,
-          subtopics: [
-            {
-              id: "css-selectors",
-              name: "CSS Selectors",
-              completed: false,
-              questionsFile: "css-selectors-questions.txt",
-            },
-            {
-              id: "css-box-model",
-              name: "Box Model",
-              completed: false,
-              questionsFile: "css-box-model-questions.txt",
-            },
-            {
-              id: "css-flexbox",
-              name: "Flexbox",
-              completed: false,
-              questionsFile: "css-flexbox-questions.txt",
-            },
-            {
-              id: "css-grid",
-              name: "CSS Grid",
-              completed: false,
-              questionsFile: "css-grid-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "responsive",
-          name: "Responsive Design",
-          completed: false,
-          subtopics: [
-            {
-              id: "media-queries",
-              name: "Media Queries",
-              completed: false,
-              questionsFile: "media-queries-questions.txt",
-            },
-            {
-              id: "mobile-first",
-              name: "Mobile First Design",
-              completed: false,
-              questionsFile: "mobile-first-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "js-basics",
-          name: "JavaScript Basics",
-          completed: false,
-          subtopics: [
-            {
-              id: "variables",
-              name: "Variables & Data Types",
-              completed: false,
-              questionsFile: "js-variables-questions.txt",
-            },
-            {
-              id: "operators",
-              name: "Operators",
-              completed: true,
-              questionsFile: "js-operators-questions.txt",
-            },
-            {
-              id: "conditionals",
-              name: "Conditionals",
-              completed: true,
-              questionsFile: "js-conditionals-questions.txt",
-            },
-            {
-              id: "loops",
-              name: "Loops",
-              completed: false,
-              questionsFile: "js-loops-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "js-functions",
-          name: "Functions",
-          completed: false,
-          subtopics: [
-            {
-              id: "function-basics",
-              name: "Function Basics",
-              completed: false,
-              questionsFile: "function-basics-questions.txt",
-            },
-            {
-              id: "arrow-functions",
-              name: "Arrow Functions",
-              completed: false,
-              questionsFile: "arrow-functions-questions.txt",
-            },
-            {
-              id: "callbacks",
-              name: "Callbacks",
-              completed: false,
-              questionsFile: "callbacks-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "js-strings",
-          name: "String Methods",
-          completed: false,
-          subtopics: [
-            {
-              id: "string-basics",
-              name: "String Basics",
-              completed: true,
-              questionsFile: "string-basics-questions.txt",
-            },
-            {
-              id: "string-methods",
-              name: "String Methods",
-              completed: true,
-              questionsFile: "string-methods-questions.txt",
-            },
-            {
-              id: "string-methods-args",
-              name: "String Methods With Arguments",
-              completed: true,
-              questionsFile: "string-methods-args-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "js-advanced",
-          name: "Advanced Concepts",
-          completed: false,
-          subtopics: [
-            {
-              id: "promises",
-              name: "Promises",
-              completed: false,
-              questionsFile: "promises-questions.txt",
-            },
-            {
-              id: "async-await",
-              name: "Async/Await",
-              completed: false,
-              questionsFile: "async-await-questions.txt",
-            },
-            {
-              id: "es6-features",
-              name: "ES6+ Features",
-              completed: false,
-              questionsFile: "es6-features-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "nodejs",
-          name: "Node.js",
-          completed: false,
-          subtopics: [
-            {
-              id: "node-basics",
-              name: "Node.js Basics",
-              completed: false,
-              questionsFile: "node-basics-questions.txt",
-            },
-            {
-              id: "npm",
-              name: "NPM",
-              completed: false,
-              questionsFile: "npm-questions.txt",
-            },
-            {
-              id: "express",
-              name: "Express.js",
-              completed: false,
-              questionsFile: "express-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "databases",
-          name: "Databases",
-          completed: false,
-          subtopics: [
-            {
-              id: "sql",
-              name: "SQL",
-              completed: false,
-              questionsFile: "sql-questions.txt",
-            },
-            {
-              id: "mongodb",
-              name: "MongoDB",
-              completed: false,
-              questionsFile: "mongodb-questions.txt",
-            },
-          ],
-        },
-        {
-          id: "apis",
-          name: "APIs",
-          completed: false,
-          subtopics: [
-            {
-              id: "rest",
-              name: "REST APIs",
-              completed: false,
-              questionsFile: "rest-apis-questions.txt",
-            },
-            {
-              id: "graphql",
-              name: "GraphQL",
-              completed: false,
-              questionsFile: "graphql-questions.txt",
-            },
-          ],
-        },
-      ],
-    },
-  });
-
-  // Function to fetch and display question content
-  const showQuestions = async (subtopicName, questionsFile) => {
-    try {
-      const response = await fetch(`/api/questions/${questionsFile}`);
-
-      if (response.ok) {
-        const questionText = await response.text();
-        setModalContent(questionText);
-      } else {
-        setModalContent(`
-1. What is ${subtopicName}?
-2. How do you implement ${subtopicName} in a project?
-3. What are the best practices for ${subtopicName}?
-4. Why is ${subtopicName} important in web development?
-5. Give an example of ${subtopicName} in action.
-        `);
-      }
-
-      setModalTitle(`${subtopicName} Questions`);
-      setIsModalOpen(true);
-    } catch (error) {
-      console.error("Error loading questions:", error);
-      setModalContent("Unable to load questions at this time.");
-      setModalTitle("Error");
-      setIsModalOpen(true);
-    }
-  };
-
-  // Toggle expansion of a topic (simplified as there are no sections)
-  const toggleTopicExpansion = (topicId) => {
-    setExpandedTopics((prev) => ({
-      ...prev,
-      [topicId]: !prev[topicId],
-    }));
-  };
-
-  // Toggle completion status of a subtopic
-  const toggleSubtopicCompletion = (topicId, subtopicId) => {
-    const updatedTopics = { ...topics };
-    const webDev = updatedTopics.webDevelopment;
-    const topicIndex = webDev.topics.findIndex((topic) => topic.id === topicId);
-
-    if (topicIndex !== -1) {
-      const topic = webDev.topics[topicIndex];
-      const subtopicIndex = topic.subtopics.findIndex(
-        (subtopic) => subtopic.id === subtopicId
-      );
-
-      if (subtopicIndex !== -1) {
-        // Toggle the subtopic completion
-        topic.subtopics[subtopicIndex].completed =
-          !topic.subtopics[subtopicIndex].completed;
-
-        // Check if all subtopics are completed to mark the topic as completed
-        topic.completed = topic.subtopics.every(
-          (subtopic) => subtopic.completed
-        );
-
-        // Recalculate overall progress
-        updateProgress(updatedTopics);
-
-        setTopics(updatedTopics);
-      }
-    }
-  };
-
-  // Calculate overall progress
-  const updateProgress = (topicsData) => {
-    const webDev = topicsData.webDevelopment;
-
-    const totalSubtopics = webDev.topics.reduce(
-      (acc, topic) => acc + topic.subtopics.length,
-      0
-    );
-    const completedSubtopics = webDev.topics.reduce(
-      (acc, topic) =>
-        acc + topic.subtopics.filter((subtopic) => subtopic.completed).length,
-      0
-    );
-
-    webDev.progress =
-      totalSubtopics > 0
-        ? Math.round((completedSubtopics / totalSubtopics) * 100)
-        : 0;
-  };
-
-  // Initialize progress on component mount
+  // --- Authentication Check ---
   useEffect(() => {
-    const updatedTopics = { ...topics };
-    updateProgress(updatedTopics);
-    setTopics(updatedTopics);
+    const token = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+    if (token && storedUserId) {
+      setAuthToken(token);
+      setUserId(storedUserId);
+    } else {
+      setError("You must be logged in to view course progress.");
+      setLoading(false);
+    }
   }, []);
 
-  // Circular progress component
-  const CircularProgress = ({ progress }) => {
-    const radius = 30;
-    const circumference = 2 * Math.PI * radius;
-    const strokeDashoffset = circumference - (progress / 100) * circumference;
+  // --- Fetch Courses ---
+  const fetchCourses = useCallback(async () => {
+    if (!authToken) return;
 
-    return (
-      <div className="circular-progress">
-        <svg width="80" height="80" viewBox="0 0 100 100">
-          <circle
-            className="progress-background"
-            cx="50"
-            cy="50"
-            r={radius}
-            strokeWidth="4"
-            fill="transparent"
-          />
-          <circle
-            className="progress-bar"
-            cx="50"
-            cy="50"
-            r={radius}
-            strokeWidth="4"
-            fill="transparent"
-            strokeDasharray={circumference}
-            strokeDashoffset={strokeDashoffset}
-            transform="rotate(-90 50 50)"
-          />
-        </svg>
-        <div className="progress-text">{progress}%</div>
-      </div>
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${API_BASE_URL}/courses`, {
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Failed to fetch courses.");
+      }
+      const data = await response.json();
+      setCourses(data.courses);
+      if (data.courses.length > 0 && !selectedCourseId) {
+        setSelectedCourseId(data.courses[0]._id); // Auto-select the first course
+      }
+    } catch (err) {
+      console.error("Error fetching courses:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [authToken, selectedCourseId]);
+
+  // --- Fetch User Progress for Selected Course ---
+  const fetchUserProgress = useCallback(async () => {
+    if (!authToken || !userId || !selectedCourseId) return;
+
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/user-progress/${selectedCourseId}`,
+        {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        const errData = await response.json();
+        throw new Error(errData.message || "Failed to fetch user progress.");
+      }
+      const data = await response.json();
+      setUserProgress(data.progress);
+    } catch (err) {
+      console.error("Error fetching user progress:", err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  }, [authToken, userId, selectedCourseId]);
+
+  // --- Effects to trigger data fetching ---
+  useEffect(() => {
+    if (authToken && userId) {
+      fetchCourses();
+    }
+  }, [authToken, userId, fetchCourses]);
+
+  useEffect(() => {
+    if (selectedCourseId) {
+      fetchUserProgress();
+    }
+  }, [selectedCourseId, fetchUserProgress]);
+
+  // --- Handle Marking Subtopic Complete ---
+  const handleMarkSubtopicComplete = async (subtopicMongoId) => {
+    if (!authToken || !userId || !selectedCourseId) {
+      setMessage("Error: Not authenticated or course not selected.");
+      return;
+    }
+
+    setLoading(true);
+    setMessage("");
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/user-progress/complete-subtopic`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+          body: JSON.stringify({
+            courseId: selectedCourseId,
+            subtopicMongoId: subtopicMongoId,
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.message || "Failed to mark subtopic complete.");
+      }
+
+      setMessage(data.message || "Subtopic marked as completed!");
+      fetchUserProgress(); // Re-fetch progress to update UI
+    } catch (err) {
+      console.error("Error marking subtopic complete:", err);
+      setMessage(`Error: ${err.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Helper to check if a subtopic is completed
+  const isSubtopicCompleted = (subtopicMongoId) => {
+    // FIX: Add optional chaining for completed_subtopics
+    return userProgress?.completed_subtopics?.some(
+      (item) => item.subtopic_mongoose_id === subtopicMongoId
     );
   };
 
-  // Questions Modal Component
-  const QuestionsModal = () => {
-    if (!isModalOpen) return null;
-
-    return (
-      <div className="modal-overlay">
-        <div className="modal-content">
-          <div className="modal-header">
-            <h3>{modalTitle}</h3>
-            <button
-              className="close-button"
-              onClick={() => setIsModalOpen(false)}
-            >
-              ×
-            </button>
-          </div>
-          <div className="modal-body">
-            <pre>{modalContent}</pre>
-          </div>
-        </div>
-      </div>
-    );
-  };
+  // Get the currently selected course object
+  const currentCourse = courses.find(
+    (course) => course._id === selectedCourseId
+  );
 
   return (
-    <div
-      style={{
-        padding: "clamp(10px, 2vw, 20px)",
-        borderRadius: "20px",
-        position: "relative",
-        minHeight: "clamp(400px, 80vh, 650px)",
-        background: "#F8F8F8",
-        width: "100%",
-        boxSizing: "border-box",
-      }}
-    >
-      <div className="learning-tracker">
-        <div className="main-container">
-          <h1 className="main-title">{topics.webDevelopment.name}</h1>
+    <div className="min-h-screen bg-gray-100 p-4 sm:p-6 lg:p-8 font-inter antialiased">
+      <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6 sm:p-8 lg:p-10">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-center text-blue-800 mb-8">
+          My Course Progress
+        </h1>
 
-          <div className="progress-bar-container">
-            <div className="progress-bar">
-              <div
-                className="progress-fill"
-                style={{ width: `${topics.webDevelopment.progress}%` }}
-              ></div>
-            </div>
-            <div className="progress-text">
-              {topics.webDevelopment.progress}% completed
-            </div>
+        {loading && (
+          <div className="text-center text-blue-600 font-semibold text-lg py-4">
+            Loading...
           </div>
+        )}
 
-          <div className="topics-list">
-            {topics.webDevelopment.topics.map((topic) => (
-              <div key={topic.id} className="topic-container">
-                <div
-                  className="topic-item"
-                  onClick={() => toggleTopicExpansion(topic.id)}
-                >
-                  <span
-                    className={`topic-indicator ${
-                      topic.completed ? "completed" : ""
-                    }`}
-                  ></span>
-                  <span className="topic-name">{topic.name}</span>
-                  <span className="expand-icon">
-                    {expandedTopics[topic.id] ? "−" : "+"}
-                  </span>
+        {error && (
+          <div
+            className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded-lg relative mb-4"
+            role="alert"
+          >
+            <strong className="font-bold">Error!</strong>
+            <span className="block sm:inline ml-2">{error}</span>
+          </div>
+        )}
+
+        {message && (
+          <div
+            className={`px-4 py-3 rounded-lg relative mb-4 ${
+              message.includes("Error")
+                ? "bg-red-100 border-red-400 text-red-700"
+                : "bg-green-100 border-green-400 text-green-700"
+            }`}
+            role="alert"
+          >
+            <span className="block sm:inline">{message}</span>
+          </div>
+        )}
+
+        {!authToken && !loading && (
+          <p className="text-center text-gray-600 text-lg">
+            Please log in to view your course progress.
+          </p>
+        )}
+
+        {authToken && !loading && !error && (
+          <>
+            {/* Course Selection Dropdown */}
+            <div className="mb-6">
+              <label
+                htmlFor="course-select"
+                className="block text-gray-700 text-sm font-bold mb-2"
+              >
+                Select Course:
+              </label>
+              <select
+                id="course-select"
+                className="block w-full px-4 py-2 border border-gray-300 rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                value={selectedCourseId}
+                onChange={(e) => setSelectedCourseId(e.target.value)}
+                disabled={courses.length === 0}
+              >
+                {courses.length === 0 ? (
+                  <option value="">No courses available</option>
+                ) : (
+                  courses.map((course) => (
+                    <option key={course._id} value={course._id}>
+                      {course.name}
+                    </option>
+                  ))
+                )}
+              </select>
+            </div>
+
+            {currentCourse && userProgress ? (
+              <>
+                {/* Progress Bar */}
+                <div className="mb-8">
+                  <h2 className="text-xl font-semibold text-gray-800 mb-2">
+                    Overall Progress:{" "}
+                    {userProgress.progress_percentage.toFixed(0)}%
+                  </h2>
+                  <div className="w-full bg-gray-200 rounded-full h-3">
+                    <div
+                      className="bg-green-500 h-3 rounded-full transition-all duration-500 ease-out"
+                      style={{ width: `${userProgress.progress_percentage}%` }}
+                    ></div>
+                  </div>
+                  {userProgress.is_completed && (
+                    <p className="text-green-600 text-sm mt-2 font-medium">
+                      Congratulations! You have completed this course.
+                    </p>
+                  )}
                 </div>
 
-                {expandedTopics[topic.id] && (
-                  <div className="subtopics-list">
-                    {topic.subtopics.map((subtopic) => (
-                      <div
-                        key={subtopic.id}
-                        className="subtopic-item"
-                        onClick={() =>
-                          toggleSubtopicCompletion(topic.id, subtopic.id)
-                        }
-                      >
-                        <span
-                          className={`subtopic-indicator ${
-                            subtopic.completed ? "completed" : ""
-                          }`}
-                        ></span>
-                        <span className="subtopic-name">{subtopic.name}</span>
-                        <a
-                          href="#"
-                          className="questions-link"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            e.preventDefault();
-                            showQuestions(
-                              subtopic.name,
-                              subtopic.questionsFile
-                            );
-                          }}
-                        >
-                          Questions
-                        </a>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+                {/* Course Topics and Subtopics */}
+                <div className="space-y-6">
+                  {currentCourse.topics.map((topic) => (
+                    <div
+                      key={topic._id}
+                      className="bg-blue-50 rounded-lg p-4 shadow-sm border border-blue-100"
+                    >
+                      <h3 className="text-lg font-bold text-blue-700 mb-3">
+                        {topic.name}
+                      </h3>
+                      <ul className="space-y-3">
+                        {topic.subtopics.map((subtopic) => (
+                          <li
+                            key={subtopic._id}
+                            className={`flex items-center justify-between p-3 rounded-md transition-colors duration-200 ${
+                              isSubtopicCompleted(subtopic._id)
+                                ? "bg-green-50 border border-green-200 text-green-800"
+                                : "bg-white border border-gray-200 text-gray-800 hover:bg-gray-50"
+                            }`}
+                          >
+                            <span className="flex items-center text-base font-medium">
+                              {isSubtopicCompleted(subtopic._id) ? (
+                                <svg
+                                  className="w-5 h-5 text-green-500 mr-2"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  ></path>
+                                </svg>
+                              ) : (
+                                <svg
+                                  className="w-5 h-5 text-gray-400 mr-2"
+                                  fill="none"
+                                  stroke="currentColor"
+                                  viewBox="0 0 24 24"
+                                  xmlns="http://www.w3.org/2000/svg"
+                                >
+                                  <path
+                                    strokeLinecap="round"
+                                    strokeLinejoin="round"
+                                    strokeWidth="2"
+                                    d="M12 9v3m0 0v3m0-3h3m-3 0H9m12 0a9 9 0 11-18 0 9 9 0 0118 0z"
+                                  ></path>
+                                </svg>
+                              )}
+                              {subtopic.name}
+                            </span>
+                            {!isSubtopicCompleted(subtopic._id) && (
+                              <button
+                                onClick={() =>
+                                  handleMarkSubtopicComplete(subtopic._id)
+                                }
+                                className="px-4 py-2 bg-blue-600 text-white text-sm font-semibold rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors duration-200"
+                                disabled={loading}
+                              >
+                                {loading ? "Marking..." : "Mark Complete"}
+                              </button>
+                            )}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  ))}
+                </div>
+              </>
+            ) : (
+              !loading &&
+              !error &&
+              courses.length > 0 && (
+                <p className="text-center text-gray-600 text-lg">
+                  Select a course from the dropdown to view your progress.
+                </p>
+              )
+            )}
+            {!loading && !error && courses.length === 0 && (
+              <p className="text-center text-gray-600 text-lg">
+                No courses available to display.
+              </p>
+            )}
+          </>
+        )}
       </div>
-
-      {/* Render Questions Modal */}
-      <QuestionsModal />
-
-      <style jsx>{`
-        .learning-tracker {
-          font-family: "Arial", sans-serif;
-          color: #333;
-          max-width: 1000px;
-          margin: 0 auto;
-          padding: 20px;
-        }
-
-        .main-container {
-          border: 1px solid #e0e0e0;
-          border-radius: 15px;
-          padding: 20px;
-          background-color: #fff;
-        }
-
-        .main-title {
-          text-align: center;
-          font-size: 24px;
-          font-weight: 500;
-        }
-
-        .progress-bar-container {
-          margin: 20px 0;
-          text-align: center;
-        }
-
-        .progress-bar {
-          height: 4px;
-          background-color: #f0f0f0;
-          border-radius: 3px;
-          overflow: hidden;
-          margin: 0 auto;
-          max-width: 400px;
-        }
-
-        .progress-fill {
-          height: 100%;
-          background-color: #ff9a70;
-          border-radius: 3px;
-          transition: width 0.3s ease;
-        }
-
-        .progress-text {
-          margin-top: 5px;
-          font-size: 14px;
-          color: #ff9a70;
-        }
-
-        .topics-list {
-          margin-top: 20px;
-          padding: 0 20px; /* Adjust padding as needed */
-        }
-
-        .topic-container {
-          margin-bottom: 10px;
-          border: 1px solid #e0e0e0; /* Added border for topic container */
-          border-radius: 10px; /* Rounded corners for topic container */
-          padding: 10px 15px; /* Padding for topic container */
-          background-color: #fdfdfd; /* Light background for topic container */
-        }
-
-        .topic-item {
-          display: flex;
-          align-items: center;
-          padding: 8px 0;
-          cursor: pointer;
-        }
-
-        .topic-indicator,
-        .subtopic-indicator {
-          width: 12px;
-          height: 12px;
-          border-radius: 50%;
-          margin-right: 10px;
-          border: 1px solid #e0e0e0;
-          flex-shrink: 0;
-        }
-
-        .topic-indicator.completed,
-        .subtopic-indicator.completed {
-          background-color: #ff9a70;
-          border-color: #ff9a70;
-        }
-
-        .topic-name,
-        .subtopic-name {
-          font-size: 16px;
-          flex-grow: 1;
-        }
-
-        .expand-icon {
-          margin-left: 10px;
-          font-size: 18px;
-          color: #999;
-          width: 20px;
-          text-align: center;
-        }
-
-        .subtopics-list {
-          margin-left: 22px;
-          border-left: 1px solid #e0e0e0;
-          padding-left: 15px;
-          margin-top: 5px; /* Spacing between topic name and subtopics */
-        }
-
-        .subtopic-item {
-          display: flex;
-          align-items: center;
-          padding: 8px 0;
-          cursor: pointer;
-        }
-
-        .questions-link {
-          margin-left: auto;
-          color: #0066ff;
-          text-decoration: none;
-        }
-
-        .questions-link:hover {
-          text-decoration: underline;
-        }
-
-        /* Modal Styles */
-        .modal-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          right: 0;
-          bottom: 0;
-          background-color: rgba(0, 0, 0, 0.5);
-          display: flex;
-          justify-content: center;
-          align-items: center;
-          z-index: 1000;
-        }
-
-        .modal-content {
-          background-color: white;
-          border-radius: 10px;
-          width: 80%;
-          max-width: 600px;
-          max-height: 80vh;
-          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-          overflow: hidden;
-          display: flex;
-          flex-direction: column;
-        }
-
-        .modal-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          padding: 15px 20px;
-          border-bottom: 1px solid #e0e0e0;
-        }
-
-        .modal-header h3 {
-          margin: 0;
-          font-size: 18px;
-        }
-
-        .close-button {
-          background: none;
-          border: none;
-          font-size: 24px;
-          cursor: pointer;
-          color: #999;
-        }
-
-        .modal-body {
-          padding: 20px;
-          overflow-y: auto;
-          flex-grow: 1;
-        }
-
-        .modal-body pre {
-          white-space: pre-wrap;
-          font-family: inherit;
-          margin: 0;
-        }
-
-        /* CircularProgress component styles (already present, but ensure they are here) */
-        .circular-progress {
-          position: relative;
-          width: 80px;
-          height: 80px;
-          display: flex;
-          justify-content: center;
-          align-items: center;
-        }
-
-        .progress-background {
-          stroke: #f0f0f0;
-        }
-
-        .progress-bar {
-          stroke: #ff9a70;
-          transition: stroke-dashoffset 0.3s ease;
-        }
-
-        .circular-progress .progress-text {
-          position: absolute;
-          font-size: 14px;
-          font-weight: bold;
-        }
-      `}</style>
     </div>
   );
 };
 
-export default CourseTimeline;
+export default CourseProgressPage;

@@ -1,43 +1,82 @@
 const express = require("express");
 const router = express.Router();
 const Course = require("../models/Course");
-const SubCourse = require("../models/SubCourse");
-const CourseTopic = require("../models/CourseTopic");
-const Question = require("../models/Question"); // Added for cascading deletes
+const UserCourseProgress = require("../models/UserCourseProgress");
 const { protect } = require("../middleware/authMiddleware");
+// --- Course Management Routes (Admin Only) ---
+const checkAdmin = (req, res, next) => {
+  if (!req.user || !req.user.isAdmin) {
+    return res.status(403).json({ message: "Not authorized as an admin" });
+  }
+  next();
+};
 
-// --- Course Routes ---
-
-// POST /api/courses - Create a new course (Admin only)
-router.post("/courses", protect, async (req, res) => {
+// POST /api/courses - Create a new course
+router.post("/courses", protect, checkAdmin, async (req, res) => {
+  // checkAdmin middleware
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
+    const { name, description, topics } = req.body; // Changed 'modules' to 'topics'
+
+    if (!name || !description || !topics || !Array.isArray(topics)) {
+      return res.status(400).json({
+        message: "Course name, description, and topics array are required.", // Changed 'modules' to 'topics'
+      });
     }
-    const { course_name, description } = req.body;
-    const newCourse = new Course({ course_name, description });
-    const savedCourse = await newCourse.save();
-    res.status(201).json({
-      message: "Course created successfully",
-      course: savedCourse,
+
+    // Basic validation for topics and subtopics structure
+    for (const topic of topics) {
+      // Changed 'module' to 'topic'
+      // Ensure topic has id_string and name, and subtopics is an array
+      if (!topic.id_string || !topic.name || !Array.isArray(topic.subtopics)) {
+        // Changed module_name to name, added id_string, lessons to subtopics
+        return res.status(400).json({
+          message:
+            "Each topic must have an id_string, name, and a subtopics array.", // Changed 'module' to 'topic', 'lessons' to 'subtopics'
+        });
+      }
+      for (const subtopic of topic.subtopics) {
+        // Changed 'lesson' to 'subtopic'
+        // Ensure subtopic has id_string and name (questionsFile is optional)
+        if (!subtopic.id_string || !subtopic.name) {
+          // Changed lesson_name to name, added id_string, removed order check (as it's not strictly required by model, but you can add if needed)
+          return res.status(400).json({
+            message: "Each subtopic must have an id_string and a name.",
+          }); // Changed 'lesson' to 'subtopic'
+        }
+      }
+    }
+
+    const newCourse = new Course({
+      name,
+      description,
+      topics, // Changed 'modules' to 'topics'
+      created_by: req.user.id, // Link to the admin who created it
     });
+
+    const savedCourse = await newCourse.save();
+    res
+      .status(201)
+      .json({ message: "Course created successfully", course: savedCourse });
   } catch (error) {
     console.error("Error creating course:", error);
     if (error.code === 11000) {
-      return res.status(400).json({ message: "Course name already exists" });
+      // Duplicate key error for unique name
+      return res
+        .status(400)
+        .json({ message: "A course with this name already exists." });
     }
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
-
-// GET /api/courses - Get all courses (now populates sub_course_ids)
-router.get("/courses", async (req, res) => {
+// GET /api/courses - Get all courses (Admin can see all, users can see available)
+router.get("/courses", protect, async (req, res) => {
   try {
-    // Populate sub_course_ids to get sub-course names and descriptions
-    const courses = await Course.find({}).populate(
-      "sub_course_ids",
-      "sub_course_name description"
-    );
+    let query = {};
+    // If you want to differentiate, e.g., only active courses for non-admins
+    // if (!req.user.isAdmin) {
+    //   query = { is_active: true }; // Assuming Course has an is_active field
+    // }
+    const courses = await Course.find(query).sort({ createdAt: -1 });
     res.status(200).json({ courses });
   } catch (error) {
     console.error("Error fetching courses:", error);
@@ -45,402 +84,568 @@ router.get("/courses", async (req, res) => {
   }
 });
 
-// GET /api/courses/:id - Get a single course by ID (now populates sub_course_ids)
-router.get("/courses/:id", async (req, res) => {
+// GET /api/courses/:id - Get a single course by ID
+router.get("/courses/:id", protect, async (req, res) => {
   try {
-    const course = await Course.findById(req.params.id).populate(
-      "sub_course_ids",
-      "sub_course_name description"
-    ); // Populate desired fields
+    const course = await Course.findById(req.params.id);
     if (!course) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: "Course not found." });
     }
     res.status(200).json({ course });
   } catch (error) {
-    console.error("Error fetching course by ID:", error);
+    console.error("Error fetching course:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// PUT /api/courses/:id - Update a course (Admin only)
-router.put("/courses/:id", protect, async (req, res) => {
+// PUT /api/courses/:id - Update a course (Admin Only)
+router.put("/courses/:id", protect, checkAdmin, async (req, res) => {
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
     const updatedCourse = await Course.findByIdAndUpdate(
       req.params.id,
       req.body,
       { new: true, runValidators: true }
     );
     if (!updatedCourse) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: "Course not found." });
     }
-    res.status(200).json({
-      message: "Course updated successfully",
-      course: updatedCourse,
-    });
+    res
+      .status(200)
+      .json({ message: "Course updated successfully", course: updatedCourse });
   } catch (error) {
     console.error("Error updating course:", error);
-    if (error.code === 11000) {
-      return res.status(400).json({ message: "Course name already exists" });
-    }
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// DELETE /api/courses/:id - Delete a course (Admin only)
-router.delete("/courses/:id", protect, async (req, res) => {
+// DELETE /api/courses/:id - Delete a course (Admin Only)
+router.delete("/courses/:id", protect, checkAdmin, async (req, res) => {
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
-    const courseId = req.params.id;
-
-    // --- IMPORTANT: Cascading Delete for SubCourses, Topics, Questions ---
-    // 1. Find all sub-courses associated with this course
-    const subCoursesToDelete = await SubCourse.find({ course_id: courseId });
-    const subCourseIdsToDelete = subCoursesToDelete.map((sc) => sc._id);
-
-    // 2. Delete all topics associated with these sub-courses
-    const topicsToDelete = await CourseTopic.find({
-      sub_course_id: { $in: subCourseIdsToDelete },
-    });
-    const topicIdsToDelete = topicsToDelete.map((t) => t._id);
-    await CourseTopic.deleteMany({
-      sub_course_id: { $in: subCourseIdsToDelete },
-    });
-
-    // 3. Delete all questions associated with these topics
-    await Question.deleteMany({ course_topic_id: { $in: topicIdsToDelete } });
-
-    // 4. Delete the sub-courses themselves
-    await SubCourse.deleteMany({ course_id: courseId });
-
-    // 5. Delete the course itself
-    const deletedCourse = await Course.findByIdAndDelete(courseId);
+    const deletedCourse = await Course.findByIdAndDelete(req.params.id);
     if (!deletedCourse) {
-      return res.status(404).json({ message: "Course not found" });
+      return res.status(404).json({ message: "Course not found." });
     }
-    res
-      .status(200)
-      .json({ message: "Course and its associated data deleted successfully" });
+    // OPTIONAL: Also delete associated groups and user progress for this course
+    await Group.deleteMany({ course_id: req.params.id });
+    await UserCourseProgress.deleteMany({ course_id: req.params.id });
+
+    res.status(200).json({ message: "Course deleted successfully." });
   } catch (error) {
     console.error("Error deleting course:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// --- SubCourse Routes ---
+// --- Group Management Routes (Admin Only) ---
 
-// POST /api/sub-courses - Create a new sub-course (Admin only)
-router.post("/sub-courses", protect, async (req, res) => {
+// POST /api/groups - Create a new group
+router.post("/groups", protect, checkAdmin, async (req, res) => {
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
-    const { course_id, sub_course_name, description } = req.body;
+    const { group_name, description, course_id, members } = req.body;
 
-    // Check if the parent course exists
-    const parentCourse = await Course.findById(course_id);
-    if (!parentCourse) {
-      return res.status(404).json({ message: "Parent course not found" });
-    }
-
-    const newSubCourse = new SubCourse({
-      course_id,
-      sub_course_name,
-      description,
-    });
-    const savedSubCourse = await newSubCourse.save();
-
-    // --- IMPORTANT: Update the parent Course's sub_course_ids array ---
-    parentCourse.sub_course_ids.push(savedSubCourse._id);
-    await parentCourse.save();
-    // --- End important update ---
-
-    res.status(201).json({
-      message: "Sub-course created successfully",
-      subCourse: savedSubCourse,
-    });
-  } catch (error) {
-    console.error("Error creating sub-course:", error);
-    if (error.code === 11000) {
+    if (!group_name || !course_id) {
       return res
         .status(400)
-        .json({ message: "Sub-course name already exists for this course" });
+        .json({ message: "Group name and course ID are required." });
     }
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
 
-// GET /api/sub-courses - Get all sub-courses (optionally by course_id)
-router.get("/sub-courses", async (req, res) => {
-  try {
-    const { course_id } = req.query;
-    let query = {};
-    if (course_id) {
-      query.course_id = course_id;
+    // Optional: Validate if course_id and member_ids exist
+    const courseExists = await Course.findById(course_id);
+    if (!courseExists) {
+      return res.status(400).json({ message: "Course not found." });
     }
-    const subCourses = await SubCourse.find(query).populate(
-      "course_id",
-      "course_name"
-    );
-    res.status(200).json({ subCourses });
-  } catch (error) {
-    console.error("Error fetching sub-courses:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-// GET /api/sub-courses/:id - Get a single sub-course by ID
-router.get("/sub-courses/:id", async (req, res) => {
-  try {
-    const subCourse = await SubCourse.findById(req.params.id).populate(
-      "course_id",
-      "course_name"
-    );
-    if (!subCourse) {
-      return res.status(404).json({ message: "Sub-course not found" });
-    }
-    res.status(200).json({ subCourse });
-  } catch (error) {
-    console.error("Error fetching sub-course by ID:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
-
-// PUT /api/sub-courses/:id - Update a sub-course (Admin only)
-router.put("/sub-courses/:id", protect, async (req, res) => {
-  try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
-    const subCourseId = req.params.id;
-    const updates = req.body;
-
-    // --- IMPORTANT: Handle change of parent course_id ---
-    if (updates.course_id && updates.course_id !== subCourseId) {
-      const oldSubCourse = await SubCourse.findById(subCourseId);
-      if (
-        oldSubCourse &&
-        oldSubCourse.course_id.toString() !== updates.course_id
-      ) {
-        // Remove from old parent's sub_course_ids array
-        await Course.findByIdAndUpdate(oldSubCourse.course_id, {
-          $pull: { sub_course_ids: subCourseId },
-        });
-        // Add to new parent's sub_course_ids array
-        await Course.findByIdAndUpdate(updates.course_id, {
-          $push: { sub_course_ids: subCourseId },
-        });
+    if (members && Array.isArray(members) && members.length > 0) {
+      const existingMembers = await User.find({ _id: { $in: members } });
+      if (existingMembers.length !== members.length) {
+        return res
+          .status(400)
+          .json({ message: "One or more member IDs are invalid." });
       }
     }
-    // --- End important update ---
 
-    const updatedSubCourse = await SubCourse.findByIdAndUpdate(
-      subCourseId,
-      updates,
-      { new: true, runValidators: true }
-    );
-    if (!updatedSubCourse) {
-      return res.status(404).json({ message: "Sub-course not found" });
-    }
-    res.status(200).json({
-      message: "Sub-course updated successfully",
-      subCourse: updatedSubCourse,
+    const newGroup = new Group({
+      group_name,
+      description,
+      course_id,
+      members: members || [],
+      created_by: req.user.id,
     });
+
+    const savedGroup = await newGroup.save();
+    res
+      .status(201)
+      .json({ message: "Group created successfully", group: savedGroup });
   } catch (error) {
-    console.error("Error updating sub-course:", error);
+    console.error("Error creating group:", error);
     if (error.code === 11000) {
+      // Duplicate key error for unique group_name
       return res
         .status(400)
-        .json({ message: "Sub-course name already exists for this course" });
+        .json({ message: "A group with this name already exists." });
     }
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// DELETE /api/sub-courses/:id - Delete a sub-course (Admin only)
-router.delete("/sub-courses/:id", protect, async (req, res) => {
+// GET /api/groups - Get all groups (Admin can see all, users can see their own)
+router.get("/groups", protect, async (req, res) => {
   try {
+    let query = {};
     if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
+      // If not admin, only show groups the user is a member of
+      query = { members: req.user.id };
     }
-    const subCourseId = req.params.id;
+    const groups = await Group.find(query)
+      .populate("course_id", "name description total_lessons_count") // Populate course details
+      .populate("members", "username email"); // Populate member details
 
-    // Find the sub-course to get its parent_course_id before deleting
-    const subCourseToDelete = await SubCourse.findById(subCourseId);
-    if (!subCourseToDelete) {
-      return res.status(404).json({ message: "Sub-course not found" });
+    res.status(200).json({ groups });
+  } catch (error) {
+    console.error("Error fetching groups:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// GET /api/groups/:id - Get a single group by ID
+router.get("/groups/:id", protect, async (req, res) => {
+  try {
+    const group = await Group.findById(req.params.id)
+      .populate("course_id", "name description total_lessons_count")
+      .populate("members", "username email");
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found." });
     }
+    // Ensure non-admin users can only view groups they are members of
+    if (
+      !req.user.isAdmin &&
+      !group.members.some(
+        (member) => member._id.toString() === req.user.id.toString()
+      )
+    ) {
+      return res
+        .status(403)
+        .json({ message: "Not authorized to view this group." });
+    }
+    res.status(200).json({ group });
+  } catch (error) {
+    console.error("Error fetching group:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
 
-    // --- IMPORTANT: Remove from the parent Course's sub_course_ids array ---
-    await Course.findByIdAndUpdate(subCourseToDelete.course_id, {
-      $pull: { sub_course_ids: subCourseId },
-    });
-    // --- End important update ---
-
-    // Optional: Delete related topics and questions
-    const topicsToDelete = await CourseTopic.find({
-      sub_course_id: subCourseId,
-    });
-    const topicIdsToDelete = topicsToDelete.map((t) => t._id);
-
-    await Question.deleteMany({ course_topic_id: { $in: topicIdsToDelete } });
-    await CourseTopic.deleteMany({ sub_course_id: subCourseId });
-
-    const deletedSubCourse = await SubCourse.findByIdAndDelete(subCourseId);
-    if (!deletedSubCourse) {
-      return res.status(404).json({ message: "Sub-course not found" });
+// PUT /api/groups/:id - Update a group (Admin Only)
+router.put("/groups/:id", protect, checkAdmin, async (req, res) => {
+  try {
+    const updatedGroup = await Group.findByIdAndUpdate(
+      req.params.id,
+      req.body,
+      { new: true, runValidators: true }
+    );
+    if (!updatedGroup) {
+      return res.status(404).json({ message: "Group not found." });
     }
     res
       .status(200)
-      .json({
-        message: "Sub-course and its associated data deleted successfully",
+      .json({ message: "Group updated successfully", group: updatedGroup });
+  } catch (error) {
+    console.error("Error updating group:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// DELETE /api/groups/:id - Delete a group (Admin Only)
+router.delete("/groups/:id", protect, checkAdmin, async (req, res) => {
+  try {
+    const deletedGroup = await Group.findByIdAndDelete(req.params.id);
+    if (!deletedGroup) {
+      return res.status(404).json({ message: "Group not found." });
+    }
+    res.status(200).json({ message: "Group deleted successfully." });
+  } catch (error) {
+    console.error("Error deleting group:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// --- User Course Progress Routes ---
+
+// GET /api/user-progress/:courseId - Get user's progress for a specific course
+router.get("/user-progress/:courseId", protect, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+
+    const progress = await UserCourseProgress.findOne({
+      user_id: userId,
+      course_id: courseId,
+    })
+      .populate("user_id", "username email")
+      .populate("course_id", "name description total_lessons_count modules"); // Populate course details for calculation
+
+    if (!progress) {
+      // If no progress document exists, return a default one (0% completed)
+      return res.status(200).json({
+        message: "No progress found for this course yet.",
+        progress: {
+          user_id: userId,
+          course_id: courseId,
+          completed_lessons: [],
+          progress_percentage: 0,
+          is_completed: false,
+        },
       });
+    }
+    res.status(200).json({ progress });
   } catch (error) {
-    console.error("Error deleting sub-course:", error);
+    console.error("Error fetching user course progress:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// --- CourseTopic Routes ---
-
-// POST /api/topics - Create a new course topic (Admin only)
-router.post("/topics", protect, async (req, res) => {
+// POST /api/user-progress/complete-lesson - Mark a lesson as completed
+router.post("/user-progress/complete-lesson", protect, async (req, res) => {
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
-    const { sub_course_id, course_topic_name, description, is_completed } =
-      req.body; // <-- Added is_completed
+    const { courseId, lessonId } = req.body; // lessonId should be the unique ID of the lesson
+    const userId = req.user.id;
 
-    // Check if the parent sub-course exists
-    const parentSubCourse = await SubCourse.findById(sub_course_id);
-    if (!parentSubCourse) {
-      return res.status(404).json({ message: "Parent sub-course not found" });
+    if (!courseId || !lessonId) {
+      return res
+        .status(400)
+        .json({ message: "Course ID and Lesson ID are required." });
     }
 
-    const newTopic = new CourseTopic({
-      sub_course_id,
-      course_topic_name,
-      description,
-      is_completed: is_completed === "true", // <-- Handle boolean conversion
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found." });
+    }
+
+    // Find the specific lesson within the course's modules
+    let foundLesson = null;
+    for (const module of course.modules) {
+      foundLesson = module.lessons.find(
+        (lesson) => lesson._id.toString() === lessonId
+      );
+      if (foundLesson) break;
+    }
+
+    if (!foundLesson) {
+      return res
+        .status(404)
+        .json({ message: "Lesson not found in this course." });
+    }
+
+    let userProgress = await UserCourseProgress.findOne({
+      user_id: userId,
+      course_id: courseId,
     });
-    const savedTopic = await newTopic.save();
-    res.status(201).json({
-      message: "Course topic created successfully",
-      topic: savedTopic,
-    });
-  } catch (error) {
-    console.error("Error creating course topic:", error);
-    if (error.code === 11000) {
-      return res.status(400).json({
-        message: "Course topic name already exists for this sub-course",
+
+    if (!userProgress) {
+      // Create new progress document if it doesn't exist
+      userProgress = new UserCourseProgress({
+        user_id: userId,
+        course_id: courseId,
+        completed_lessons: [],
+        progress_percentage: 0,
+        is_completed: false,
       });
     }
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
 
-// GET /api/topics - Get all course topics (optionally by sub_course_id)
-router.get("/topics", async (req, res) => {
-  try {
-    const { sub_course_id } = req.query;
-    let query = {};
-    if (sub_course_id) {
-      query.sub_course_id = sub_course_id;
-    }
-    const topics = await CourseTopic.find(query).populate(
-      "sub_course_id",
-      "sub_course_name"
+    // Check if lesson is already completed
+    const isLessonAlreadyCompleted = userProgress.completed_lessons.some(
+      (item) => item.lesson_id === lessonId
     );
-    res.status(200).json({ topics });
-  } catch (error) {
-    console.error("Error fetching course topics:", error);
-    res.status(500).json({ message: "Server error", error: error.message });
-  }
-});
 
-// GET /api/topics/:id - Get a single course topic by ID
-router.get("/topics/:id", async (req, res) => {
-  try {
-    const topic = await CourseTopic.findById(req.params.id).populate(
-      "sub_course_id",
-      "sub_course_name"
-    );
-    if (!topic) {
-      return res.status(404).json({ message: "Course topic not found" });
+    if (isLessonAlreadyCompleted) {
+      return res
+        .status(400)
+        .json({ message: "Lesson already marked as completed." });
     }
-    res.status(200).json({ topic });
+
+    // Add the completed lesson
+    userProgress.completed_lessons.push({
+      lesson_id: lessonId,
+      completed_at: new Date(),
+    });
+
+    // Recalculate progress percentage
+    const totalLessons = course.total_lessons_count;
+    userProgress.progress_percentage =
+      totalLessons > 0
+        ? (userProgress.completed_lessons.length / totalLessons) * 100
+        : 0;
+
+    if (userProgress.progress_percentage >= 100) {
+      userProgress.is_completed = true;
+    }
+    userProgress.last_progress_update = new Date();
+
+    const updatedProgress = await userProgress.save();
+    res.status(200).json({
+      message: "Lesson marked as completed!",
+      progress: updatedProgress,
+    });
   } catch (error) {
-    console.error("Error fetching course topic by ID:", error);
+    console.error("Error marking lesson completed:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// PUT /api/topics/:id - Update a course topic (Admin only, or maybe student for their completion status)
-router.put("/topics/:id", protect, async (req, res) => {
+// In your router file:
+
+// GET /api/group-progress/:groupId - Get aggregated progress for a group (Admin or Group Member)
+router.get("/group-progress/:groupId", protect, async (req, res) => {
   try {
-    // Decide who can update 'is_completed': only admin, or also the user themselves?
-    // For now, let's assume admin or the user themselves for their progress.
-    // If only admin, keep `if (!req.user.isAdmin)` check only.
-    if (!req.user.isAdmin && !req.body.is_completed) {
-      // If not admin, only allow updates to is_completed
-      // Add logic here if you want to restrict who can change other topic fields
+    const { groupId } = req.params;
+    const group = await Group.findById(groupId)
+      .populate("members", "username email")
+      .populate("course_id", "name total_subtopics_count topics"); // Populate course_id with topics and total_subtopics_count
+
+    if (!group) {
+      return res.status(404).json({ message: "Group not found." });
+    }
+
+    // Authorization: Admin can view any group, members can view their own group
+    if (
+      !req.user.isAdmin &&
+      !group.members.some(
+        (member) => member._id.toString() === req.user.id.toString()
+      )
+    ) {
       return res
         .status(403)
-        .json({ message: "Not authorized to update this topic" });
+        .json({ message: "Not authorized to view this group's progress." });
     }
 
-    const updates = req.body;
-    if (typeof updates.is_completed === "string") {
-      // Handle boolean conversion for is_completed
-      updates.is_completed = updates.is_completed === "true";
-    }
+    const memberIds = group.members.map((member) => member._id);
+    const courseId = group.course_id._id;
+    const totalSubtopicsInCourse = group.course_id.total_subtopics_count; // Use the correct count
 
-    const updatedTopic = await CourseTopic.findByIdAndUpdate(
-      req.params.id,
-      updates, // Pass updates object
-      { new: true, runValidators: true }
-    );
-    if (!updatedTopic) {
-      return res.status(404).json({ message: "Course topic not found" });
-    }
+    // Fetch progress for all members of this group for this specific course
+    const membersProgress = await UserCourseProgress.find({
+      user_id: { $in: memberIds },
+      course_id: courseId,
+    }).populate("user_id", "username");
+
+    let totalProgressSum = 0;
+    let completedMembers = 0;
+    const detailedProgress = group.members.map((member) => {
+      const memberProg = membersProgress.find(
+        (p) => p.user_id._id.toString() === member._id.toString()
+      );
+      const progressPercentage = memberProg
+        ? memberProg.progress_percentage
+        : 0;
+      totalProgressSum += progressPercentage;
+      if (memberProg && memberProg.is_completed) {
+        completedMembers++;
+      }
+      return {
+        user_id: member._id,
+        username: member.username,
+        email: member.email,
+        progress_percentage: progressPercentage,
+        is_completed: memberProg ? memberProg.is_completed : false,
+        completed_subtopics_count: memberProg
+          ? memberProg.completed_subtopics.length
+          : 0, // Adjusted name
+      };
+    });
+
+    const averageGroupProgress =
+      memberIds.length > 0 ? totalProgressSum / memberIds.length : 0;
+    const allMembersCompleted =
+      completedMembers === memberIds.length && memberIds.length > 0;
+
     res.status(200).json({
-      message: "Course topic updated successfully",
-      topic: updatedTopic,
+      group_name: group.group_name,
+      course_name: group.course_id.name,
+      total_members: group.members.length,
+      average_progress: parseFloat(averageGroupProgress.toFixed(2)),
+      all_members_completed: allMembersCompleted,
+      detailed_member_progress: detailedProgress,
     });
   } catch (error) {
-    console.error("Error updating course topic:", error);
-    if (error.code === 11000) {
-      return res.status(400).json({
-        message: "Course topic name already exists for this sub-course",
-      });
-    }
+    console.error("Error fetching group progress:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });
 
-// DELETE /api/topics/:id - Delete a course topic (Admin only)
-router.delete("/topics/:id", protect, async (req, res) => {
+// ... (keep all your existing DailyQuestion and DailyQuestionSubmission routes here) ...
+
+module.exports = router;
+// POST /api/courses - Create a new course (Admin Only)
+router.post("/courses", protect, checkAdmin, async (req, res) => {
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
-    const topicId = req.params.id;
+    const { name, description, topics } = req.body; // 'topics' instead of 'modules'
 
-    // Optional: Delete related questions
-    await Question.deleteMany({ course_topic_id: topicId });
-
-    const deletedTopic = await CourseTopic.findByIdAndDelete(topicId);
-    if (!deletedTopic) {
-      return res.status(404).json({ message: "Course topic not found" });
+    if (!name || !description || !topics || !Array.isArray(topics)) {
+      return res.status(400).json({
+        message: "Course name, description, and topics array are required.",
+      });
     }
-    res.status(200).json({ message: "Course topic deleted successfully" });
+
+    // Basic validation for topics and subtopics structure
+    for (const topic of topics) {
+      if (!topic.id_string || !topic.name || !Array.isArray(topic.subtopics)) {
+        return res.status(400).json({
+          message:
+            "Each topic must have an id_string, name, and a subtopics array.",
+        });
+      }
+      for (const subtopic of topic.subtopics) {
+        if (!subtopic.id_string || !subtopic.name) {
+          return res.status(400).json({
+            message: "Each subtopic must have an id_string and a name.",
+          });
+        }
+      }
+    }
+
+    const newCourse = new Course({
+      name,
+      description,
+      topics, // Store the nested topics structure
+      created_by: req.user.id,
+    });
+
+    const savedCourse = await newCourse.save();
+    res
+      .status(201)
+      .json({ message: "Course created successfully", course: savedCourse });
   } catch (error) {
-    console.error("Error deleting course topic:", error);
+    console.error("Error creating course:", error);
+    if (error.code === 11000) {
+      // Duplicate key error for unique name
+      return res
+        .status(400)
+        .json({ message: "A course with this name already exists." });
+    }
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+// ... (keep all your existing DailyQuestion and DailyQuestionSubmission routes here) ...
+// In your router file:
+
+// POST /api/user-progress/complete-subtopic - Mark a subtopic as completed
+router.post("/user-progress/complete-subtopic", protect, async (req, res) => {
+  try {
+    const { courseId, subtopicMongoId } = req.body; // subtopicMongoId is the _id from the Course's nested subtopic document
+    const userId = req.user.id;
+
+    if (!courseId || !subtopicMongoId) {
+      return res
+        .status(400)
+        .json({ message: "Course ID and Subtopic Mongoose ID are required." });
+    }
+
+    // Find the course to get its structure and total subtopics count
+    const course = await Course.findById(courseId);
+    if (!course) {
+      return res.status(404).json({ message: "Course not found." });
+    }
+
+    // Verify if the subtopicMongoId actually exists within this course
+    let subtopicExists = false;
+    for (const topic of course.topics) {
+      if (
+        topic.subtopics.some((sub) => sub._id.toString() === subtopicMongoId)
+      ) {
+        subtopicExists = true;
+        break;
+      }
+    }
+    if (!subtopicExists) {
+      return res
+        .status(404)
+        .json({ message: "Subtopic not found in this course or invalid ID." });
+    }
+
+    let userProgress = await UserCourseProgress.findOne({
+      user_id: userId,
+      course_id: courseId,
+    });
+
+    if (!userProgress) {
+      // Create new progress document if it doesn't exist
+      userProgress = new UserCourseProgress({
+        user_id: userId,
+        course_id: courseId,
+        completed_subtopics: [],
+        progress_percentage: 0,
+        is_completed: false,
+      });
+    }
+
+    // Check if subtopic is already completed
+    const isSubtopicAlreadyCompleted = userProgress.completed_subtopics.some(
+      (item) => item.subtopic_mongoose_id.toString() === subtopicMongoId
+    );
+
+    if (isSubtopicAlreadyCompleted) {
+      return res
+        .status(400)
+        .json({ message: "Subtopic already marked as completed." });
+    }
+
+    // Add the completed subtopic's Mongoose ID
+    userProgress.completed_subtopics.push({
+      subtopic_mongoose_id: subtopicMongoId,
+      completed_at: new Date(),
+    });
+
+    // Recalculate progress percentage
+    const totalSubtopics = course.total_subtopics_count;
+    userProgress.progress_percentage =
+      totalSubtopics > 0
+        ? (userProgress.completed_subtopics.length / totalSubtopics) * 100
+        : 0;
+
+    if (userProgress.progress_percentage >= 100) {
+      userProgress.is_completed = true;
+    }
+    userProgress.last_progress_update = new Date();
+
+    const updatedProgress = await userProgress.save();
+    res.status(200).json({
+      message: "Subtopic marked as completed!",
+      progress: updatedProgress,
+    });
+  } catch (error) {
+    console.error("Error marking subtopic completed:", error);
+    res.status(500).json({ message: "Server error", error: error.message });
+  }
+});
+
+// GET /api/user-progress/:courseId - Get user's progress for a specific course (no change needed here, it fetches the UserCourseProgress document)
+router.get("/user-progress/:courseId", protect, async (req, res) => {
+  try {
+    const { courseId } = req.params;
+    const userId = req.user.id;
+
+    const progress = await UserCourseProgress.findOne({
+      user_id: userId,
+      course_id: courseId,
+    })
+      .populate("user_id", "username email")
+      .populate("course_id", "name description total_subtopics_count topics"); // Populate topics to enable frontend to match completed_subtopics
+
+    if (!progress) {
+      // If no progress document exists, return a default one (0% completed)
+      return res.status(200).json({
+        message: "No progress found for this course yet.",
+        progress: {
+          user_id: userId,
+          course_id: courseId,
+          completed_subtopics: [], // Changed from completed_lessons
+          progress_percentage: 0,
+          is_completed: false,
+        },
+      });
+    }
+    res.status(200).json({ progress });
+  } catch (error) {
+    console.error("Error fetching user course progress:", error);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 });

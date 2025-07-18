@@ -7,7 +7,6 @@ require("dotenv").config();
 const connectDB = require("./config/db");
 const authRoutes = require("./routes/authRoutes");
 const courseRoutes = require("./routes/courseRoutes");
-const questionRoutes = require("./routes/questionRoutes");
 const dailyQuestionRoutes = require("./routes/dailyQuestionRoutes"); // NEW IMPORT
 const studentWorkRoutes = require("./routes/studentWorkRoutes");
 
@@ -31,7 +30,6 @@ app.use("/uploads", express.static(uploadsDir));
 // API Routes
 app.use("/api", authRoutes);
 app.use("/api", courseRoutes);
-app.use("/api", questionRoutes);
 app.use("/api", dailyQuestionRoutes); // NEW USAGE
 
 // --- Use the student work routes ---

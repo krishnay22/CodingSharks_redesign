@@ -1,8 +1,9 @@
+// backend/models/Course.js
 const mongoose = require("mongoose");
 
-const courseSchema = new mongoose.Schema(
+const CourseSchema = new mongoose.Schema(
   {
-    course_name: {
+    name: {
       type: String,
       required: true,
       unique: true,
@@ -10,19 +11,45 @@ const courseSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      default: "",
+      required: true,
     },
-    sub_course_ids: [
-      // <-- NEW FIELD: Array of SubCourse ObjectIds
+    topics: [
       {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "SubCourse", // References the SubCourse model
+        id_string: { type: String, required: true },
+        name: { type: String, required: true },
+        subtopics: [
+          {
+            id_string: { type: String, required: true },
+            name: { type: String, required: true },
+            questionsFile: { type: String },
+          },
+        ],
       },
     ],
+    total_subtopics_count: {
+      type: Number,
+      default: 0,
+    },
+    created_by: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true,
+    },
   },
   {
     timestamps: true,
   }
 );
 
-module.exports = mongoose.model("Course", courseSchema);
+// Pre-save hook to calculate total_subtopics_count
+CourseSchema.pre("save", function (next) {
+  let count = 0;
+  this.topics.forEach((topic) => {
+    count += topic.subtopics.length;
+  });
+  this.total_subtopics_count = count;
+  next();
+});
+
+// THIS IS THE MOST IMPORTANT LINE FOR THE ERROR YOU'RE GETTING:
+module.exports = mongoose.model("Course", CourseSchema);
