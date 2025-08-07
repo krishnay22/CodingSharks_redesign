@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import CourseCard from "./CourseCard";
 
 const CourseCarousel = () => {
-  const [activeIndex, setActiveIndex] = useState(1);
+  const [activeIndex, setActiveIndex] = useState(0); // Changed initial activeIndex to 0 to make the first card active initially
   const [isAnimating, setIsAnimating] = useState(false);
   const [screenSize, setScreenSize] = useState({
     isTablet: false,
@@ -63,32 +63,6 @@ const CourseCarousel = () => {
     return () => window.removeEventListener("resize", checkScreenSize);
   }, []);
 
-  const handleCardClick = (index) => {
-    if (isAnimating || index === activeIndex) return;
-
-    setIsAnimating(true);
-    setActiveIndex(index);
-
-    setTimeout(() => {
-      setIsAnimating(false);
-    }, 500);
-  };
-
-  useEffect(() => {
-    const interval = setInterval(() => {
-      if (!isAnimating) {
-        setIsAnimating(true);
-        setActiveIndex((prev) => (prev + 1) % courses.length);
-
-        setTimeout(() => {
-          setIsAnimating(false);
-        }, 500);
-      }
-    }, 5000);
-
-    return () => clearInterval(interval);
-  }, [isAnimating, courses.length]);
-
   // CSS in JS styles
   const styles = {
     carouselContainer: {
@@ -100,14 +74,15 @@ const CourseCarousel = () => {
     },
     carouselTrack: {
       display: "flex",
-      justifyContent: "center",
+      justifyContent: "center", // Changed to center to display all cards equally
       alignItems: "center",
       minHeight: screenSize.isSmallMobile ? "400px" : "500px",
       position: "relative",
       perspective: "1000px",
+      flexWrap: "wrap", // Added flexWrap to allow cards to wrap on smaller screens
+      gap: "20px", // Added gap between cards
     },
     carouselCardWrapper: {
-      position: "absolute",
       width: screenSize.isSmallMobile
         ? "220px"
         : screenSize.isMobile
@@ -120,50 +95,17 @@ const CourseCarousel = () => {
         : "400px",
       transition: "all 0.5s cubic-bezier(0.25, 0.1, 0.25, 1)",
       cursor: "pointer",
-      zIndex: 1,
-    },
-    leftCard: {
-      transform: screenSize.isSmallMobile
-        ? "translateX(-120px) scale(0.7)"
-        : screenSize.isMobile
-        ? "translateX(-180px) scale(0.75)"
-        : screenSize.isTablet
-        ? "translateX(-220px) scale(0.8)"
-        : "translateX(-320px) scale(0.85)",
-      zIndex: 0,
-    },
-    rightCard: {
-      transform: screenSize.isSmallMobile
-        ? "translateX(120px) scale(0.7)"
-        : screenSize.isMobile
-        ? "translateX(180px) scale(0.75)"
-        : screenSize.isTablet
-        ? "translateX(220px) scale(0.8)"
-        : "translateX(320px) scale(0.85)",
-      zIndex: 0,
-    },
-    activeCard: {
-      transform: "translateY(-20px) scale(1.1)",
-      zIndex: 2,
+      zIndex: 1, // All cards will have the same zIndex
+      transform: "translateY(-20px) scale(1.0)", // Applied the "active" style to all cards, adjusted scale slightly
     },
     carouselIndicators: {
-      display: "flex",
-      justifyContent: "center",
-      marginTop: "30px",
-      gap: "10px",
+      display: "none", // Hide indicators if there's no active card
     },
     carouselIndicator: {
-      width: screenSize.isSmallMobile ? "10px" : "12px",
-      height: screenSize.isSmallMobile ? "10px" : "12px",
-      borderRadius: "50%",
-      backgroundColor: "#ddd",
-      border: "none",
-      cursor: "pointer",
-      transition: "all 0.3s ease",
+      display: "none", // Hide indicators if there's no active card
     },
     activeIndicator: {
-      backgroundColor: "var(--primary-color, #ff9a70)",
-      transform: "scale(1.2)",
+      display: "none", // Hide indicators if there's no active card
     },
     heading: {
       fontSize: screenSize.isSmallMobile
@@ -179,17 +121,9 @@ const CourseCarousel = () => {
     },
   };
 
-  // Function to get card wrapper style based on index
-  const getCardWrapperStyle = (index) => {
-    const baseStyle = styles.carouselCardWrapper;
-
-    if (index < activeIndex) {
-      return { ...baseStyle, ...styles.leftCard };
-    } else if (index > activeIndex) {
-      return { ...baseStyle, ...styles.rightCard };
-    } else {
-      return { ...baseStyle, ...styles.activeCard };
-    }
+  // Function to get card wrapper style - simplified to always return the desired "active" look
+  const getCardWrapperStyle = () => {
+    return { ...styles.carouselCardWrapper };
   };
 
   return (
@@ -198,13 +132,13 @@ const CourseCarousel = () => {
 
       <div style={styles.carouselContainer}>
         <div style={styles.carouselTrack}>
-          {courses.map((course, index) => (
+          {courses.map((course) => (
             <div
               key={course.id}
-              style={getCardWrapperStyle(index)}
-              onClick={() => handleCardClick(index)}
+              style={getCardWrapperStyle()} // Always apply the "active" style
             >
-              <CourseCard course={course} isActive={index === activeIndex} />
+              {/* Pass isActive as true if you want the CourseCard component to also apply an active style */}
+              <CourseCard course={course} isActive={true} />
             </div>
           ))}
         </div>

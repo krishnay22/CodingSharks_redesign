@@ -1,19 +1,9 @@
 import React, { useState, useEffect } from "react";
 
-const CourseCard = ({ course, isActive }) => {
+const CourseCard = ({ course }) => {
+  // Removed isActive as it's always true from carousel
   const [isHovered, setIsHovered] = useState(false);
-  const [isVisible, setIsVisible] = useState(false);
-
-  useEffect(() => {
-    if (isActive) {
-      const timer = setTimeout(() => {
-        setIsVisible(true);
-      }, 100);
-      return () => clearTimeout(timer);
-    } else {
-      setIsVisible(false);
-    }
-  }, [isActive]);
+  // isVisible state and useEffect are removed as text should always be visible
 
   const styles = {
     courseCard: {
@@ -26,9 +16,7 @@ const CourseCard = ({ course, isActive }) => {
       transition: "all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275)",
       position: "relative",
     },
-    active: {
-      boxShadow: "0 15px 35px rgba(255, 154, 112, 0.3)",
-    },
+
     hovered: {
       transform: "translateY(-10px)",
       boxShadow: "0 20px 40px rgba(255, 154, 112, 0.4)",
@@ -61,7 +49,7 @@ const CourseCard = ({ course, isActive }) => {
       left: 0,
       width: "100%",
       height: "100%",
-      opacity: 0,
+      opacity: 0, // This overlay is fine as it's not text content
       transition: "opacity 0.3s ease",
     },
     hoveredCardOverlay: {
@@ -81,8 +69,8 @@ const CourseCard = ({ course, isActive }) => {
       color: "#ff9a70",
       marginBottom: "8px",
       fontWeight: 600,
-      opacity: 0,
-      transform: "translateY(10px)",
+      opacity: 1, // Always visible
+      transform: "translateY(0)", // Always in place
       transition: "all 0.3s ease",
     },
     cardTitle: {
@@ -90,8 +78,8 @@ const CourseCard = ({ course, isActive }) => {
       fontWeight: 700,
       color: "#333",
       marginBottom: "10px",
-      opacity: 0,
-      transform: "translateY(10px)",
+      opacity: 1, // Always visible
+      transform: "translateY(0)", // Always in place
       transition: "all 0.3s ease",
       transitionDelay: "0.1s",
     },
@@ -100,8 +88,8 @@ const CourseCard = ({ course, isActive }) => {
       color: "#666",
       marginBottom: "15px",
       flexGrow: 1,
-      opacity: 0,
-      transform: "translateY(10px)",
+      opacity: 1, // Always visible
+      transform: "translateY(0)", // Always in place
       transition: "all 0.3s ease",
       transitionDelay: "0.2s",
     },
@@ -114,8 +102,8 @@ const CourseCard = ({ course, isActive }) => {
       fontWeight: 600,
       cursor: "pointer",
       transition: "all 0.3s ease",
-      opacity: 0,
-      transform: "translateY(10px)",
+      opacity: 1, // Always visible
+      transform: "translateY(0)", // Always in place
       transitionDelay: "0.3s",
       alignSelf: "flex-start",
       textDecoration: "none",
@@ -126,10 +114,11 @@ const CourseCard = ({ course, isActive }) => {
       transform: "translateY(-3px)",
       boxShadow: "0 5px 15px rgba(255, 154, 112, 0.4)",
     },
-    visible: {
-      opacity: 1,
-      transform: "translateY(0)",
-    },
+    // The 'visible' property is no longer needed as default opacity is 1 and transform is 0
+    // visible: {
+    //   opacity: 1,
+    //   transform: "translateY(0)",
+    // },
     // Media queries can be applied with JavaScript conditionally
     smallScreen: {
       cardTitle: {
@@ -146,12 +135,29 @@ const CourseCard = ({ course, isActive }) => {
   };
 
   // Determine if we should use small screen styles
-  const isSmallScreen = window.matchMedia("(max-width: 768px)").matches;
+  // It's better to use a useEffect for window.matchMedia to prevent issues on initial render
+  const [isSmallScreen, setIsSmallScreen] = useState(false);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(max-width: 768px)");
+    const handleMediaQueryChange = (e) => setIsSmallScreen(e.matches);
+
+    // Initial check
+    setIsSmallScreen(mediaQuery.matches);
+
+    // Listen for changes
+    mediaQuery.addEventListener("change", handleMediaQueryChange);
+
+    // Cleanup
+    return () =>
+      mediaQuery.removeEventListener("change", handleMediaQueryChange);
+  }, []);
 
   // Combine styles based on component state
   const courseCardStyle = {
     ...styles.courseCard,
-    ...(isActive && styles.active),
+    // isActive is always true from the carousel, so styles.active is always applied
+    ...styles.active,
     ...(isHovered && styles.hovered),
   };
 
@@ -165,28 +171,25 @@ const CourseCard = ({ course, isActive }) => {
     ...(isHovered && styles.hoveredCardOverlay),
   };
 
-  // Apply visible styles to card elements when visible is true
+  // All text elements now have default opacity: 1 and transform: translateY(0)
+  // No need for conditional 'isVisible && styles.visible'
   const categoryStyle = {
     ...styles.cardCategory,
-    ...(isVisible && styles.visible),
     ...(isSmallScreen && styles.smallScreen.cardCategory),
   };
 
   const titleStyle = {
     ...styles.cardTitle,
-    ...(isVisible && styles.visible),
     ...(isSmallScreen && styles.smallScreen.cardTitle),
   };
 
   const descriptionStyle = {
     ...styles.cardDescription,
-    ...(isVisible && styles.visible),
     ...(isSmallScreen && styles.smallScreen.cardDescription),
   };
 
   const buttonStyle = {
     ...styles.cardButton,
-    ...(isVisible && styles.visible),
     ...(isSmallScreen && styles.smallScreen.cardButton),
   };
 

@@ -55,11 +55,8 @@ export default function StudentWorkPage() {
             <div className="project-card" key={project._id}>
               {" "}
               {/* Use _id from MongoDB */}
-              <div className="project-image">
+              <div className="project-image-wrapper">
                 <img
-                  // Construct the full image URL.
-                  // Assumes your backend serves static files from '/uploads'
-                  // and your backend is at http://localhost:5000
                   src={
                     project.imageUrl
                       ? `http://localhost:5000${project.imageUrl}`
@@ -96,7 +93,6 @@ export default function StudentWorkPage() {
         </div>
       )}
 
-      {/* Styles remain the same, adding some for loading/error messages */}
       <style jsx>{`
         .student-work-container {
           max-width: 1200px;
@@ -136,7 +132,7 @@ export default function StudentWorkPage() {
           display: flex;
           flex-direction: column;
           width: 100%;
-          height: 600px; /* Increased from 450px to 550px */
+          min-height: 450px; /* Adjust this to your desired minimum card height */
           background-color: white;
           border-radius: 8px;
           overflow: hidden;
@@ -149,28 +145,31 @@ export default function StudentWorkPage() {
           box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
         }
 
-        .project-image {
+        .project-image-wrapper {
           width: 100%;
-          height: 70%; /* Maintaining 70% for image section */
+          height: 300px; /* Fixed height for the image section */
           overflow: hidden;
+          position: relative; /* Needed for img absolute positioning if not directly img */
         }
 
-        .project-image img {
+        .project-image-wrapper img {
           width: 100%;
           height: 100%;
-          object-fit: cover;
+          object-fit: cover; /* Ensures image covers the fixed area, cropping if necessary */
           transition: transform 0.5s ease;
         }
 
-        .project-card:hover .project-image img {
+        .project-card:hover .project-image-wrapper img {
           transform: scale(1.05);
         }
 
         .project-details {
-          height: 35%; /* Maintaining 30% for details section */
           padding: 15px;
           display: flex;
           flex-direction: column;
+          flex-grow: 1; /* Allow details to fill remaining space */
+          /* max-height: 150px; If you want to strictly limit the text area height as well */
+          /* overflow-y: auto; If max-height is used and content might overflow */
         }
 
         h2 {
@@ -181,13 +180,13 @@ export default function StudentWorkPage() {
         }
 
         .student-name {
-          color: #888; /* Style for student name */
+          color: #888;
           font-size: 0.9rem;
           margin-bottom: 5px;
         }
 
         .project-description {
-          flex-grow: 1;
+          flex-grow: 1; /* Allows description to take available space */
           margin-bottom: 10px;
           color: #555;
           line-height: 1.5;
@@ -217,19 +216,33 @@ export default function StudentWorkPage() {
           background-color: #ff8a57;
         }
 
-        @media (max-width: 768px) {
+        @media (min-width: 769px) {
+          .projects-container {
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: center;
+            align-items: stretch; /* Ensures cards in a row have equal height */
+          }
+
           .project-card {
-            height: auto;
-            min-height: 600px; /* Increased from 500px to 600px */
+            width: calc(
+              33.33% - 20px
+            ); /* Adjust for 3 cards per row with gap */
+            max-width: 350px; /* Cap individual card width for large screens */
+            margin-bottom: 20px; /* Space between rows */
           }
+        }
 
-          .project-image {
-            height: 350px; /* Increased from 280px to 350px */
+        @media (max-width: 768px) {
+          .projects-container {
+            gap: 20px;
           }
-
-          .project-details {
-            height: auto;
-            padding: 12px;
+          .project-card {
+            width: 100%;
+            /* min-height: 400px; You can adjust this for mobile if needed, or let content flow */
+          }
+          .project-image-wrapper {
+            height: 250px; /* Slightly smaller image height on mobile */
           }
         }
       `}</style>

@@ -30,12 +30,10 @@ router.post(
       typeof points_awarded !== "number" ||
       points_awarded < 0
     ) {
-      return res
-        .status(400)
-        .json({
-          message:
-            "Invalid input: is_correct must be a boolean, points_awarded must be a non-negative number.",
-        });
+      return res.status(400).json({
+        message:
+          "Invalid input: is_correct must be a boolean, points_awarded must be a non-negative number.",
+      });
     }
 
     try {
@@ -74,12 +72,17 @@ router.post(
     }
   }
 );
-// GET /api/daily-questions/submissions - Get ALL submissions (Admin only)
+
+// GET /api/daily-questions/submissions - Get ALL submissions (Accessible to any authenticated user)
 router.get("/daily-questions/submissions", protect, async (req, res) => {
   try {
-    if (!req.user.isAdmin) {
-      return res.status(403).json({ message: "Not authorized as an admin" });
-    }
+    // REMOVE or comment out the following lines:
+    // if (!req.user.isAdmin) {
+    //   return res.status(403).json({ message: "Not authorized as an admin" });
+    // }
+
+    // The 'protect' middleware already ensures the user is logged in.
+    // Now, all authenticated users can access this.
 
     const submissions = await DailyQuestionSubmission.find({})
       .populate("user_id", "username email") // Populate user details
