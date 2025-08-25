@@ -1,92 +1,174 @@
+"use client";
+
 import { useState, useEffect, useRef, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import Editor from "react-simple-code-editor";
+import { highlight, languages } from "prismjs/components/prism-core";
+import "prismjs/components/prism-clike";
+import "prismjs/components/prism-javascript";
+import "prismjs/themes/prism.css";
 
 export default function AnswerSubmissionModel() {
   const [activeQuestion, setActiveQuestion] = useState(null);
   const [loadingQuestion, setLoadingQuestion] = useState(true);
   const [questionError, setQuestionError] = useState(null);
 
-  // Changed to timeRemainingSeconds to reflect its purpose
   const [timeRemainingSeconds, setTimeRemainingSeconds] = useState(0);
   const [progress, setProgress] = useState(0);
-  const [totalDurationSeconds, setTotalDurationSeconds] = useState(0); // New state for total duration
+  const [totalDurationSeconds, setTotalDurationSeconds] = useState(0);
 
   const [answer, setAnswer] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false); // Indicates if user has already submitted for THIS question
+  const [isSubmitted, setIsSubmitted] = useState(false);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [characterCount, setCharacterCount] = useState(0);
 
-  const timerIntervalRef = useRef(null); // Ref to hold the interval ID
+  const [isRunning, setIsRunning] = useState(false);
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
 
-  // Base URL for your backend API
+  const timerIntervalRef = useRef(null);
+
   const API_BASE_URL = "http://localhost:5000/api";
 
-  // --- Utility function to format time ---
-  // Using useCallback for memoization as it's a utility function
+  const handlePaste = useCallback((e) => {
+    e.preventDefault();
+    alert("Pasting is not allowed in this coding challenge!");
+  }, []);
+
+  const handleContextMenu = useCallback((e) => {
+    e.preventDefault();
+  }, []);
+
+  const runCode = useCallback(() => {
+    if (!answer.trim()) {
+      alert("Please enter some code to run!");
+      return;
+    }
+
+    setIsRunning(true);
+    setOutput("");
+    setError("");
+
+    try {
+      const workerCode = `
+        self.onmessage = function(e) {
+          const logs = [];
+          const originalLog = console.log;
+          
+          console.log = (...args) => {
+            logs.push(args.map(arg => 
+              typeof arg === 'object' ? JSON.stringify(arg, null, 2) : String(arg)
+            ).join(' '));
+          };
+          
+          try {
+            eval(e.data);
+            
+            self.postMessage({
+              success: true,
+              output: logs.length > 0 ? logs.join('\\n') : 'Code executed successfully (no output)'
+            });
+          } catch (error) {
+            self.postMessage({
+              success: false,
+              error: error.message
+            });
+          } finally {
+            console.log = originalLog;
+          }
+        };
+      `;
+
+      const blob = new Blob([workerCode], { type: "application/javascript" });
+      const worker = new Worker(URL.createObjectURL(blob));
+
+      const timeout = setTimeout(() => {
+        worker.terminate();
+        setError("Code execution timed out (5 second limit)");
+        setIsRunning(false);
+      }, 5000);
+
+      worker.onmessage = (e) => {
+        clearTimeout(timeout);
+        worker.terminate();
+
+        if (e.data.success) {
+          setOutput(e.data.output);
+        } else {
+          setError(`Error: ${e.data.error}`);
+        }
+        setIsRunning(false);
+      };
+
+      worker.onerror = (error) => {
+        clearTimeout(timeout);
+        worker.terminate();
+        setError(`Worker Error: ${error.message}`);
+        setIsRunning(false);
+      };
+
+      worker.postMessage(answer);
+    } catch (err) {
+      setError(`Setup Error: ${err.message}`);
+      setIsRunning(false);
+    }
+  }, [answer]);
+
   const formatTime = useCallback((totalSeconds) => {
-    if (totalSeconds < 0) totalSeconds = 0; // Ensure time doesn't go negative on display
+    if (totalSeconds < 0) totalSeconds = 0;
     const minutes = Math.floor(totalSeconds / 60);
     const seconds = totalSeconds % 60;
     return `${minutes}:${seconds.toString().padStart(2, "0")}`;
-  }, []); // No dependencies, so it's stable
+  }, []);
 
-  // --- Timer Logic (useEffect to run every second) ---
   useEffect(() => {
-    // Only run if an active question and its total duration are available
-    if (activeQuestion && totalDurationSeconds > 0) {
-      // Clear any existing timer first to prevent multiple intervals
+    if (activeQuestion && totalDurationSeconds > 0 && !isSubmitted) {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
       }
 
       timerIntervalRef.current = setInterval(() => {
-        const now = new Date().getTime(); // Current client-side time in milliseconds
-        const questionStartTime = new Date(activeQuestion.startTime).getTime(); // Question's start time in milliseconds
+        const now = new Date().getTime();
+        const questionStartTime = new Date(activeQuestion.startTime).getTime();
 
-        // Calculate the absolute end time of the question's duration
         const endTime = questionStartTime + totalDurationSeconds * 1000;
 
-        // Calculate remaining seconds
         const remaining = Math.max(0, Math.floor((endTime - now) / 1000));
 
-        setTimeRemainingSeconds(remaining); // Update the state for display
+        setTimeRemainingSeconds(remaining);
 
-        // Calculate progress for the progress bar
         setProgress(
           ((totalDurationSeconds - remaining) / totalDurationSeconds) * 100
         );
 
-        // If time runs out
         if (remaining <= 0) {
-          clearInterval(timerIntervalRef.current); // Stop the timer
-          // If the user hasn't submitted and the time is up, alert them
+          clearInterval(timerIntervalRef.current);
           if (!isSubmitted && !isSubmitting) {
             alert(
               "Time's up! The submission period for this question has ended."
             );
-            // Optionally, you could automatically trigger a submission here if desired,
-            // or just disable further input/submission.
           }
         }
-      }, 1000); // Update every second
+      }, 1000);
+    } else if (isSubmitted && timerIntervalRef.current) {
+      clearInterval(timerIntervalRef.current);
+      timerIntervalRef.current = null;
     }
 
-    // Cleanup function: Clear interval when component unmounts or dependencies change
     return () => {
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
       }
     };
-  }, [activeQuestion, totalDurationSeconds, isSubmitted, isSubmitting]); // Dependencies: activeQuestion (for startTime/duration), totalDuration, and submission states
+  }, [activeQuestion, totalDurationSeconds, isSubmitted, isSubmitting]);
 
-  // --- Fetch Active Daily Question ---
   useEffect(() => {
     const fetchActiveQuestion = async () => {
       setLoadingQuestion(true);
       setQuestionError(null);
       try {
-        const token = localStorage.getItem("token"); // Assuming user token is stored
+        const token = localStorage.getItem("token");
 
         if (!token) {
           setQuestionError(
@@ -111,17 +193,15 @@ export default function AnswerSubmissionModel() {
 
         const data = await response.json();
 
-        // Handle case where user has already submitted for this question
         if (data.submitted) {
-          setIsSubmitted(true); // Mark as submitted
-          setAnswer(data.yourSubmission?.answer_text || ""); // Display their previous answer
-          // Keep the question data to show duration/start time for context
+          setIsSubmitted(true);
+          setAnswer(data.yourSubmission?.answer_text || "");
           setActiveQuestion(data.question);
           setTotalDurationSeconds(data.question.duration * 60);
           setQuestionError(
             "You have already submitted an answer for today's question."
           );
-          return; // Exit as user can't submit again
+          return;
         }
 
         setActiveQuestion(data.question);
@@ -142,12 +222,10 @@ export default function AnswerSubmissionModel() {
           );
 
           setTimeRemainingSeconds(initialRemaining);
-          // Set initial progress based on how much time has already passed
           setProgress(
             ((durationInSeconds - initialRemaining) / durationInSeconds) * 100
           );
 
-          // If time is already up when fetching
           if (initialRemaining <= 0) {
             if (timerIntervalRef.current) {
               clearInterval(timerIntervalRef.current);
@@ -155,8 +233,7 @@ export default function AnswerSubmissionModel() {
             alert(
               "Time's up! The submission period for this question has ended."
             );
-            // Disable input if time is already over
-            setIsSubmitted(true); // Treat as if submitted to disable form
+            setIsSubmitted(true);
           }
         } else {
           setQuestionError(
@@ -172,21 +249,17 @@ export default function AnswerSubmissionModel() {
     };
 
     fetchActiveQuestion();
+  }, []);
 
-    // No specific cleanup needed here, the other useEffect for the timer handles its own cleanup.
-  }, []); // Runs once on component mount
-
-  // Effect to update character count whenever the answer changes
   useEffect(() => {
     setCharacterCount(answer.length);
   }, [answer]);
 
-  const handleAnswerChange = (e) => {
-    setAnswer(e.target.value);
+  const handleAnswerChange = (code) => {
+    setAnswer(code);
   };
 
   const handleSubmit = async () => {
-    // Prevent submission if no active question, time is up, or input is invalid/already submitting
     if (!activeQuestion || timeRemainingSeconds <= 0) {
       alert("Cannot submit: Question not loaded or time has run out.");
       return;
@@ -196,7 +269,7 @@ export default function AnswerSubmissionModel() {
       return;
     }
     if (isSubmitting || isSubmitted) {
-      return; // Prevent multiple clicks
+      return;
     }
     setShowConfirmation(true);
   };
@@ -218,11 +291,10 @@ export default function AnswerSubmissionModel() {
       return;
     }
 
-    // Additional client-side check if time has run out just before submitting
     if (timeRemainingSeconds <= 0) {
       alert("Submission failed: Time has run out.");
       setIsSubmitting(false);
-      setIsSubmitted(true); // Disable further attempts
+      setIsSubmitted(true);
       return;
     }
 
@@ -236,7 +308,6 @@ export default function AnswerSubmissionModel() {
         body: JSON.stringify({
           daily_question_id: activeQuestion._id,
           answer_text: answer,
-          // time_taken_seconds is no longer sent here as per your previous request
         }),
       });
 
@@ -248,18 +319,16 @@ export default function AnswerSubmissionModel() {
       const data = await response.json();
       console.log("Submission successful:", data);
 
-      setIsSubmitting(false);
-      setIsSubmitted(true); // Mark as submitted for this session
-      // Stop the timer on successful submission
       if (timerIntervalRef.current) {
         clearInterval(timerIntervalRef.current);
+        timerIntervalRef.current = null;
       }
 
-      // Reset after showing success message
+      setIsSubmitting(false);
+      setIsSubmitted(true);
+
       setTimeout(() => {
-        setAnswer(""); // Clear the answer input
-        // You might want to reload the page or navigate away here to show the next daily question or a "submitted" state.
-        // For now, we'll keep it as submitted and disabled.
+        setAnswer("");
       }, 3000);
     } catch (error) {
       console.error("Error submitting answer:", error);
@@ -271,6 +340,10 @@ export default function AnswerSubmissionModel() {
   const cancelSubmit = () => {
     setShowConfirmation(false);
   };
+
+  const highlightCode = useCallback((code) => {
+    return highlight(code, languages.js);
+  }, []);
 
   const styles = {
     container: {
@@ -318,12 +391,14 @@ export default function AnswerSubmissionModel() {
       border: "2px solid #e0e0e0",
       borderRadius: "15px",
       fontSize: "16px",
-      fontFamily: "monospace",
+      fontFamily:
+        '"Fira Code", "Fira Mono", Consolas, Monaco, "Courier New", monospace',
       resize: "vertical",
       outline: "none",
       backgroundColor: "#ffffff",
       transition: "border-color 0.3s ease",
       boxSizing: "border-box",
+      lineHeight: "1.5",
     },
     answerInputFocused: {
       borderColor: "#ff9d76",
@@ -333,6 +408,56 @@ export default function AnswerSubmissionModel() {
       marginTop: "5px",
       fontSize: "14px",
       color: "#888",
+    },
+    compilerSection: {
+      marginBottom: "20px",
+      padding: "15px",
+      border: "1px solid #e0e0e0",
+      borderRadius: "15px",
+      backgroundColor: "#ffffff",
+    },
+    compilerHeader: {
+      display: "flex",
+      justifyContent: "space-between",
+      alignItems: "center",
+      marginBottom: "10px",
+    },
+    compilerTitle: {
+      fontSize: "16px",
+      fontWeight: "600",
+      color: "#555",
+    },
+    runButton: {
+      padding: "8px 16px",
+      border: "none",
+      borderRadius: "20px",
+      background: "#4CAF50",
+      color: "white",
+      fontSize: "14px",
+      cursor: "pointer",
+      transition: "all 0.3s ease",
+    },
+    runButtonDisabled: {
+      background: "#ccc",
+      cursor: "not-allowed",
+    },
+    outputContainer: {
+      minHeight: "80px",
+      maxHeight: "200px",
+      overflow: "auto",
+      padding: "10px",
+      border: "1px solid #ddd",
+      borderRadius: "8px",
+      backgroundColor: "#f9f9f9",
+      fontFamily: "monospace",
+      fontSize: "14px",
+      whiteSpace: "pre-wrap",
+    },
+    outputSuccess: {
+      color: "#2e7d32",
+    },
+    outputError: {
+      color: "#d32f2f",
     },
     timerContainer: {
       display: "flex",
@@ -359,7 +484,6 @@ export default function AnswerSubmissionModel() {
       background: "#e0e0e0",
       borderRadius: "2px",
     },
-    // The `width` of this style will be overridden by inline style based on `progress` state
     progress: {
       position: "absolute",
       top: 0,
@@ -497,7 +621,6 @@ export default function AnswerSubmissionModel() {
         <div style={styles.timerContainer}>
           <div style={styles.progressBarContainer}>
             <div style={styles.progressBar}></div>
-            {/* Inline style for dynamic width based on progress */}
             <div style={{ ...styles.progress, width: `${progress}%` }}></div>
           </div>
           <div style={styles.timer}>
@@ -512,30 +635,97 @@ export default function AnswerSubmissionModel() {
 
         <div style={styles.answerSection}>
           <label style={styles.answerLabel}>Your Answer:</label>
-          <textarea
+          <div
+            onPaste={handlePaste}
+            onContextMenu={handleContextMenu}
             style={{
               ...styles.answerInput,
               ...(answer && styles.answerInputFocused),
             }}
-            value={answer}
-            onChange={handleAnswerChange}
-            placeholder="Enter your JavaScript code here..."
-            // Disable if no active question, submitting, already submitted, or time has run out
-            disabled={
-              !activeQuestion ||
-              isSubmitting ||
-              isSubmitted ||
-              timeRemainingSeconds <= 0
-            }
-          />
+          >
+            <Editor
+              value={answer}
+              onValueChange={handleAnswerChange}
+              highlight={highlightCode}
+              padding={15}
+              disabled={
+                !activeQuestion ||
+                isSubmitting ||
+                isSubmitted ||
+                timeRemainingSeconds <= 0
+              }
+              placeholder="Enter your JavaScript code here..."
+              style={{
+                fontFamily:
+                  '"Fira Code", "Fira Mono", Consolas, Monaco, "Courier New", monospace',
+                fontSize: "16px",
+                lineHeight: "1.5",
+                minHeight: "120px",
+                outline: "none",
+              }}
+            />
+          </div>
           <div style={styles.characterCounter}>{characterCount} characters</div>
+        </div>
+
+        <div style={styles.compilerSection}>
+          <div style={styles.compilerHeader}>
+            <span style={styles.compilerTitle}>Code Compiler</span>
+            <motion.button
+              style={{
+                ...styles.runButton,
+                ...((!answer.trim() ||
+                  isRunning ||
+                  !activeQuestion ||
+                  timeRemainingSeconds <= 0) &&
+                  styles.runButtonDisabled),
+              }}
+              whileHover={
+                !answer.trim() ||
+                isRunning ||
+                !activeQuestion ||
+                timeRemainingSeconds <= 0
+                  ? {}
+                  : { scale: 1.05, backgroundColor: "#45a049" }
+              }
+              whileTap={
+                !answer.trim() ||
+                isRunning ||
+                !activeQuestion ||
+                timeRemainingSeconds <= 0
+                  ? {}
+                  : { scale: 0.95 }
+              }
+              onClick={runCode}
+              disabled={
+                !answer.trim() ||
+                isRunning ||
+                !activeQuestion ||
+                timeRemainingSeconds <= 0
+              }
+            >
+              {isRunning ? "Running..." : "▶ Run Code"}
+            </motion.button>
+          </div>
+          <div style={styles.outputContainer}>
+            {isRunning ? (
+              <div style={{ color: "#666" }}>Running your code...</div>
+            ) : output ? (
+              <div style={styles.outputSuccess}>{output}</div>
+            ) : error ? (
+              <div style={styles.outputError}>{error}</div>
+            ) : (
+              <div style={{ color: "#999" }}>
+                Output will appear here when you run your code
+              </div>
+            )}
+          </div>
         </div>
 
         <div style={styles.buttonContainer}>
           <motion.button
             style={{
               ...styles.button,
-              // Apply disabled style if any of the conditions are met
               ...((!activeQuestion ||
                 !answer.trim() ||
                 isSubmitting ||
@@ -543,7 +733,6 @@ export default function AnswerSubmissionModel() {
                 timeRemainingSeconds <= 0) &&
                 styles.buttonDisabled),
             }}
-            // Hover and tap effects only if button is not disabled
             whileHover={
               !activeQuestion ||
               !answer.trim() ||
@@ -568,7 +757,6 @@ export default function AnswerSubmissionModel() {
             }
             transition={{ type: "spring", stiffness: 300, damping: 15 }}
             onClick={handleSubmit}
-            // Actual disabled prop for browser handling
             disabled={
               !activeQuestion ||
               !answer.trim() ||
